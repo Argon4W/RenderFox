@@ -21,7 +21,6 @@ package com.github.argon4w.renderfox.opengl.texture.sampler.object.feature;
 
 import com.github.argon4w.renderfox.format.ColorFloat;
 import com.github.argon4w.renderfox.format.ColorInt;
-import com.github.argon4w.renderfox.format.ColorUnion;
 import com.github.argon4w.renderfox.opengl.texture.constant.GLTextureCompareFunction;
 import com.github.argon4w.renderfox.opengl.texture.constant.GLTextureCompareMode;
 import com.github.argon4w.renderfox.opengl.texture.constant.filter.GLTextureFilter;

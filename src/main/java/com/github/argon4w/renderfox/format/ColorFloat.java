@@ -19,7 +19,7 @@
 
 package com.github.argon4w.renderfox.format;
 
-public class ColorFloat {
+public final class ColorFloat implements IColor {
 
 	private final float colorRed;
 	private final float colorGreen;
@@ -67,6 +67,21 @@ public class ColorFloat {
 				colorGreen,
 				colorBlue,
 				colorAlpha
+		);
+	}
+
+	@Override
+	public ColorFloat asFloat() {
+		return this;
+	}
+
+	@Override
+	public ColorInt asInt() {
+		return new ColorInt(
+				(int) colorRed,
+				(int) colorGreen,
+				(int) colorBlue,
+				(int) colorAlpha
 		);
 	}
 }

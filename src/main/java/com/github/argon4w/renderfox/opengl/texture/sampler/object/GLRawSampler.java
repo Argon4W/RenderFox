@@ -22,7 +22,7 @@ package com.github.argon4w.renderfox.opengl.texture.sampler.object;
 import com.github.argon4w.renderfox.data.view.IDataView;
 import com.github.argon4w.renderfox.format.ColorFloat;
 import com.github.argon4w.renderfox.format.ColorInt;
-import com.github.argon4w.renderfox.format.ColorUnion;
+import com.github.argon4w.renderfox.format.IColor;
 import com.github.argon4w.renderfox.opengl.device.texture.GLTextureContext;
 import com.github.argon4w.renderfox.opengl.texture.constant.GLTextureCompareFunction;
 import com.github.argon4w.renderfox.opengl.texture.constant.GLTextureCompareMode;
@@ -42,7 +42,7 @@ public class GLRawSampler extends AbstractGLSamplerStore implements IGLSampler {
 	private			GLTextureWrapFunction		wrapR;
 	private			GLTextureFilter				minFilter;
 	private			GLTextureFilter				magFilter;
-	private			ColorUnion					borderColor;
+	private			IColor						borderColor;
 	private			float						minLOD;
 	private			float						maxLOD;
 	private			float						LODBias;
@@ -59,7 +59,7 @@ public class GLRawSampler extends AbstractGLSamplerStore implements IGLSampler {
 		this.wrapR				= GLTextureWrapFunction		.REPEAT;
 		this.minFilter			= GLTextureFilter			.NEAREST_MIPMAP_LINEAR;
 		this.magFilter			= GLTextureFilter			.LINEAR;
-		this.borderColor		= new ColorUnion();
+		this.borderColor		= null;
 		this.minLOD				= -1000.0f;
 		this.maxLOD				= +1000.0f;
 		this.LODBias			= 0.0f;
@@ -198,7 +198,7 @@ public class GLRawSampler extends AbstractGLSamplerStore implements IGLSampler {
 
 		super.setBorderColorFloat(borderColor);
 
-		this.borderColor = new ColorUnion(borderColor);
+		this.borderColor = borderColor;
 	}
 
 	@Override
@@ -209,7 +209,7 @@ public class GLRawSampler extends AbstractGLSamplerStore implements IGLSampler {
 
 		super.setBorderColorInt(borderColor);
 
-		this.borderColor = new ColorUnion(borderColor);
+		this.borderColor = borderColor;
 	}
 
 	@Override
