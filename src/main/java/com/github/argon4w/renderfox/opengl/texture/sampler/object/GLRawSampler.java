@@ -251,9 +251,8 @@ public class GLRawSampler extends AbstractGLSamplerStore implements IGLSampler {
 			throw new IllegalStateException("The sampler has been deleted.");
 		}
 
-		deleted = true;
-
-		samplerHelper.delete();
+		this.samplerHelper.delete();
+		this.deleted = true;
 	}
 
 	@Override

@@ -45,13 +45,13 @@ public enum GLTextureType implements ITextureType {
 	TEXTURE_CUBE_MAP			(GL13.GL_TEXTURE_CUBE_MAP,				GLGlobalParameter.TEXTURE_CUBE_MAP_BINDING,				GLTextureLevelParameter.TEXTURE_DEPTH,	2,	2, GLTextureFeatures.COMPLETE |	GLTextureFeatures.MIPMAP									| GLTextureFeatures.CUBE),
 	TEXTURE_CUBE_MAP_ARRAY		(GL40.GL_TEXTURE_CUBE_MAP_ARRAY,		GLGlobalParameter.TEXTURE_CUBE_MAP_ARRAY_BINDING,		GLTextureLevelParameter.TEXTURE_DEPTH,	2,	3, GLTextureFeatures.COMPLETE |	GLTextureFeatures.MIPMAP		| GLTextureFeatures.ARRAY	| GLTextureFeatures.CUBE),
 	TEXTURE_2D_MULTISAMPLE		(GL32.GL_TEXTURE_2D_MULTISAMPLE,		GLGlobalParameter.TEXTURE_2D_MULTISAMPLE_BINDING,		GLTextureLevelParameter.INVALID,		-1,	2, GLTextureFeatures.COMPLETE |	GLTextureFeatures.MULTISAMPLED),
-	TEXTURE_2D_MULTISAMPLE_ARRAY(GL32.GL_TEXTURE_2D_MULTISAMPLE_ARRAY,	GLGlobalParameter.TEXTURE_2D_MULTISAMPLE_ARRAY_BINDING,	GLTextureLevelParameter.INVALID,		-1,	3, GLTextureFeatures.COMPLETE |	GLTextureFeatures.MULTISAMPLED	| GLTextureFeatures.ARRAY),
-	CUBE_MAP_POSITIVE_X			(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X,	GLGlobalParameter.TEXTURE_CUBE_MAP_BINDING,				GLTextureLevelParameter.INVALID,		-1,	2,								GLTextureFeatures.MIPMAP),
-	CUBE_MAP_NEGATIVE_X			(GL13.GL_TEXTURE_CUBE_MAP_NEGATIVE_X,	GLGlobalParameter.TEXTURE_CUBE_MAP_BINDING,				GLTextureLevelParameter.INVALID,		-1,	2,								GLTextureFeatures.MIPMAP),
-	CUBE_MAP_POSITIVE_Y			(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_Y,	GLGlobalParameter.TEXTURE_CUBE_MAP_BINDING,				GLTextureLevelParameter.INVALID,		-1,	2,								GLTextureFeatures.MIPMAP),
-	CUBE_MAP_NEGATIVE_Y			(GL13.GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,	GLGlobalParameter.TEXTURE_CUBE_MAP_BINDING,				GLTextureLevelParameter.INVALID,		-1,	2,								GLTextureFeatures.MIPMAP),
-	CUBE_MAP_POSITIVE_Z			(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_Z,	GLGlobalParameter.TEXTURE_CUBE_MAP_BINDING,				GLTextureLevelParameter.INVALID,		-1,	2,								GLTextureFeatures.MIPMAP),
-	CUBE_MAP_NEGATIVE_Z			(GL13.GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,	GLGlobalParameter.TEXTURE_CUBE_MAP_BINDING,				GLTextureLevelParameter.INVALID,		-1,	2,								GLTextureFeatures.MIPMAP);
+	TEXTURE_2D_MULTISAMPLE_ARRAY(GL32.GL_TEXTURE_2D_MULTISAMPLE_ARRAY,	GLGlobalParameter.TEXTURE_2D_MULTISAMPLE_ARRAY_BINDING,	GLTextureLevelParameter.INVALID,		2,	3, GLTextureFeatures.COMPLETE |	GLTextureFeatures.MULTISAMPLED	| GLTextureFeatures.ARRAY),
+	CUBE_MAP_POSITIVE_X			(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X,	GLGlobalParameter.TEXTURE_CUBE_MAP_BINDING,				GLTextureLevelParameter.INVALID,		-1,	2,								GLTextureFeatures.MIPMAP									| GLTextureFeatures.CUBE),
+	CUBE_MAP_NEGATIVE_X			(GL13.GL_TEXTURE_CUBE_MAP_NEGATIVE_X,	GLGlobalParameter.TEXTURE_CUBE_MAP_BINDING,				GLTextureLevelParameter.INVALID,		-1,	2,								GLTextureFeatures.MIPMAP									| GLTextureFeatures.CUBE),
+	CUBE_MAP_POSITIVE_Y			(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_Y,	GLGlobalParameter.TEXTURE_CUBE_MAP_BINDING,				GLTextureLevelParameter.INVALID,		-1,	2,								GLTextureFeatures.MIPMAP									| GLTextureFeatures.CUBE),
+	CUBE_MAP_NEGATIVE_Y			(GL13.GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,	GLGlobalParameter.TEXTURE_CUBE_MAP_BINDING,				GLTextureLevelParameter.INVALID,		-1,	2,								GLTextureFeatures.MIPMAP									| GLTextureFeatures.CUBE),
+	CUBE_MAP_POSITIVE_Z			(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_Z,	GLGlobalParameter.TEXTURE_CUBE_MAP_BINDING,				GLTextureLevelParameter.INVALID,		-1,	2,								GLTextureFeatures.MIPMAP									| GLTextureFeatures.CUBE),
+	CUBE_MAP_NEGATIVE_Z			(GL13.GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,	GLGlobalParameter.TEXTURE_CUBE_MAP_BINDING,				GLTextureLevelParameter.INVALID,		-1,	2,								GLTextureFeatures.MIPMAP									| GLTextureFeatures.CUBE);
 
 	public static final GLTextureType[] CUBE_MAP_FACES = new GLTextureType[] {
 			GLTextureType.CUBE_MAP_POSITIVE_X, GLTextureType.CUBE_MAP_NEGATIVE_X,
@@ -115,6 +115,10 @@ public enum GLTextureType implements ITextureType {
 
 	public int getLayerIndex() {
 		return layerIndex;
+	}
+
+	public boolean isLayered() {
+		return layerIndex >= 0;
 	}
 
 	public int getBindingConstant() {

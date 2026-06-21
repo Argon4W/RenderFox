@@ -42,6 +42,34 @@ public class DataViewStack implements AutoCloseable {
 		return new AddressDataView(stack.nmalloc((int) bytes), bytes);
 	}
 
+	public IDataView<?> ofZeros(long bytes) {
+		return new AddressDataView(stack.ncalloc(1, 1, (int) bytes), bytes);
+	}
+
+	public IDataView<?> aByte(byte value) {
+		return of(1L).putByte(0L, value);
+	}
+
+	public IDataView<?> aShort(short value) {
+		return ofShorts(1L).putShort(0L, value);
+	}
+
+	public IDataView<?> aInt(int value) {
+		return ofInts(1L).putInt(0L, value);
+	}
+
+	public IDataView<?> aLong(long value) {
+		return ofLongs(1L).putLong(0L, value);
+	}
+
+	public IDataView<?> aFloat(float value) {
+		return ofFloats(1L).putFloat(0L, value);
+	}
+
+	public IDataView<?> aDouble(double value) {
+		return ofDoubles(1L).putDouble(0L, value);
+	}
+
 	public IDataView<?> ofShorts(long shorts) {
 		return of(Short.BYTES * shorts);
 	}
@@ -60,6 +88,26 @@ public class DataViewStack implements AutoCloseable {
 
 	public IDataView<?> ofDoubles(long doubles) {
 		return of(Double.BYTES * doubles);
+	}
+
+	public IDataView<?> ofShortsZeros(long shorts) {
+		return ofZeros(Short.BYTES * shorts);
+	}
+
+	public IDataView<?> ofIntsZeros(long ints) {
+		return ofZeros(Integer.BYTES * ints);
+	}
+
+	public IDataView<?> ofLongsZeros(long longs) {
+		return ofZeros(Long.BYTES * longs);
+	}
+
+	public IDataView<?> ofFloatsZeros(long floats) {
+		return ofZeros(Float.BYTES * floats);
+	}
+
+	public IDataView<?> ofDoublesZeros(long doubles) {
+		return ofZeros(Double.BYTES * doubles);
 	}
 
 	public IDataView<?> of(byte[] bytes) {
@@ -86,28 +134,82 @@ public class DataViewStack implements AutoCloseable {
 		return ofDoubles(doubles.length).putDoubles(0L, doubles);
 	}
 
-	public IDataView<?> aByte(byte value) {
-		return of(1L).putByte(0L, value);
+	public IDataView<?> of(
+			byte[]	bytes,
+			int		offset,
+			int		length
+	) {
+		return of(bytes.length).putBytes(
+				0L,
+				bytes,
+				offset,
+				length
+		);
 	}
 
-	public IDataView<?> aShort(short value) {
-		return ofShorts(1L).putShort(0L, value);
+	public IDataView<?> ofShorts(
+			short[]	shorts,
+			int		offset,
+			int		length
+	) {
+		return ofShorts(shorts.length).putShorts(
+				0L,
+				shorts,
+				offset,
+				length
+		);
 	}
 
-	public IDataView<?> aInt(int value) {
-		return ofInts(1L).putInt(0L, value);
+	public IDataView<?> ofInts(
+			int[]	ints,
+			int		offset,
+			int		length
+	) {
+		return ofInts(ints.length).putInts(
+				0L,
+				ints,
+				offset,
+				length
+		);
 	}
 
-	public IDataView<?> aLong(long value) {
-		return ofLongs(1L).putLong(0L, value);
+	public IDataView<?> ofLongs(
+			long[]	longs,
+			int		offset,
+			int		length
+	) {
+		return ofLongs(longs.length).putLongs(
+				0L,
+				longs,
+				offset,
+				length
+		);
 	}
 
-	public IDataView<?> aFloat(float value) {
-		return ofFloats(1L).putFloat(0L, value);
+	public IDataView<?> ofFloats(
+			float[]	floats,
+			int		offset,
+			int		length
+	) {
+		return ofFloats(floats.length).putFloats(
+				0L,
+				floats,
+				offset,
+				length
+		);
 	}
 
-	public IDataView<?> aDouble(double value) {
-		return ofDoubles(1L).putDouble(0L, value);
+	public IDataView<?> ofDoubles(
+			double[]	doubles,
+			int			offset,
+			int			length
+	) {
+		return ofDoubles(doubles.length).putDoubles(
+				0L,
+				doubles,
+				offset,
+				length
+		);
 	}
 
 	public static DataViewStack stackPush() {

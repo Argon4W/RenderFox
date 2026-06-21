@@ -21,8 +21,8 @@ package com.github.argon4w.renderfox.data.coordinate;
 
 public interface IDataRange {
 
-	long		getOffset	();
-	long		getLength	();
-	IDataRange	withOffset	(long newOffset);
-	IDataRange	withLength	(long newLength);
+	long				getOffset	();
+	long				getLength	();
+	default IDataRange	withOffset	(long newOffset) { return new DataRange(newOffset, getLength()); }
+	default IDataRange	withLength	(long newLength) { return new DataRange(getOffset(), newLength); }
 }

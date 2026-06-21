@@ -21,25 +21,17 @@ package com.github.argon4w.renderfox.data.view.wrapped;
 
 import com.github.argon4w.renderfox.data.view.DataViewStack;
 import com.github.argon4w.renderfox.data.view.IDataView;
-import com.github.argon4w.renderfox.format.IDataType;
 
 public class StackDataView extends DataViewWrapper<StackDataView> implements AutoCloseable {
 
 	private final DataViewStack	dataViewStack;
 	private final IDataView<?>	dataView;
 
-	public StackDataView(DataViewStack dataViewStack, long capacity) {
-		this.dataViewStack	= dataViewStack;
-		this.dataView		= dataViewStack.of(capacity);
-	}
-
-	public StackDataView(
-			DataViewStack	dataViewStack,
-			long			address,
-			long			size
-	) {
-		this.dataViewStack	= dataViewStack;
-		this.dataView		= dataViewStack.asDataView(address, size);
+	public StackDataView(long capacity, boolean zeros) {
+		this.dataViewStack	= DataViewStack.stackPush();
+		this.dataView		= zeros
+				? dataViewStack.of		(capacity)
+				: dataViewStack.ofZeros	(capacity);
 	}
 
 	@Override
@@ -52,20 +44,36 @@ public class StackDataView extends DataViewWrapper<StackDataView> implements Aut
 		dataViewStack.close();
 	}
 
-	public static StackDataView asDataView(long address, long size) {
-		return new StackDataView(
-				DataViewStack.stackPush(),
-				address,
-				size
-		);
-	}
-
 	public static StackDataView of(long bytes) {
-		return new StackDataView(DataViewStack.stackPush(), bytes);
+		return new StackDataView(bytes, false);
 	}
 
-	public static StackDataView of(IDataType type, long size) {
-		return of((int) (type.getSize() * size));
+	public static StackDataView ofZeros(long bytes) {
+		return new StackDataView(bytes, true);
+	}
+
+	public static StackDataView aByte(byte value) {
+		return of(1L).putByte(0L, value);
+	}
+
+	public static StackDataView aShort(short value) {
+		return ofShorts(1L).putShort(0L, value);
+	}
+
+	public static StackDataView aInt(int value) {
+		return ofInts(1L).putInt(0L, value);
+	}
+
+	public static StackDataView aLong(long value) {
+		return ofLongs(1L).putLong(0L, value);
+	}
+
+	public static StackDataView aFloat(float value) {
+		return ofFloats(1L).putFloat(0L, value);
+	}
+
+	public static StackDataView aDouble(double value) {
+		return ofDoubles(1L).putDouble(0L, value);
 	}
 
 	public static StackDataView ofShorts(long shorts) {
@@ -86,6 +94,26 @@ public class StackDataView extends DataViewWrapper<StackDataView> implements Aut
 
 	public static StackDataView ofDoubles(long doubles) {
 		return of(Double.BYTES * doubles);
+	}
+
+	public static StackDataView ofShortsZeros(long shorts) {
+		return ofZeros(Short.BYTES * shorts);
+	}
+
+	public static StackDataView ofIntsZeros(long ints) {
+		return ofZeros(Integer.BYTES * ints);
+	}
+
+	public static StackDataView ofLongsZeros(long longs) {
+		return ofZeros(Long.BYTES * longs);
+	}
+
+	public static StackDataView ofFloatsZeros(long floats) {
+		return ofZeros(Float.BYTES * floats);
+	}
+
+	public static StackDataView ofDoublesZeros(long doubles) {
+		return ofZeros(Double.BYTES * doubles);
 	}
 
 	public static StackDataView of(byte[] bytes) {
@@ -112,27 +140,81 @@ public class StackDataView extends DataViewWrapper<StackDataView> implements Aut
 		return ofDoubles(doubles.length).putDoubles(0L, doubles);
 	}
 
-	public static StackDataView aByte(byte value) {
-		return of(1L).putByte(0L, value);
+	public static StackDataView of(
+			byte[] bytes,
+			int offset,
+			int length
+	) {
+		return of(bytes.length).putBytes(
+				0L,
+				bytes,
+				offset,
+				length
+		);
 	}
 
-	public static StackDataView aShort(short value) {
-		return ofShorts(1L).putShort(0L, value);
+	public static StackDataView ofShorts(
+			short[]	shorts,
+			int		offset,
+			int		length
+	) {
+		return ofShorts(shorts.length).putShorts(
+				0L,
+				shorts,
+				offset,
+				length
+		);
 	}
 
-	public static StackDataView aInt(int value) {
-		return ofInts(1L).putInt(0L, value);
+	public static StackDataView ofInts(
+			int[]	ints,
+			int		offset,
+			int		length
+	) {
+		return ofInts(ints.length).putInts(
+				0L,
+				ints,
+				offset,
+				length
+		);
 	}
 
-	public static StackDataView aLong(long value) {
-		return ofLongs(1L).putLong(0L, value);
+	public static StackDataView ofLongs(
+			long[]	longs,
+			int		offset,
+			int		length
+	) {
+		return ofLongs(longs.length).putLongs(
+				0L,
+				longs,
+				offset,
+				length
+		);
 	}
 
-	public static StackDataView aFloat(float value) {
-		return ofFloats(1L).putFloat(0L, value);
+	public static StackDataView ofFloats(
+			float[]	floats,
+			int		offset,
+			int		length
+	) {
+		return ofFloats(floats.length).putFloats(
+				0L,
+				floats,
+				offset,
+				length
+		);
 	}
 
-	public static StackDataView aDouble(double value) {
-		return ofDoubles(1L).putDouble(0L, value);
+	public static StackDataView ofDoubles(
+			double[]	doubles,
+			int			offset,
+			int			length
+	) {
+		return ofDoubles(doubles.length).putDoubles(
+				0L,
+				doubles,
+				offset,
+				length
+		);
 	}
 }

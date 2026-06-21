@@ -58,7 +58,7 @@ public abstract class AbstractBufferMultiBind implements IBufferMultiBind {
 
 		try (var bufferHandlesView = StackDataView.ofInts(bufferBlockCount)) {
 			for (var index = 0; index < bufferBlockCount; index++) {
-				bufferHandlesView.putInt((long) index * Integer.BYTES, buffers[index].getBufferHandle());
+				bufferHandlesView.putIntAligned(index, buffers[index].getBufferHandle());
 			}
 
 			bindBuffersBase(
@@ -124,7 +124,7 @@ public abstract class AbstractBufferMultiBind implements IBufferMultiBind {
 		     var bufferLengthsView = StackDataView.ofLongs	(bufferLengths)
 		) {
 			for (var index = 0; index < bufferBlockCount; index ++) {
-				bufferHandlesView.putInt((long) index * Integer.BYTES, buffers[index].getBufferHandle());
+				bufferHandlesView.putIntAligned(index, buffers[index].getBufferHandle());
 			}
 
 			bindBuffersRange(
@@ -153,9 +153,9 @@ public abstract class AbstractBufferMultiBind implements IBufferMultiBind {
 			for (var index = 0; index < bufferBlockCount; index ++) {
 				var bufferBind = bufferBinds[index];
 
-				bufferHandlesView.putInt	((long) index * Integer	.BYTES, bufferBind.bufferHandle	());
-				bufferOffsetsView.putLong	((long) index * Long	.BYTES, bufferBind.offset		());
-				bufferLengthsView.putLong	((long) index * Long	.BYTES, bufferBind.length		());
+				bufferHandlesView.putIntAligned	(index, bufferBind.bufferHandle	());
+				bufferOffsetsView.putLongAligned(index, bufferBind.offset		());
+				bufferLengthsView.putLongAligned(index, bufferBind.length		());
 			}
 
 			bindBuffersRange(

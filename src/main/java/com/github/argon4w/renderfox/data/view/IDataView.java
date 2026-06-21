@@ -26,9 +26,10 @@ public interface IDataView<T extends IDataView<T>> {
 	<R extends IDataView<R>> R as(IDataViewDecorator<R> dataViewDecorator);
 
 	IDataView<?>	slice();
-	IDataView<?>	slice(long offset, long length);
+	IDataView<?>	slice(long			length);
+	IDataView<?>	slice(IDataRange	range);
 	IDataRange		flush();
-	IDataRange		flush(long offset, long length);
+	IDataRange		flush(IDataRange	range);
 
 	long	capacity	();
 	long	remaining	();
@@ -207,4 +208,10 @@ public interface IDataView<T extends IDataView<T>> {
 			long	offset,
 			long	length
 	);
+
+	default T putShortAligned	(long position, short	value) { return putShort	(position * Short	.BYTES, value); }
+	default T putIntAligned		(long position, int		value) { return putInt		(position * Integer	.BYTES, value); }
+	default T putLongAligned	(long position, long	value) { return putLong		(position * Long	.BYTES, value); }
+	default T putFloatAligned	(long position, float	value) { return putFloat	(position * Float	.BYTES, value); }
+	default T putDoubleAligned	(long position, double	value) { return putDouble	(position * Double	.BYTES, value); }
 }

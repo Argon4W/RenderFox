@@ -28,12 +28,12 @@ import com.github.argon4w.renderfox.opengl.format.GLInternalFormat;
 import com.github.argon4w.renderfox.opengl.texture.GLTextureType;
 import com.github.argon4w.renderfox.opengl.texture.function.GLTextureFunctionsHelper;
 import com.github.argon4w.renderfox.opengl.texture.function.parameter.GLTextureParameter;
+import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLRawTexture;
 import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLTextureBase;
-import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLTextureSetup;
 
 import java.util.Arrays;
 
-public class GLRawTexture extends AbstractGLRawTextureView implements IGLRawTextureView, IGLTextureSetup {
+public class GLRawTexture extends AbstractGLRawTextureView implements IGLRawTexture {
 
 	protected final	GLTextureType				textureType;
 	protected final	GLTextureContext			textureContext;
@@ -166,7 +166,7 @@ public class GLRawTexture extends AbstractGLRawTextureView implements IGLRawText
 		this.immutable			= true;
 		this.setup				= true;
 
-		if (textureMipLevels >= maxMipLevel) {
+		if (textureMipLevels - 1 > maxMipLevel) {
 			this.maxMipLevel			= textureMipLevels - 1;
 			this.mipDimensions[0]		= Arrays.copyOf(this.mipDimensions[0],		textureMipLevels);
 			this.mipDimensions[1]		= Arrays.copyOf(this.mipDimensions[1],		textureMipLevels);
@@ -498,11 +498,11 @@ public class GLRawTexture extends AbstractGLRawTextureView implements IGLRawText
 			throw new IllegalStateException("The texture has been deleted.");
 		}
 
+		textureHelper.delete();
+
 		this.setup		= false;
 		this.immutable	= false;
 		this.deleted	= true;
-
-		textureHelper.delete();
 	}
 
 	@Override

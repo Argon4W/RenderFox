@@ -19,6 +19,16 @@
 
 package com.github.argon4w.renderfox.opengl.framebuffer.function;
 
+import com.github.argon4w.renderfox.opengl.framebuffer.constant.GLFramebufferAttachment;
+
 public interface IGLFramebufferHelperFunctions extends IGLFramebufferQueryFunctions {
 
+	GLFramebufferAttachment	getDrawBuffer			(int framebufferHandle, int index);
+	GLFramebufferAttachment	getReadBuffer			(int framebufferHandle);
+	int						getMaxDrawBuffers		();
+	int						getMaxColorAttachments	();
+	int						getMaxFramebufferWidth	();
+	int						getMaxFramebufferHeight	();
+	int						getMaxFramebufferLayers	();
+	int						getMaxFramebufferSamples();
 }

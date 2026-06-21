@@ -32,12 +32,14 @@ import com.github.argon4w.renderfox.opengl.device.texture.view.TextureViewLegacy
 import com.github.argon4w.renderfox.opengl.texture.GLTextureStateManager;
 import com.github.argon4w.renderfox.opengl.texture.GLTextureType;
 import com.github.argon4w.renderfox.opengl.texture.function.*;
+import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLRawTexture;
 import com.github.argon4w.renderfox.opengl.texture.object.raw.GLRawTexture;
 import com.github.argon4w.renderfox.opengl.texture.pixel.GLPixelStateManager;
 import com.github.argon4w.renderfox.opengl.texture.pixel.function.*;
 import com.github.argon4w.renderfox.opengl.texture.sampler.GLSamplerStateManager;
 import com.github.argon4w.renderfox.opengl.texture.sampler.functions.*;
 import com.github.argon4w.renderfox.opengl.texture.sampler.object.GLRawSampler;
+import com.github.argon4w.renderfox.opengl.texture.sampler.object.IGLSampler;
 
 public class GLTextureContext {
 
@@ -131,7 +133,7 @@ public class GLTextureContext {
 	}
 
 	public GLTextureFunctionsHelper createTextureHelper() {
-		return new GLTextureFunctionsHelper(textureFunctions);
+		return new GLTextureFunctionsHelper(this);
 	}
 
 	public GLPixelFunctionsHelper createPixelHelper() {
@@ -143,19 +145,19 @@ public class GLTextureContext {
 	}
 
 	public GLTextureFunctionsHelper createTextureHelper(GLTextureType textureType, int textureHandle) {
-		return new GLTextureFunctionsHelper(textureFunctions).setTexture(textureHandle, textureType);
+		return new GLTextureFunctionsHelper(this).setTexture(textureHandle, textureType);
 	}
 
 	public GLSamplerFunctionsHelper createSamplerHelper(int samplerHandle) {
 		return new GLSamplerFunctionsHelper(samplerFunctions).setSampler(samplerHandle);
 	}
 
-	public GLRawTexture createRawTexture(GLTextureType textureType) {
-		return new GLRawTexture(this, textureType);
+	public IGLRawTexture createRawTexture(GLTextureType textureType) {
+		return device.getCreateInfo().useCacheProperties() ? new GLRawTexture(this, textureType) : createTextureHelper(textureType, createTextureHandle(textureType));
 	}
 
-	public GLRawSampler createRawSampler() {
-		return new GLRawSampler(this);
+	public IGLSampler createRawSampler() {
+		return device.getCreateInfo().useCacheProperties() ? new GLRawSampler(this) : createSamplerHelper(createSamplerHandle());
 	}
 
 	public GLTextureStateManager getTextureStateManager() {

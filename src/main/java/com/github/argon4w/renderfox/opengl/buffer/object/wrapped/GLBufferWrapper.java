@@ -284,24 +284,6 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 	}
 
 	@Override
-	public IDataRange withOffset(long newOffset) {
-		if (getBuffer() == null) {
-			throw new IllegalStateException("buffer cannot be null.");
-		}
-
-		return getBuffer().withOffset(newOffset);
-	}
-
-	@Override
-	public IDataRange withLength(long newLength) {
-		if (getBuffer() == null) {
-			throw new IllegalStateException("buffer cannot be null.");
-		}
-
-		return getBuffer().withLength(newLength);
-	}
-
-	@Override
 	public int getBufferHandle() {
 		if (getBuffer() == null) {
 			throw new IllegalStateException("buffer cannot be null.");

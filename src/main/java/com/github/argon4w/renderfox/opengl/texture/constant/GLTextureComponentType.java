@@ -29,13 +29,13 @@ import org.lwjgl.opengl.GL31;
 
 public enum GLTextureComponentType {
 
-	INVALID				(-1,							0),
+	INVALID				(-1,							-1),
 	NONE				(GL11.GL_NONE,					0),
 	SIGNED_NORMALIZED	(GL31.GL_SIGNED_NORMALIZED,		GLFormatComponent.NORMALIZED_MASK	|	GLFormatComponent.SIGNED_MASK),
 	UNSIGNED_NORMALIZED	(GL30.GL_UNSIGNED_NORMALIZED,	GLFormatComponent.NORMALIZED_MASK),
 	FLOAT				(GL11.GL_FLOAT,															GLFormatComponent.SIGNED_MASK),
-	INT					(GL11.GL_INT,					GLFormatComponent.INTEGER_MASK		|	GLFormatComponent.SIGNED_MASK),
-	GL_UNSIGNED_INT		(GL11.GL_UNSIGNED_INT,			GLFormatComponent.INTEGER_MASK);
+	SIGNED_INT			(GL11.GL_INT,					GLFormatComponent.INTEGER_MASK		|	GLFormatComponent.SIGNED_MASK),
+	UNSIGNED_INT		(GL11.GL_UNSIGNED_INT,			GLFormatComponent.INTEGER_MASK);
 
 	private static final Int2ReferenceMap<GLTextureComponentType> TABLE_CONSTANT;
 	private static final Int2ReferenceMap<GLTextureComponentType> TABLE_FLAGS;

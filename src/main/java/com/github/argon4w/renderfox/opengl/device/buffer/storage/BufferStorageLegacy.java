@@ -26,6 +26,7 @@ import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBuff
 import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.GLMappedBufferLegacy;
 import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.IGLMappedBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.GLRawBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBuffer;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
 
 public class BufferStorageLegacy extends AbstractBufferStorage {
@@ -36,7 +37,7 @@ public class BufferStorageLegacy extends AbstractBufferStorage {
 
 	@Override
 	protected void setupStorage(
-			GLRawBuffer			buffer,
+			IGLRawBuffer		buffer,
 			long				bufferDataAddress,
 			long				bufferDataOffset,
 			long				bufferDataSize,

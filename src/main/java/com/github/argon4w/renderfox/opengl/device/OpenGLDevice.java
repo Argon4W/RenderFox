@@ -22,6 +22,7 @@ package com.github.argon4w.renderfox.opengl.device;
 import com.github.argon4w.renderfox.opengl.binding.GLBindingSourceType;
 import com.github.argon4w.renderfox.opengl.binding.IGLBindingSource;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
+import com.github.argon4w.renderfox.opengl.device.framebuffer.GLFramebufferContext;
 import com.github.argon4w.renderfox.opengl.device.texture.GLTextureContext;
 import com.github.argon4w.renderfox.opengl.dsa.DirectStateAccessARB;
 import com.github.argon4w.renderfox.opengl.dsa.DirectStateAccessLegacy;

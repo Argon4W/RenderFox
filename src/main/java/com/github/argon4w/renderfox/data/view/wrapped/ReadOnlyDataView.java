@@ -41,7 +41,7 @@ public class ReadOnlyDataView extends DataViewWrapper<ReadOnlyDataView> {
 	}
 
 	@Override
-	public IDataRange flush(long offset, long length) {
+	public IDataRange flush(IDataRange range) {
 		throw new UnsupportedOperationException("Cannot lush a read-only data view.");
 	}
 
@@ -343,7 +343,12 @@ public class ReadOnlyDataView extends DataViewWrapper<ReadOnlyDataView> {
 	}
 
 	@Override
-	public ReadOnlyDataView slice(long offset, long length) {
-		return new ReadOnlyDataView(super.slice(offset, length));
+	public ReadOnlyDataView slice(long length) {
+		return new ReadOnlyDataView(super.slice(length));
+	}
+
+	@Override
+	public ReadOnlyDataView slice(IDataRange range) {
+		return new ReadOnlyDataView(super.slice(range));
 	}
 }

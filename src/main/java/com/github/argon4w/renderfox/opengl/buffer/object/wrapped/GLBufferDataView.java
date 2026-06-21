@@ -22,9 +22,9 @@ package com.github.argon4w.renderfox.opengl.buffer.object.wrapped;
 import com.github.argon4w.renderfox.data.coordinate.DataRange;
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.view.IDataView;
-import com.github.argon4w.renderfox.data.view.wrapped.MappingDataView;
+import com.github.argon4w.renderfox.data.view.wrapped.OffsetDataView;
 
-public class GLBufferDataView extends MappingDataView<GLBufferDataView> implements IGLBufferDataView<GLBufferDataView> {
+public class GLBufferDataView extends OffsetDataView<GLBufferDataView> implements IGLBufferDataView<GLBufferDataView> {
 
 	private final IGLBuffer		buffer;
 	private final IDataView<?>	dataView;
@@ -63,67 +63,73 @@ public class GLBufferDataView extends MappingDataView<GLBufferDataView> implemen
 	}
 
 	@Override
-	public IDataRange flush(long offset, long length) {
-		if (offset < 0) {
+	public IDataRange flush(IDataRange range) {
+		if (range == null) {
+			throw new IllegalArgumentException("Range cannot be null.");
+		}
+
+		if (range.getOffset() < 0) {
 			throw new IllegalArgumentException("Offset cannot be negative.");
 		}
 
-		if (length < 0) {
+		if (range.getLength() < 0) {
 			throw new IllegalArgumentException("Length cannot be negative.");
 		}
 
-		if (offset + length > limit()) {
+		if (range.getOffset() + range.getLength() > limit()) {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of limit.");
 		}
 
-		buffer.getRawBuffer().flushMappedRange(this.offset + offset, length);
+		buffer.getRawBuffer().flushMappedRange(
+				this.offset +	range.getOffset(),
+								range.getLength()
+		);
 
-		return new DataRange(this.offset + offset, length);
+		return new DataRange(
+				this.offset +	range.getOffset(),
+								range.getLength()
+		);
 	}
 
 	@Override
 	public GLBufferDataView slice() {
 		return new GLBufferDataView(
-				buffer,
-				getDataView(),
-				offset + position(),
+				this.buffer,
+				this.dataView,
+				this.offset + position(),
 				remaining()
 		);
 	}
 
 	@Override
-	public GLBufferDataView slice(long offset, long length) {
-		if (offset < 0) {
+	public GLBufferDataView slice(IDataRange range) {
+		if (range == null) {
+			throw new IllegalArgumentException("Range cannot be null.");
+		}
+
+		if (range.getOffset() < 0) {
 			throw new IllegalArgumentException("Offset cannot be negative.");
 		}
 
-		if (length < 0) {
+		if (range.getLength() < 0) {
 			throw new IllegalArgumentException("Length cannot be negative.");
 		}
 
-		if (offset + length > limit()) {
+		if (range.getOffset() + range.getLength() > limit()) {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of mapped length.");
 		}
 
 		return new GLBufferDataView(
 				this.buffer,
 				this.dataView,
-				this.offset + offset,
-				length
+				this.offset +	range.getOffset(),
+								range.getLength()
 		);
 	}
 
 	@Override
-	protected long mapPosition(long position) {
-		if (position < 0) {
-			throw new IllegalArgumentException("Position cannot be negative.");
-		}
-
-		if (position > limit()) {
-			throw new IllegalArgumentException("Position cannot be greater than the value of view limit.");
-		}
-
-		return offset + position;
+	protected long getOffset() {
+		return offset;
 	}
 
 	@Override

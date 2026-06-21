@@ -21,8 +21,9 @@ package com.github.argon4w.renderfox.opengl.texture.sampler.object;
 
 import com.github.argon4w.renderfox.opengl.texture.sampler.object.feature.IGLSamplerBase;
 import com.github.argon4w.renderfox.opengl.texture.sampler.object.feature.IGLSamplerBinding;
+import com.github.argon4w.renderfox.opengl.texture.sampler.object.feature.IGLSamplerModifier;
 import com.github.argon4w.renderfox.opengl.texture.sampler.object.feature.IGLSamplerStore;
 
-public interface IGLSampler extends IGLSamplerBase, IGLSamplerStore, IGLSamplerBinding {
+public interface IGLSampler extends IGLSamplerBase, IGLSamplerStore, IGLSamplerModifier, IGLSamplerBinding {
 
 }

@@ -26,7 +26,7 @@ import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBuff
 import com.github.argon4w.renderfox.opengl.buffer.object.GLBufferCreateInfo;
 import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.GLMappedBufferCreateInfo;
 import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.IGLMappedBuffer;
-import com.github.argon4w.renderfox.opengl.buffer.object.raw.GLRawBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.GLBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.IGLBuffer;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
@@ -41,7 +41,7 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 	}
 
 	protected abstract void setupStorage(
-			GLRawBuffer			buffer,
+			IGLRawBuffer		buffer,
 			long				bufferDataAddress,
 			long				bufferDataOffset,
 			long				bufferDataSize,

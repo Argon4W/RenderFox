@@ -21,12 +21,9 @@ package com.github.argon4w.renderfox.opengl.texture.object.raw;
 
 import com.github.argon4w.renderfox.opengl.device.texture.GLTextureContext;
 import com.github.argon4w.renderfox.opengl.texture.constant.GLTextureComponent;
-import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLTextureBase;
-import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLTextureOperation;
-import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLTextureParameter;
-import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLTextureStore;
+import com.github.argon4w.renderfox.opengl.texture.object.feature.*;
 
-public interface IGLRawTextureView extends IGLTextureBase, IGLTextureParameter, IGLTextureStore, IGLTextureOperation {
+public interface IGLRawTextureView extends IGLRawTextureBase, IGLTextureParameter, IGLTextureOperation {
 
 	IGLRawTextureView view(
 			GLTextureComponent	viewSwizzleRed,

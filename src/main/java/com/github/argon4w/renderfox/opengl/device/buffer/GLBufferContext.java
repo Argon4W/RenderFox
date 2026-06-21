@@ -24,6 +24,7 @@ import com.github.argon4w.renderfox.opengl.buffer.GLBufferStateManager;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.*;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.GLRawBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBuffer;
 import com.github.argon4w.renderfox.opengl.device.OpenGLDevice;
 import com.github.argon4w.renderfox.opengl.device.buffer.bind.BufferMultiBindARB;
 import com.github.argon4w.renderfox.opengl.device.buffer.bind.BufferMultiBindLegacy;
@@ -85,8 +86,8 @@ public class GLBufferContext {
 		return new GLBufferFunctionsHelper(bufferFunctions).setBuffer(bufferHandle, bufferType);
 	}
 
-	public GLRawBuffer createRawBuffer(GLBufferType bufferType) {
-		return new GLRawBuffer(this, bufferType);
+	public IGLRawBuffer createRawBuffer(GLBufferType bufferType) {
+		return device.getCreateInfo().useCacheProperties() ? new GLRawBuffer(this, bufferType) : createBufferHelper(bufferType, createBufferHandle(bufferType));
 	}
 
 	public IResizeMethod getResizeMethod() {

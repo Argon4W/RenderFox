@@ -20,14 +20,16 @@
 package com.github.argon4w.renderfox.opengl.constant;
 
 import com.github.argon4w.renderfox.data.UnionValue;
-import org.lwjgl.system.MemoryUtil;
+import com.github.argon4w.renderfox.data.view.DataViews;
 
 public abstract class AbstractGLDefinedConstants<T> implements IGLDefinedConstants<T> {
 
 	@Override
 	public boolean isValidAddress(T context, long address) {
+		var view = DataViews.wrapInts(address, getCount());
+
 		for (var i = 0; i < getCount(); i ++) {
-			if (!isValidValue(context, new UnionValue(MemoryUtil.memGetInt(address + i * 4L)))) {
+			if (!isValidValue(context, new UnionValue(view.getInt((long) i * Integer.BYTES)))) {
 				return false;
 			}
 		}

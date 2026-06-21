@@ -19,7 +19,7 @@
 
 package com.github.argon4w.renderfox.opengl.binding;
 
-import com.github.argon4w.renderfox.data.view.wrapped.StackDataView;
+import com.github.argon4w.renderfox.data.view.DataViews;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferBlockType;
 import com.github.argon4w.renderfox.opengl.device.OpenGLDevice;
@@ -265,15 +265,15 @@ public class GLCachedBindingSource implements IGLBindingSource {
 			long			bufferHandlesAddress,
 			GLBufferType	bufferType
 	) {
-		try (var bufferHandlesView = StackDataView.asDataView(bufferHandlesAddress, (long) bufferCounts * Integer.BYTES)) {
-			for (var index = 0; index < bufferCounts; index ++) {
-				bindBufferBase(
-						bufferTarget,
-						bufferTargetFirstIndex + index,
-						bufferHandlesView.getInt(index),
-						bufferType
-				);
-			}
+		var bufferHandlesView = DataViews.wrapInts(bufferHandlesAddress, bufferCounts);
+
+		for (var index = 0; index < bufferCounts; index ++) {
+			bindBufferBase(
+					bufferTarget,
+					bufferTargetFirstIndex + index,
+					bufferHandlesView.getInt(index),
+					bufferType
+			);
 		}
 	}
 
@@ -287,20 +287,19 @@ public class GLCachedBindingSource implements IGLBindingSource {
 			long			bufferLengthsAddress,
 			GLBufferType	bufferType
 	) {
-		try (var bufferHandlesView = StackDataView.asDataView(bufferHandlesAddress, (long) bufferCounts * Integer	.BYTES);
-		     var bufferOffsetsView = StackDataView.asDataView(bufferOffsetsAddress, (long) bufferCounts * Long		.BYTES);
-		     var bufferLengthsView = StackDataView.asDataView(bufferLengthsAddress, (long) bufferCounts * Long		.BYTES)
-		) {
-			for (var index = 0; index < bufferCounts; index ++) {
-				bindBufferRange(
-						bufferTarget,
-						bufferTargetFirstIndex + index,
-						bufferHandlesView.getInt	(index),
-						bufferOffsetsView.getLong	(index),
-						bufferLengthsView.getLong	(index),
-						bufferType
-				);
-			}
+		var bufferHandlesView = DataViews.wrapInts	(bufferHandlesAddress, bufferCounts);
+		var bufferOffsetsView = DataViews.wrapLongs	(bufferOffsetsAddress, bufferCounts);
+		var bufferLengthsView = DataViews.wrapLongs	(bufferLengthsAddress, bufferCounts);
+
+		for (var index = 0; index < bufferCounts; index ++) {
+			bindBufferRange(
+					bufferTarget,
+					bufferTargetFirstIndex + index,
+					bufferHandlesView.getInt	(index),
+					bufferOffsetsView.getLong	(index),
+					bufferLengthsView.getLong	(index),
+					bufferType
+			);
 		}
 	}
 

@@ -21,11 +21,11 @@ package com.github.argon4w.renderfox.opengl.texture.sampler.functions;
 
 import com.github.argon4w.renderfox.data.view.IDataView;
 import com.github.argon4w.renderfox.opengl.texture.function.parameter.GLTextureParameter;
+import com.github.argon4w.renderfox.opengl.texture.sampler.object.IGLSampler;
 import com.github.argon4w.renderfox.opengl.texture.sampler.object.feature.AbstractGLSamplerStore;
-import com.github.argon4w.renderfox.opengl.texture.sampler.object.feature.IGLSamplerBase;
 import com.github.argon4w.renderfox.opengl.texture.sampler.object.feature.IGLSamplerOperation;
 
-public class GLSamplerFunctionsHelper extends AbstractGLSamplerStore implements IGLSamplerBase, IGLSamplerOperation {
+public class GLSamplerFunctionsHelper extends AbstractGLSamplerStore implements IGLSampler, IGLSamplerOperation {
 
 	private final	IGLSamplerFunctions	samplerFunctions;
 	private			int					samplerHandle;

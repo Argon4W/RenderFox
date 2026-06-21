@@ -19,6 +19,7 @@
 
 package com.github.argon4w.renderfox;
 
+import com.github.argon4w.renderfox.data.coordinate.DataRange;
 import com.github.argon4w.renderfox.format.ColorFloat;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferBlockType;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;

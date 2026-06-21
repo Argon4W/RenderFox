@@ -47,12 +47,12 @@ public abstract class DataViewWrapper<T extends DataViewWrapper<T>> implements I
 	}
 
 	@Override
-	public IDataRange flush(long offset, long length) {
+	public IDataRange flush(IDataRange range) {
 		if (getDataView() == null) {
 			throw new IllegalStateException("DataView cannot be null.");
 		}
 
-		return getDataView().flush(offset, length);
+		return getDataView().flush(range);
 	}
 
 	@Override
@@ -939,11 +939,20 @@ public abstract class DataViewWrapper<T extends DataViewWrapper<T>> implements I
 	}
 
 	@Override
-	public IDataView<?> slice(long offset, long length) {
+	public IDataView<?> slice(long length) {
 		if (getDataView() == null) {
 			throw new IllegalStateException("DataView cannot be null.");
 		}
 
-		return getDataView().slice(offset, length);
+		return getDataView().slice(length);
+	}
+
+	@Override
+	public IDataView<?> slice(IDataRange range) {
+		if (getDataView() == null) {
+			throw new IllegalStateException("DataView cannot be null.");
+		}
+
+		return getDataView().slice(range);
 	}
 }

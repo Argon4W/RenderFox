@@ -21,9 +21,8 @@ package com.github.argon4w.renderfox.opengl.framebuffer.function;
 
 import com.github.argon4w.renderfox.opengl.binding.IGLBindingSource;
 import com.github.argon4w.renderfox.opengl.device.OpenGLDevice;
-import com.github.argon4w.renderfox.opengl.dsa.IDirectStateAccess;
 import com.github.argon4w.renderfox.opengl.framebuffer.GLFramebufferType;
-import org.lwjgl.opengl.GL30;
+import com.github.argon4w.renderfox.opengl.texture.GLTextureType;
 
 public class GLFramebufferFunctionsCached implements IGLFramebufferFunctions {
 
@@ -62,33 +61,37 @@ public class GLFramebufferFunctionsCached implements IGLFramebufferFunctions {
 
 	@Override
 	public void framebufferTexture(
-			int framebufferHandle,
-			int framebufferAttachment,
-			int textureHandle,
-			int textureMipLevel
+			int				framebufferHandle,
+			int				framebufferAttachment,
+			int				textureHandle,
+			GLTextureType	textureType,
+			int				textureMipLevel
 	) {
 		framebufferFunctions.framebufferTexture(
 				framebufferHandle,
 				framebufferAttachment,
 				textureHandle,
+				textureType,
 				textureMipLevel
 		);
 	}
 
 	@Override
 	public void framebufferTextureLayer(
-			int framebufferHandle,
-			int framebufferAttachment,
-			int textureHandle,
-			int textureMipLevel,
-			int framebufferLayer
+			int				framebufferHandle,
+			int				framebufferAttachment,
+			int				textureHandle,
+			GLTextureType	textureType,
+			int				textureMipLevel,
+			int				textureLayer
 	) {
 		framebufferFunctions.framebufferTextureLayer(
 				framebufferHandle,
 				framebufferAttachment,
 				textureHandle,
+				textureType,
 				textureMipLevel,
-				framebufferLayer
+				textureLayer
 		);
 	}
 

@@ -36,7 +36,7 @@ public class GLBufferFunctionsErrorCheck implements IGLBufferFunctions {
 	public void initialize(OpenGLDevice device) {
 		bufferFunctions.initialize(device);
 
-		errorChecker = new GLErrorChecker(device);
+		errorChecker = device.getErrorChecker();
 	}
 
 	@Override

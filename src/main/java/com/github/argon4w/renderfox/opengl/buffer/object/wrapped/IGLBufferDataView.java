@@ -19,11 +19,13 @@
 
 package com.github.argon4w.renderfox.opengl.buffer.object.wrapped;
 
+import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.view.IMappedDataView;
 
 public interface IGLBufferDataView<T extends IGLBufferDataView<T>> extends IMappedDataView<T>, AutoCloseable {
 
 	void					close();
 	IGLBufferDataView<?>	slice();
-	IGLBufferDataView<?>	slice(long offset, long length);
+	IGLBufferDataView<?>	slice(long			length);
+	IGLBufferDataView<?>	slice(IDataRange	range);
 }

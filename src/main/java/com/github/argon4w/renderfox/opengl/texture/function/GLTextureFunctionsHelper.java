@@ -19,26 +19,28 @@
 
 package com.github.argon4w.renderfox.opengl.texture.function;
 
+import com.github.argon4w.renderfox.opengl.device.texture.GLTextureContext;
 import com.github.argon4w.renderfox.opengl.format.GLDataType;
 import com.github.argon4w.renderfox.opengl.format.GLFormat;
 import com.github.argon4w.renderfox.opengl.format.GLInternalFormat;
 import com.github.argon4w.renderfox.opengl.texture.GLTextureType;
 import com.github.argon4w.renderfox.opengl.texture.function.parameter.GLTextureLevelParameter;
 import com.github.argon4w.renderfox.opengl.texture.function.parameter.GLTextureParameter;
-import com.github.argon4w.renderfox.opengl.texture.object.feature.AbstractGLTextureStore;
+import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLRawTexture;
 import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLTextureBase;
-import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLTextureOperation;
-import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLTextureSetup;
+import com.github.argon4w.renderfox.opengl.texture.object.raw.AbstractGLRawTextureView;
 
-public class GLTextureFunctionsHelper extends AbstractGLTextureStore implements IGLTextureBase, IGLTextureOperation, IGLTextureSetup {
+public class GLTextureFunctionsHelper extends AbstractGLRawTextureView implements IGLRawTexture {
 
+	private final	GLTextureContext	textureContext;
 	private final	IGLTextureFunctions	textureFunctions;
 
 	private			int					textureHandle;
 	private			GLTextureType		textureType;
 
-	public GLTextureFunctionsHelper(IGLTextureFunctions textureFunctions) {
-		this.textureFunctions	= textureFunctions;
+	public GLTextureFunctionsHelper(GLTextureContext textureContext) {
+		this.textureContext		= textureContext;
+		this.textureFunctions	= textureContext.getTextureFunctions();
 		this.textureHandle		= -1;
 		this.textureType		= null;
 	}
@@ -926,12 +928,27 @@ public class GLTextureFunctionsHelper extends AbstractGLTextureStore implements 
 	}
 
 	@Override
+	public int getLayer(int mipLevel) {
+		return switch (textureType.getLayerIndex()) {
+			case 0 -> getWidth	(mipLevel);
+			case 1 -> getHeight	(mipLevel);
+			case 2 -> getDepth	(mipLevel);
+			default -> 0;
+		};
+	}
+
+	@Override
 	public boolean isDeleted() {
 		throw new UnsupportedOperationException("Unsupported Operation.");
 	}
 
 	@Override
+	public GLTextureContext getTextureContext() {
+		return textureContext;
+	}
+
+	@Override
 	public boolean isSamplable() {
-		return true;
+		return false;
 	}
 }

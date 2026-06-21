@@ -25,6 +25,7 @@ import com.github.argon4w.renderfox.opengl.texture.GLTextureType;
 import com.github.argon4w.renderfox.opengl.texture.object.GLTexture;
 import com.github.argon4w.renderfox.opengl.texture.object.GLTextureCreateInfo;
 import com.github.argon4w.renderfox.opengl.texture.object.IGLTexture;
+import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLRawTexture;
 import com.github.argon4w.renderfox.opengl.texture.object.raw.GLRawTexture;
 
 public abstract class AbstractTextureStorage implements ITextureStorage {
@@ -36,7 +37,7 @@ public abstract class AbstractTextureStorage implements ITextureStorage {
 	}
 
 	public abstract void setupStorage(
-			GLRawTexture		texture,
+			IGLRawTexture		texture,
 			int					textureMipLevels,
 			int					textureWidth,
 			int					textureHeight,
@@ -45,7 +46,7 @@ public abstract class AbstractTextureStorage implements ITextureStorage {
 	);
 
 	public abstract void setupStorageMultisampled(
-			GLRawTexture		texture,
+			IGLRawTexture		texture,
 			boolean				textureFixedSamples,
 			int					textureSamples,
 			int					textureWidth,

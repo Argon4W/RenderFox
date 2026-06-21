@@ -28,6 +28,7 @@ import com.github.argon4w.renderfox.opengl.texture.constant.filter.GLMipmapMode;
 import com.github.argon4w.renderfox.opengl.texture.function.parameter.GLTextureParameter;
 import com.github.argon4w.renderfox.opengl.texture.sampler.functions.GLSamplerFunctionsHelper;
 import com.github.argon4w.renderfox.opengl.texture.sampler.object.GLRawSampler;
+import com.github.argon4w.renderfox.opengl.texture.sampler.object.IGLSampler;
 
 public class SamplerCreatorAnisotropy extends SamplerCreatorLegacy {
 
@@ -37,7 +38,7 @@ public class SamplerCreatorAnisotropy extends SamplerCreatorLegacy {
 
 	@Override
 	protected void setupSampler(
-			GLRawSampler				sampler,
+			IGLSampler 					sampler,
 			GLTextureCompareFunction	compareFunction,
 			GLTextureCompareMode		compareMode,
 			GLTextureWrapFunction		wrapS,

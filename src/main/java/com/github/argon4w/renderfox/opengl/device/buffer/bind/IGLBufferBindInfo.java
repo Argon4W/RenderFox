@@ -20,7 +20,7 @@
 package com.github.argon4w.renderfox.opengl.device.buffer.bind;
 
 import com.github.argon4w.renderfox.data.view.AddressDataView;
-import com.github.argon4w.renderfox.data.view.DataViewUtil;
+import com.github.argon4w.renderfox.data.view.DataViews;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferBlockType;
 import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferBase;
 import it.unimi.dsi.fastutil.ints.Int2ObjectAVLTreeMap;
@@ -176,9 +176,9 @@ public interface IGLBufferBindInfo extends AutoCloseable {
 
 		@Override
 		public void close() throws Exception {
-			DataViewUtil.free(bufferHandlesView);
-			DataViewUtil.free(bufferLengthsView);
-			DataViewUtil.free(bufferOffsetsView);
+			DataViews.free(bufferHandlesView);
+			DataViews.free(bufferLengthsView);
+			DataViews.free(bufferOffsetsView);
 		}
 
 		@Override
@@ -220,9 +220,9 @@ public interface IGLBufferBindInfo extends AutoCloseable {
 			public IGLBufferBindInfo build() {
 				var firstIndex			= bufferBinds	.firstIntKey();
 				var bufferCount			= bufferBinds	.size		();
-				var bufferHandlesView	= DataViewUtil	.ofInts		(bufferCount);
-				var bufferOffsetsView	= DataViewUtil	.ofLongs	(bufferCount);
-				var bufferLengthsView	= DataViewUtil	.ofLongs	(bufferCount);
+				var bufferHandlesView	= DataViews		.ofInts		(bufferCount);
+				var bufferOffsetsView	= DataViews		.ofLongs	(bufferCount);
+				var bufferLengthsView	= DataViews		.ofLongs	(bufferCount);
 
 				for (var entry : bufferBinds.int2ObjectEntrySet()) {
 					var bindingPoint	= entry.getIntKey	();

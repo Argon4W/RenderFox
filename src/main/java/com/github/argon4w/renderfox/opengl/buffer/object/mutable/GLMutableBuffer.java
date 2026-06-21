@@ -58,7 +58,7 @@ public class GLMutableBuffer extends GLBufferWrapper implements IMutableSizeObje
 	}
 
 	@Override
-	public GLMutableBufferView view(IDataRange viewRange) {
+	public IGLBuffer view(IDataRange viewRange) {
 		if (buffer.isDeleted()) {
 			throw new IllegalStateException("The buffer has been deleted.");
 		}

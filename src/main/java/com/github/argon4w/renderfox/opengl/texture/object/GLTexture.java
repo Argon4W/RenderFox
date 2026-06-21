@@ -106,6 +106,10 @@ public class GLTexture implements IGLTexture {
 
 	@Override
 	public void clearFullImage(int clearMipLevel, ColorFloat clearColor) {
+		if (clearColor == null) {
+			throw new IllegalArgumentException("ClearColor cannot be null.");
+		}
+
 		try (var dataView = StackDataView.ofFloats(4L)) {
 			var internalFormat = texture.getInternalFormat(clearMipLevel);
 
@@ -125,6 +129,10 @@ public class GLTexture implements IGLTexture {
 
 	@Override
 	public void clearFullImage(int clearMipLevel, ColorInt clearColor) {
+		if (clearColor == null) {
+			throw new IllegalArgumentException("ClearColor cannot be null.");
+		}
+
 		try (var dataView = StackDataView.ofInts(4L)) {
 			var internalFormat = texture.getInternalFormat(clearMipLevel);
 
@@ -198,6 +206,10 @@ public class GLTexture implements IGLTexture {
 			Extent3D	clearExtent,
 			ColorFloat	clearColor
 	) {
+		if (clearColor == null) {
+			throw new IllegalArgumentException("ClearColor cannot be null.");
+		}
+
 		if (clearOffset == null) {
 			throw new IllegalArgumentException("ClearOffset cannot be null.");
 		}
@@ -236,6 +248,10 @@ public class GLTexture implements IGLTexture {
 			Extent3D	clearExtent,
 			ColorInt	clearColor
 	) {
+		if (clearColor == null) {
+			throw new IllegalArgumentException("ClearColor cannot be null.");
+		}
+
 		try (var dataView = StackDataView.ofInts(4L)) {
 			var internalFormat = texture.getInternalFormat(clearMipLevel);
 
@@ -417,6 +433,11 @@ public class GLTexture implements IGLTexture {
 	@Override
 	public int getMaxLevel() {
 		return texture.getMaxLevel();
+	}
+
+	@Override
+	public int getRealLevel(int mipLevel) {
+		return texture.getRealLevel(mipLevel);
 	}
 
 	@Override

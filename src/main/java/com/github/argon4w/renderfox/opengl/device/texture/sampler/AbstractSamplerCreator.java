@@ -28,7 +28,6 @@ import com.github.argon4w.renderfox.opengl.texture.constant.GLTextureWrapFunctio
 import com.github.argon4w.renderfox.opengl.texture.constant.filter.GLFilterMode;
 import com.github.argon4w.renderfox.opengl.texture.constant.filter.GLMipmapMode;
 import com.github.argon4w.renderfox.opengl.texture.sampler.object.GLRawSampler;
-import com.github.argon4w.renderfox.opengl.texture.sampler.object.GLSampler;
 import com.github.argon4w.renderfox.opengl.texture.sampler.object.GLSamplerCreateInfo;
 import com.github.argon4w.renderfox.opengl.texture.sampler.object.IGLSampler;
 
@@ -41,7 +40,7 @@ public abstract class AbstractSamplerCreator implements ISamplerCreator {
 	}
 
 	protected abstract void setupSampler(
-			GLRawSampler				sampler,
+			IGLSampler					sampler,
 			GLTextureCompareFunction	compareFunction,
 			GLTextureCompareMode		compareMode,
 			GLTextureWrapFunction		wrapS,
@@ -130,7 +129,7 @@ public abstract class AbstractSamplerCreator implements ISamplerCreator {
 
 		sampler.setBorderColorFloat(borderColor);
 
-		return new GLSampler(sampler);
+		return sampler;
 	}
 
 	@Override
@@ -169,6 +168,6 @@ public abstract class AbstractSamplerCreator implements ISamplerCreator {
 
 		sampler.setBorderColorInt(borderColor);
 
-		return new GLSampler(sampler);
+		return sampler;
 	}
 }

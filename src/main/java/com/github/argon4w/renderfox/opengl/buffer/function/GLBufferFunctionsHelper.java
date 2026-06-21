@@ -31,12 +31,15 @@ import com.github.argon4w.renderfox.opengl.buffer.object.feature.AbstractGLBuffe
 import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferBase;
 import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferOperation;
 import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferSetup;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.GLRawBufferView;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 import com.github.argon4w.renderfox.opengl.format.GLDataType;
 import com.github.argon4w.renderfox.opengl.format.GLFormat;
 import com.github.argon4w.renderfox.opengl.format.GLInternalFormat;
 import com.github.argon4w.renderfox.util.RangeUtils;
 
-public class GLBufferFunctionsHelper extends AbstractGLBufferStore implements IGLBufferBase, IGLBufferSetup, IGLBufferOperation {
+public class GLBufferFunctionsHelper extends AbstractGLBufferStore implements IGLRawBuffer {
 
 	private final	IGLBufferFunctions	bufferFunctions;
 
@@ -708,5 +711,20 @@ public class GLBufferFunctionsHelper extends AbstractGLBufferStore implements IG
 	@Override
 	public boolean isDeleted() {
 		throw new UnsupportedOperationException("Unsupported Operation.");
+	}
+
+	@Override
+	public IGLRawBufferView view(long offset, long length) {
+		return new GLRawBufferView(this, offset, length);
+	}
+
+	@Override
+	public long getLength() {
+		return getBufferSize();
+	}
+
+	@Override
+	public long getOffset() {
+		return 0;
 	}
 }

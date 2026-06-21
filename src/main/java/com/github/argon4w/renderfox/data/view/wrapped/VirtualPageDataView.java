@@ -19,9 +19,11 @@
 
 package com.github.argon4w.renderfox.data.view.wrapped;
 
+import com.github.argon4w.renderfox.data.coordinate.IDataRange;
+import com.github.argon4w.renderfox.data.view.AbstractDataView;
 import com.github.argon4w.renderfox.data.view.IDataView;
 
-public class VirtualPageDataView extends MappingDataView<VirtualPageDataView> {
+public class VirtualPageDataView extends AbstractDataView<VirtualPageDataView> {
 
 	private final IDataView<?>	dataView;
 	private final long[]		pageAddresses;
@@ -64,14 +66,105 @@ public class VirtualPageDataView extends MappingDataView<VirtualPageDataView> {
 		return pageSize - (position + this.offset) % pageSize;
 	}
 
-	@Override
 	protected long mapPosition(long position) {
 		return getPageAddress((position + offset) / pageSize) + (position + offset) % pageSize;
 	}
 
 	@Override
-	public IDataView<?> getDataView() {
-		return dataView;
+	public VirtualPageDataView putByte(long position, byte value) {
+		dataView.putByte(mapPosition(position), value);
+		return this;
+	}
+
+	@Override
+	public VirtualPageDataView putShort(long position, short value) {
+		var byte0 = (byte) (value >>> 0 & 0xFF);
+		var byte1 = (byte) (value >>> 8 & 0xFF);
+
+		dataView.putByte(mapPosition(position + 0L), byte0);
+		dataView.putByte(mapPosition(position + 1L), byte1);
+
+		return this;
+	}
+
+	@Override
+	public VirtualPageDataView putInt(long position, int value) {
+		var byte0 = (byte) (value >>> 0		& 0xFF);
+		var byte1 = (byte) (value >>> 8		& 0xFF);
+		var byte2 = (byte) (value >>> 16	& 0xFF);
+		var byte3 = (byte) (value >>> 24	& 0xFF);
+
+		dataView.putByte(mapPosition(position + 0L), byte0);
+		dataView.putByte(mapPosition(position + 1L), byte1);
+		dataView.putByte(mapPosition(position + 2L), byte2);
+		dataView.putByte(mapPosition(position + 3L), byte3);
+
+		return this;
+	}
+
+	@Override
+	public VirtualPageDataView putLong(long position, long value) {
+		var byte0 = (byte) (value >>> 0		& 0xFF);
+		var byte1 = (byte) (value >>> 8		& 0xFF);
+		var byte2 = (byte) (value >>> 16	& 0xFF);
+		var byte3 = (byte) (value >>> 24	& 0xFF);
+		var byte4 = (byte) (value >>> 32	& 0xFF);
+		var byte5 = (byte) (value >>> 40	& 0xFF);
+		var byte6 = (byte) (value >>> 48	& 0xFF);
+		var byte7 = (byte) (value >>> 56	& 0xFF);
+
+		dataView.putByte(mapPosition(position + 0L), byte0);
+		dataView.putByte(mapPosition(position + 1L), byte1);
+		dataView.putByte(mapPosition(position + 2L), byte2);
+		dataView.putByte(mapPosition(position + 3L), byte3);
+		dataView.putByte(mapPosition(position + 4L), byte4);
+		dataView.putByte(mapPosition(position + 5L), byte5);
+		dataView.putByte(mapPosition(position + 6L), byte6);
+		dataView.putByte(mapPosition(position + 7L), byte7);
+
+		return this;
+	}
+
+	@Override
+	public VirtualPageDataView putFloat(long position, float value) {
+		var intBits = Float.floatToRawIntBits(value);
+
+		var byte0 = (byte) (intBits >>> 0	& 0xFF);
+		var byte1 = (byte) (intBits >>> 8	& 0xFF);
+		var byte2 = (byte) (intBits >>> 16	& 0xFF);
+		var byte3 = (byte) (intBits >>> 24	& 0xFF);
+
+		dataView.putByte(mapPosition(position + 0L), byte0);
+		dataView.putByte(mapPosition(position + 1L), byte1);
+		dataView.putByte(mapPosition(position + 2L), byte2);
+		dataView.putByte(mapPosition(position + 3L), byte3);
+
+		return this;
+	}
+
+	@Override
+	public VirtualPageDataView putDouble(long position, double value) {
+		var intBits = Double.doubleToRawLongBits(value);
+
+		var byte0 = (byte) (intBits >>> 0	& 0xFF);
+		var byte1 = (byte) (intBits >>> 8	& 0xFF);
+		var byte2 = (byte) (intBits >>> 16	& 0xFF);
+		var byte3 = (byte) (intBits >>> 24	& 0xFF);
+		var byte4 = (byte) (intBits >>> 32	& 0xFF);
+		var byte5 = (byte) (intBits >>> 40	& 0xFF);
+		var byte6 = (byte) (intBits >>> 48	& 0xFF);
+		var byte7 = (byte) (intBits >>> 56	& 0xFF);
+
+		dataView.putByte(mapPosition(position + 0L), byte0);
+		dataView.putByte(mapPosition(position + 1L), byte1);
+		dataView.putByte(mapPosition(position + 2L), byte2);
+		dataView.putByte(mapPosition(position + 3L), byte3);
+		dataView.putByte(mapPosition(position + 4L), byte4);
+		dataView.putByte(mapPosition(position + 5L), byte5);
+		dataView.putByte(mapPosition(position + 6L), byte6);
+		dataView.putByte(mapPosition(position + 7L), byte7);
+
+		return this;
 	}
 
 	@Override
@@ -84,15 +177,15 @@ public class VirtualPageDataView extends MappingDataView<VirtualPageDataView> {
 		while (length > 0) {
 			var batchSize = Math.min(length, getBatchSize(position));
 
-			super.putBuffer(
-					position,
+			dataView.putBuffer(
+					mapPosition(position),
 					value,
 					offset,
 					batchSize
 			);
 
-			offset		+= batchSize;
 			position	+= batchSize;
+			offset		+= batchSize;
 			length		-= batchSize;
 		}
 
@@ -109,15 +202,15 @@ public class VirtualPageDataView extends MappingDataView<VirtualPageDataView> {
 		while (length > 0) {
 			var batchSize = Math.min(length, getBatchSize(position));
 
-			super.putBuffer(
-					position,
+			dataView.putBuffer(
+					mapPosition(position),
 					valueAddress,
 					offset,
 					batchSize
 			);
 
-			offset		+= batchSize;
 			position	+= batchSize;
+			offset		+= batchSize;
 			length		-= batchSize;
 		}
 
@@ -134,15 +227,15 @@ public class VirtualPageDataView extends MappingDataView<VirtualPageDataView> {
 		while (length > 0) {
 			var batchSize = Math.min(length, getBatchSize(position));
 
-			super.putBytes(
-					position,
+			dataView.putBytes(
+					mapPosition(position),
 					value,
 					offset,
 					batchSize
 			);
 
-			offset		+= batchSize;
 			position	+= batchSize;
+			offset		+= batchSize;
 			length		-= batchSize;
 		}
 
@@ -156,19 +249,14 @@ public class VirtualPageDataView extends MappingDataView<VirtualPageDataView> {
 			long	offset,
 			long	length
 	) {
-		while (length > 0) {
-			var batchSize = Math.min(length * Short.BYTES, getBatchSize(position)) / Short.BYTES;
-
-			super.putShorts(
-					position,
+		if (length > 0) {
+			try (var view = StackDataView.ofShorts(
 					value,
-					offset,
-					batchSize
-			);
-
-			position	+= batchSize * Short.BYTES;
-			offset		+= batchSize;
-			length		-= batchSize;
+					(int) offset,
+					(int) length
+			)) {
+				putBuffer(view);
+			}
 		}
 
 		return this;
@@ -181,19 +269,14 @@ public class VirtualPageDataView extends MappingDataView<VirtualPageDataView> {
 			long	offset,
 			long	length
 	) {
-		while (length > 0) {
-			var batchSize = Math.min(length * Integer.BYTES, getBatchSize(position)) / Integer.BYTES;
-
-			super.putInts(
-					position,
+		if (length > 0) {
+			try (var view = StackDataView.ofInts(
 					value,
-					offset,
-					batchSize
-			);
-
-			position	+= batchSize * Integer.BYTES;
-			offset		+= batchSize;
-			length		-= batchSize;
+					(int) offset,
+					(int) length
+			)) {
+				putBuffer(view);
+			}
 		}
 
 		return this;
@@ -206,19 +289,14 @@ public class VirtualPageDataView extends MappingDataView<VirtualPageDataView> {
 			long	offset,
 			long	length
 	) {
-		while (length > 0) {
-			var batchSize = Math.min(length * Long.BYTES, getBatchSize(position)) / Long.BYTES;
-
-			super.putLongs(
-					position,
+		if (length > 0) {
+			try (var view = StackDataView.ofLongs(
 					value,
-					offset,
-					batchSize
-			);
-
-			position	+= batchSize * Long.BYTES;
-			offset		+= batchSize;
-			length		-= batchSize;
+					(int) offset,
+					(int) length
+			)) {
+				putBuffer(view);
+			}
 		}
 
 		return this;
@@ -231,19 +309,14 @@ public class VirtualPageDataView extends MappingDataView<VirtualPageDataView> {
 			long	offset,
 			long	length
 	) {
-		while (length > 0) {
-			var batchSize = Math.min(length * Float.BYTES, getBatchSize(position)) / Float.BYTES;
-
-			super.putFloats(
-					position,
+		if (length > 0) {
+			try (var view = StackDataView.ofFloats(
 					value,
-					offset,
-					batchSize
-			);
-
-			position	+= batchSize * Float.BYTES;
-			offset		+= batchSize;
-			length		-= batchSize;
+					(int) offset,
+					(int) length
+			)) {
+				putBuffer(view);
+			}
 		}
 
 		return this;
@@ -256,22 +329,99 @@ public class VirtualPageDataView extends MappingDataView<VirtualPageDataView> {
 			long		offset,
 			long		length
 	) {
-		while (length > 0) {
-			var batchSize = Math.min(length * Double.BYTES, getBatchSize(position)) / Double.BYTES;
-
-			super.putDoubles(
-					position,
+		if (length > 0) {
+			try (var view = StackDataView.ofDoubles(
 					value,
-					offset,
-					batchSize
-			);
-
-			position	+= batchSize * Double.BYTES;
-			offset		+= batchSize;
-			length		-= batchSize;
+					(int) offset,
+					(int) length
+			)) {
+				putBuffer(view);
+			}
 		}
 
 		return this;
+	}
+
+	@Override
+	public byte getByte(long position) {
+		return dataView.getByte(mapPosition(position));
+	}
+
+	@Override
+	public short getShort(long position) {
+		var byte0 = dataView.getByte(mapPosition(position + 0L));
+		var byte1 = dataView.getByte(mapPosition(position + 1L));
+
+		return (short) ((byte1 & 0xFF) << 8
+				|		(byte0 & 0xFF) << 0);
+	}
+
+	@Override
+	public int getInt(long position) {
+		var byte0 = dataView.getByte(mapPosition(position + 0L));
+		var byte1 = dataView.getByte(mapPosition(position + 1L));
+		var byte2 = dataView.getByte(mapPosition(position + 2L));
+		var byte3 = dataView.getByte(mapPosition(position + 3L));
+
+		return (	(byte3 & 0xFF) << 24
+				|	(byte2 & 0xFF) << 16
+				|	(byte1 & 0xFF) << 8
+				|	(byte0 & 0xFF) << 0);
+	}
+
+	@Override
+	public long getLong(long position) {
+		var byte0 = dataView.getByte(mapPosition(position + 0L));
+		var byte1 = dataView.getByte(mapPosition(position + 1L));
+		var byte2 = dataView.getByte(mapPosition(position + 2L));
+		var byte3 = dataView.getByte(mapPosition(position + 3L));
+		var byte4 = dataView.getByte(mapPosition(position + 4L));
+		var byte5 = dataView.getByte(mapPosition(position + 5L));
+		var byte6 = dataView.getByte(mapPosition(position + 6L));
+		var byte7 = dataView.getByte(mapPosition(position + 7L));
+
+		return (	(byte7 & 0xFFL) << 56
+				|	(byte6 & 0xFFL) << 48
+				|	(byte5 & 0xFFL) << 40
+				|	(byte4 & 0xFFL) << 32
+				|	(byte3 & 0xFFL) << 24
+				|	(byte2 & 0xFFL) << 16
+				|	(byte1 & 0xFFL) << 8
+				|	(byte0 & 0xFFL) << 0);
+	}
+
+	@Override
+	public float getFloat(long position) {
+		var byte0 = dataView.getByte(mapPosition(position + 0L));
+		var byte1 = dataView.getByte(mapPosition(position + 1L));
+		var byte2 = dataView.getByte(mapPosition(position + 2L));
+		var byte3 = dataView.getByte(mapPosition(position + 3L));
+
+		return Float.intBitsToFloat((byte3 & 0xFF) << 24
+				|					(byte2 & 0xFF) << 16
+				|					(byte1 & 0xFF) << 8
+				|					(byte0 & 0xFF) << 0);
+	}
+
+	@Override
+	public double getDouble(long position) {
+		var byte0 = dataView.getByte(mapPosition(position + 0L));
+		var byte1 = dataView.getByte(mapPosition(position + 1L));
+		var byte2 = dataView.getByte(mapPosition(position + 2L));
+		var byte3 = dataView.getByte(mapPosition(position + 3L));
+		var byte4 = dataView.getByte(mapPosition(position + 4L));
+		var byte5 = dataView.getByte(mapPosition(position + 5L));
+		var byte6 = dataView.getByte(mapPosition(position + 6L));
+		var byte7 = dataView.getByte(mapPosition(position + 7L));
+
+		return Double.longBitsToDouble(	(byte7 & 0xFFL) << 56
+				|						(byte6 & 0xFFL) << 48
+				|						(byte5 & 0xFFL) << 40
+				|						(byte4 & 0xFFL) << 32
+				|						(byte3 & 0xFFL) << 24
+				|						(byte2 & 0xFFL) << 16
+				|						(byte1 & 0xFFL) << 8
+				|						(byte0 & 0xFFL) << 0);
 	}
 
 	@Override
@@ -284,15 +434,15 @@ public class VirtualPageDataView extends MappingDataView<VirtualPageDataView> {
 		while (length > 0) {
 			var batchSize = Math.min(length, getBatchSize(position));
 
-			super.getBytes(
+			dataView.getBytes(
 					position,
 					value,
 					offset,
 					batchSize
 			);
 
-			offset		+= batchSize;
 			position	+= batchSize;
+			offset		+= batchSize;
 			length		-= batchSize;
 		}
 
@@ -317,24 +467,28 @@ public class VirtualPageDataView extends MappingDataView<VirtualPageDataView> {
 	}
 
 	@Override
-	public VirtualPageDataView slice(long offset, long length) {
-		if (offset < 0) {
+	public VirtualPageDataView slice(IDataRange range) {
+		if (range == null) {
+			throw new IllegalArgumentException("Range cannot be null.");
+		}
+
+		if (range.getOffset() < 0) {
 			throw new IllegalArgumentException("Offset cannot be negative.");
 		}
 
-		if (length < 0) {
+		if (range.getLength() < 0) {
 			throw new IllegalArgumentException("Length cannot be negative.");
 		}
 
-		var end = offset + length;
+		var end = range.getOffset() + range.getLength();
 
 		if (end > limit) {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of limit.");
 		}
 
-		var sliceOffset		= (offset + this.offset)	% pageSize;
-		var pageIndexStart	= (offset + this.offset)	/ pageSize;
-		var pageIndexEnd	= end						/ pageSize;
+		var sliceOffset		= (range.getOffset() + this.offset)	% pageSize;
+		var pageIndexStart	= (range.getOffset() + this.offset)	/ pageSize;
+		var pageIndexEnd	= end								/ pageSize;
 
 		return new VirtualPageDataView(
 				dataView,
@@ -343,12 +497,17 @@ public class VirtualPageDataView extends MappingDataView<VirtualPageDataView> {
 				pageIndexEnd	- pageIndexStart,
 				this.pageSize,
 				this.offset + sliceOffset,
-				length
+				range.getLength()
 		);
 	}
 
 	@Override
 	public long address() {
-		throw new UnsupportedOperationException("Unsupported Operation.");
+		throw new UnsupportedOperationException("Unsupported operation.");
+	}
+
+	@Override
+	public boolean isOffHeap() {
+		return dataView.isOffHeap();
 	}
 }

@@ -19,7 +19,6 @@
 
 package com.github.argon4w.renderfox.opengl.buffer.object.wrapped;
 
-import com.github.argon4w.renderfox.data.coordinate.DataRange;
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.view.AddressDataView;
 import com.github.argon4w.renderfox.data.view.IDataViewDecorator;
@@ -95,6 +94,10 @@ public class GLBuffer implements IGLBuffer {
 
 	@Override
 	public void clearAllData(GLInternalFormat internalFormat, ColorFloat clearColor) {
+		if (clearColor == null) {
+			throw new IllegalArgumentException("ClearColor cannot be null.");
+		}
+
 		if (internalFormat == null) {
 			throw new IllegalArgumentException("InternalFormat cannot be null.");
 		}
@@ -120,6 +123,10 @@ public class GLBuffer implements IGLBuffer {
 
 	@Override
 	public void clearAllData(GLInternalFormat internalFormat, ColorInt clearColor) {
+		if (clearColor == null) {
+			throw new IllegalArgumentException("ClearColor cannot be null.");
+		}
+
 		if (internalFormat == null) {
 			throw new IllegalArgumentException("InternalFormat cannot be null.");
 		}
@@ -234,6 +241,10 @@ public class GLBuffer implements IGLBuffer {
 			IDataRange			clearRangeElement,
 			ColorFloat			clearColor
 	) {
+		if (clearColor == null) {
+			throw new IllegalArgumentException("ClearColor cannot be null.");
+		}
+
 		if (clearRangeElement == null) {
 			throw new IllegalArgumentException("ClearRangeClement cannot be null.");
 		}
@@ -269,6 +280,10 @@ public class GLBuffer implements IGLBuffer {
 			IDataRange			clearRangeElement,
 			ColorInt			clearColor
 	) {
+		if (clearColor == null) {
+			throw new IllegalArgumentException("ClearColor cannot be null.");
+		}
+
 		if (clearRangeElement == null) {
 			throw new IllegalArgumentException("ClearRangeClement cannot be null.");
 		}
@@ -469,16 +484,6 @@ public class GLBuffer implements IGLBuffer {
 						viewRange.getLength()
 				)
 		);
-	}
-
-	@Override
-	public IDataRange withOffset(long newOffset) {
-		return new DataRange(newOffset, buffer.getLength());
-	}
-
-	@Override
-	public IDataRange withLength(long newLength) {
-		return new DataRange(buffer.getOffset(), newLength);
 	}
 
 	@Override

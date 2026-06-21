@@ -36,6 +36,7 @@ public class OpenGLDeviceCreateInfo {
 	private final boolean				cacheParameters;
 	private final boolean				cacheStates;
 	private final boolean				manageStates;
+	private final boolean				cacheProperties;
 	private final IResizeMethod			bufferResizeMethod;
 	private final GLBindingSourceType	bindingSourceType;
 
@@ -52,6 +53,7 @@ public class OpenGLDeviceCreateInfo {
 			boolean				cacheParameters,
 			boolean				cacheStates,
 			boolean				manageStates,
+			boolean				cacheProperties,
 			IResizeMethod		bufferResizeMethod,
 			GLBindingSourceType	bindingSourceType
 	) {
@@ -67,6 +69,7 @@ public class OpenGLDeviceCreateInfo {
 		this.cacheParameters		= cacheParameters;
 		this.cacheStates			= cacheStates;
 		this.manageStates			= manageStates;
+		this.cacheProperties		= cacheProperties;
 		this.bufferResizeMethod		= bufferResizeMethod;
 		this.bindingSourceType		= bindingSourceType;
 	}
@@ -119,6 +122,10 @@ public class OpenGLDeviceCreateInfo {
 		return manageStates;
 	}
 
+	public boolean useCacheProperties() {
+		return cacheProperties;
+	}
+
 	public IResizeMethod getBufferResizeMethod() {
 		return bufferResizeMethod;
 	}
@@ -149,6 +156,7 @@ public class OpenGLDeviceCreateInfo {
 		private boolean				cacheParameters;
 		private boolean				cacheStates;
 		private boolean				manageStates;
+		private boolean				cacheProperties;
 		private IResizeMethod		bufferResizeMethod;
 		private GLBindingSourceType	bindingSourceType;
 
@@ -165,6 +173,7 @@ public class OpenGLDeviceCreateInfo {
 			this.cacheParameters		= true;
 			this.manageStates			= true;
 			this.cacheStates			= true;
+			this.cacheProperties		= true;
 			this.bufferResizeMethod		= IResizeMethod			.POWER;
 			this.bindingSourceType		= GLBindingSourceType	.CACHED;
 		}
@@ -229,6 +238,11 @@ public class OpenGLDeviceCreateInfo {
 			return this;
 		}
 
+		public Builder useCacheProperties(boolean value) {
+			this.cacheProperties = value;
+			return this;
+		}
+
 		public Builder withBufferResizeMethod(IResizeMethod value) {
 			this.bufferResizeMethod = value;
 			return this;
@@ -253,6 +267,7 @@ public class OpenGLDeviceCreateInfo {
 					cacheParameters,
 					cacheStates,
 					manageStates,
+					cacheProperties,
 					bufferResizeMethod,
 					bindingSourceType
 			);

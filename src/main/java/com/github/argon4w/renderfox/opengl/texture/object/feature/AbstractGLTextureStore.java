@@ -23,7 +23,6 @@ import com.github.argon4w.renderfox.data.coordinate.extent.Extent3D;
 import com.github.argon4w.renderfox.data.coordinate.extent.IExtent3D;
 import com.github.argon4w.renderfox.opengl.format.GLInternalFormat;
 import com.github.argon4w.renderfox.opengl.texture.GLTextureType;
-import com.github.argon4w.renderfox.opengl.texture.constant.GLTextureComponent;
 import com.github.argon4w.renderfox.opengl.texture.function.parameter.GLTextureLevelParameter;
 import com.github.argon4w.renderfox.opengl.texture.function.parameter.GLTextureParameter;
 import org.lwjgl.opengl.GL11;
@@ -53,6 +52,11 @@ public abstract class AbstractGLTextureStore implements IGLTextureStore, IGLText
 	@Override
 	public int getMaxLevel() {
 		return getParameterInt(GLTextureParameter.TEXTURE_MAX_LEVEL);
+	}
+
+	@Override
+	public int getRealLevel(int mipLevel) {
+		return mipLevel;
 	}
 
 	@Override

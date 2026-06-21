@@ -43,14 +43,4 @@ public class DataRange implements IDataRange {
 	public long getLength() {
 		return length;
 	}
-
-	@Override
-	public IDataRange withOffset(long newOffset) {
-		return new DataRange(newOffset, length);
-	}
-
-	@Override
-	public IDataRange withLength(long newLength) {
-		return new DataRange(offset, newLength);
-	}
 }

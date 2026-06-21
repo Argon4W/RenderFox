@@ -19,8 +19,8 @@
 
 package com.github.argon4w.renderfox.opengl.buffer.function.parameter;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
+import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL44;
@@ -38,10 +38,10 @@ public enum GLBufferParameter {
 	BUFFER_STORAGE_FLAGS	(GL44.GL_BUFFER_STORAGE_FLAGS,		32),
 	GL_BUFFER_USAGE			(GL15.GL_BUFFER_USAGE,				32);
 
-	private static final Int2ObjectMap<GLBufferParameter> TABLE;
+	private static final Int2ReferenceMap<GLBufferParameter> TABLE;
 
 	static {
-		TABLE = new Int2ObjectOpenHashMap<>();
+		TABLE = new Int2ReferenceOpenHashMap<>();
 
 		for (var bufferParameter : GLBufferParameter.values()) {
 			TABLE.put(bufferParameter.constant, bufferParameter);

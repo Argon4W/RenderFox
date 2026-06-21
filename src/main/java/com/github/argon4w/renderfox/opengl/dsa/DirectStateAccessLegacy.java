@@ -24,6 +24,8 @@ import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.device.OpenGLDevice;
 import com.github.argon4w.renderfox.opengl.format.GLDataType;
 import com.github.argon4w.renderfox.opengl.format.GLFormat;
+import com.github.argon4w.renderfox.opengl.framebuffer.GLFramebufferStateManager;
+import com.github.argon4w.renderfox.opengl.framebuffer.GLFramebufferType;
 import com.github.argon4w.renderfox.opengl.texture.GLTextureStateManager;
 import com.github.argon4w.renderfox.opengl.texture.GLTextureType;
 import com.github.argon4w.renderfox.opengl.texture.function.parameter.GLTextureLevelParameter;
@@ -31,7 +33,6 @@ import com.github.argon4w.renderfox.opengl.texture.sampler.GLSamplerStateManager
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opengl.*;
 
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.List;
@@ -39,21 +40,24 @@ import java.util.Map;
 
 public class DirectStateAccessLegacy implements IDirectStateAccess {
 
-	private GLBufferStateManager	bufferStateManager;
-	private GLTextureStateManager	textureStateManager;
-	private GLSamplerStateManager	samplerStateManager;
+	private GLBufferStateManager		bufferStateManager;
+	private GLTextureStateManager		textureStateManager;
+	private GLSamplerStateManager		samplerStateManager;
+	private GLFramebufferStateManager	framebufferStateManager;
 
 	public DirectStateAccessLegacy() {
-		this.bufferStateManager		= null;
-		this.textureStateManager	= null;
-		this.samplerStateManager	= null;
+		this.bufferStateManager			= null;
+		this.textureStateManager		= null;
+		this.samplerStateManager		= null;
+		this.framebufferStateManager	= null;
 	}
 
 	@Override
 	public void initialize(OpenGLDevice device) {
-		this.bufferStateManager		= device.getBufferContext	().getBufferStateManager	();
-		this.textureStateManager	= device.getTextureContext	().getTextureStateManager	();
-		this.samplerStateManager	= device.getTextureContext	().getSamplerStateManager	();
+		this.bufferStateManager			= device.getBufferContext		().getBufferStateManager		();
+		this.textureStateManager		= device.getTextureContext		().getTextureStateManager		();
+		this.samplerStateManager		= device.getTextureContext		().getSamplerStateManager		();
+		this.framebufferStateManager	= device.getFramebufferContext	().getFramebufferStateManager	();
 	}
 
 	@Override
@@ -443,7 +447,11 @@ public class DirectStateAccessLegacy implements IDirectStateAccess {
 
 	@Override
 	public int createFramebuffer() {
-		return ARBDirectStateAccess.glCreateFramebuffers();
+		var framebufferHandle = GL30.glGenFramebuffers();
+
+		framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> {});
+
+		return framebufferHandle;
 	}
 
 	@Override
@@ -452,48 +460,50 @@ public class DirectStateAccessLegacy implements IDirectStateAccess {
 			int framebufferParameter,
 			int framebufferParameterValue
 	) {
-		ARBDirectStateAccess.glNamedFramebufferParameteri(
-				framebufferHandle,
+		framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> GL43.glFramebufferParameteri(
+				GLFramebufferType.DRAW_FRAMEBUFFER.getConstant(),
 				framebufferParameter,
 				framebufferParameterValue
-		);
+		));
 	}
 
 	@Override
 	public void framebufferTexture(
-			int framebufferHandle,
-			int framebufferAttachment,
-			int textureHandle,
-			int textureMipLevel
+			int				framebufferHandle,
+			int				framebufferAttachment,
+			int				textureHandle,
+			GLTextureType	textureType,
+			int				textureMipLevel
 	) {
-		ARBDirectStateAccess.glNamedFramebufferTexture(
-				framebufferHandle,
+		framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> GL32.glFramebufferTexture(
+				GLFramebufferType.DRAW_FRAMEBUFFER.getConstant(),
 				framebufferAttachment,
 				textureHandle,
 				textureMipLevel
-		);
+		));
 	}
 
 	@Override
 	public void framebufferTextureLayer(
-			int framebufferHandle,
-			int framebufferAttachment,
-			int textureHandle,
-			int textureMipLevel,
-			int framebufferLayer
+			int				framebufferHandle,
+			int				framebufferAttachment,
+			int				textureHandle,
+			GLTextureType	textureType,
+			int				textureMipLevel,
+			int				textureLayer
 	) {
-		ARBDirectStateAccess.glNamedFramebufferTextureLayer(
-				framebufferHandle,
+		framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> GL30.glFramebufferTextureLayer(
+				GLFramebufferType.DRAW_FRAMEBUFFER.getConstant(),
 				framebufferAttachment,
 				textureHandle,
 				textureMipLevel,
-				framebufferLayer
-		);
+				textureLayer
+		));
 	}
 
 	@Override
 	public void framebufferDrawBuffer(int framebufferHandle, int framebufferDrawBuffer) {
-		ARBDirectStateAccess.glNamedFramebufferDrawBuffer(framebufferHandle, framebufferDrawBuffer);
+		framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> GL11.glDrawBuffer(framebufferDrawBuffer));
 	}
 
 	@Override
@@ -502,16 +512,12 @@ public class DirectStateAccessLegacy implements IDirectStateAccess {
 			int		framebufferDrawBufferCount,
 			long	framebufferDrawBufferDataAddress
 	) {
-		ARBDirectStateAccess.nglNamedFramebufferDrawBuffers(
-				framebufferHandle,
-				framebufferDrawBufferCount,
-				framebufferDrawBufferDataAddress
-		);
+		framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> GL20.nglDrawBuffers(framebufferDrawBufferCount, framebufferDrawBufferDataAddress));
 	}
 
 	@Override
 	public void framebufferReadBuffer(int framebufferHandle, int framebufferReadBuffer) {
-		ARBDirectStateAccess.glNamedFramebufferReadBuffer(framebufferHandle, framebufferReadBuffer);
+		framebufferStateManager.runScoped(Map.of(GLFramebufferType.READ_FRAMEBUFFER, framebufferHandle), () -> GL11.glReadBuffer(framebufferReadBuffer));
 	}
 
 	@Override
@@ -520,11 +526,11 @@ public class DirectStateAccessLegacy implements IDirectStateAccess {
 			int		framebufferAttachmentCount,
 			long	framebufferAttachmentDataAddress
 	) {
-		ARBDirectStateAccess.nglInvalidateNamedFramebufferData(
-				framebufferHandle,
+		framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> GL43.nglInvalidateFramebuffer(
+				GLFramebufferType.DRAW_FRAMEBUFFER.getConstant(),
 				framebufferAttachmentCount,
 				framebufferAttachmentDataAddress
-		);
+		));
 	}
 
 	@Override
@@ -537,15 +543,15 @@ public class DirectStateAccessLegacy implements IDirectStateAccess {
 			int		invalidateWidth,
 			int		invalidateHeight
 	) {
-		ARBDirectStateAccess.nglInvalidateNamedFramebufferSubData(
-				framebufferHandle,
+		framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> GL43.nglInvalidateSubFramebuffer(
+				GLFramebufferType.DRAW_FRAMEBUFFER.getConstant(),
 				framebufferAttachmentCount,
 				framebufferAttachmentDataAddress,
 				invalidatePositionX,
 				invalidatePositionY,
 				invalidateWidth,
 				invalidateHeight
-		);
+		));
 	}
 
 	@Override
@@ -555,12 +561,11 @@ public class DirectStateAccessLegacy implements IDirectStateAccess {
 			int		clearDrawBuffer,
 			long	clearDataAddress
 	) {
-		ARBDirectStateAccess.nglClearNamedFramebufferiv(
-				framebufferHandle,
+		framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> GL30.nglClearBufferiv(
 				clearBuffer,
 				clearDrawBuffer,
 				clearDataAddress
-		);
+		));
 	}
 
 	@Override
@@ -570,12 +575,11 @@ public class DirectStateAccessLegacy implements IDirectStateAccess {
 			int		clearDrawBuffer,
 			long	clearDataAddress
 	) {
-		ARBDirectStateAccess.nglClearNamedFramebufferuiv(
-				framebufferHandle,
+		framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> GL30.nglClearBufferuiv(
 				clearBuffer,
 				clearDrawBuffer,
 				clearDataAddress
-		);
+		));
 	}
 
 	@Override
@@ -585,12 +589,11 @@ public class DirectStateAccessLegacy implements IDirectStateAccess {
 			int		clearDrawBuffer,
 			long	clearDataAddress
 	) {
-		ARBDirectStateAccess.nglClearNamedFramebufferfv(
-				framebufferHandle,
+		framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> GL30.nglClearBufferfv(
 				clearBuffer,
 				clearDrawBuffer,
 				clearDataAddress
-		);
+		));
 	}
 
 	@Override
@@ -601,13 +604,12 @@ public class DirectStateAccessLegacy implements IDirectStateAccess {
 			float	clearDepth,
 			int		clearStencil
 	) {
-		ARBDirectStateAccess.glClearNamedFramebufferfi(
-				framebufferHandle,
+		framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> GL30.glClearBufferfi(
 				clearBuffer,
 				clearDrawBuffer,
 				clearDepth,
 				clearStencil
-		);
+		));
 	}
 
 	@Override
@@ -625,25 +627,29 @@ public class DirectStateAccessLegacy implements IDirectStateAccess {
 			int blitWriteBufferMask,
 			int blitWriteFilter
 	) {
-		ARBDirectStateAccess.glBlitNamedFramebuffer(
-				framebufferHandleRead,
-				framebufferHandleWrite,
-				blitReadPositionXStart,
-				blitReadPositionYStart,
-				blitReadPositionXEnd,
-				blitReadPositionYEnd,
-				blitWritePositionXStart,
-				blitWritePositionYStart,
-				blitWritePositionXEnd,
-				blitWritePositionYEnd,
-				blitWriteBufferMask,
-				blitWriteFilter
+		framebufferStateManager.runScoped(
+				Map.of(
+						GLFramebufferType.READ_FRAMEBUFFER, framebufferHandleRead,
+						GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandleWrite
+				),
+				() -> GL30.glBlitFramebuffer(
+						blitReadPositionXStart,
+						blitReadPositionYStart,
+						blitReadPositionXEnd,
+						blitReadPositionYEnd,
+						blitWritePositionXStart,
+						blitWritePositionYStart,
+						blitWritePositionXEnd,
+						blitWritePositionYEnd,
+						blitWriteBufferMask,
+						blitWriteFilter
+				)
 		);
 	}
 
 	@Override
 	public int checkFramebufferStatus(int framebufferHandle, int framebufferTarget) {
-		return ARBDirectStateAccess.glCheckNamedFramebufferStatus(framebufferHandle, framebufferTarget);
+		return framebufferStateManager.runScoped(Map.of(GLFramebufferType.fromTypeConstant(framebufferTarget), framebufferHandle), () -> GL30.glCheckFramebufferStatus(framebufferTarget));
 	}
 
 	@Override
@@ -652,16 +658,16 @@ public class DirectStateAccessLegacy implements IDirectStateAccess {
 			int		framebufferParameter,
 			long	outDataAddress
 	) {
-		ARBDirectStateAccess.nglGetNamedFramebufferParameteriv(
-				framebufferHandle,
+		framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> GL43.nglGetFramebufferParameteriv(
+				GLFramebufferType.DRAW_FRAMEBUFFER.getConstant(),
 				framebufferParameter,
 				outDataAddress
-		);
+		));
 	}
 
 	@Override
 	public int getFramebufferParameteri(int framebufferHandle, int framebufferParameter) {
-		return ARBDirectStateAccess.glGetNamedFramebufferParameteri(framebufferParameter, framebufferHandle);
+		return framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> GL43.glGetFramebufferParameteri(GLFramebufferType.DRAW_FRAMEBUFFER.getConstant(), framebufferParameter));
 	}
 
 	@Override
@@ -671,12 +677,12 @@ public class DirectStateAccessLegacy implements IDirectStateAccess {
 			int		attachmentParameter,
 			long	outDataAddress
 	) {
-		ARBDirectStateAccess.nglGetNamedFramebufferAttachmentParameteriv(
-				framebufferHandle,
+		framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> GL30.nglGetFramebufferAttachmentParameteriv(
+				GLFramebufferType.DRAW_FRAMEBUFFER.getConstant(),
 				framebufferAttachment,
 				attachmentParameter,
 				outDataAddress
-		);
+		));
 	}
 
 	@Override
@@ -685,11 +691,11 @@ public class DirectStateAccessLegacy implements IDirectStateAccess {
 			int framebufferAttachment,
 			int attachmentParameter
 	) {
-		return ARBDirectStateAccess.glGetNamedFramebufferAttachmentParameteri(
-				framebufferHandle,
+		return framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> GL30.glGetFramebufferAttachmentParameteri(
+				GLFramebufferType.DRAW_FRAMEBUFFER.getConstant(),
 				framebufferAttachment,
 				attachmentParameter
-		);
+		));
 	}
 
 	@Override

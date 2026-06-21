@@ -21,6 +21,7 @@ package com.github.argon4w.renderfox.opengl.device.texture.storage;
 
 import com.github.argon4w.renderfox.opengl.device.texture.GLTextureContext;
 import com.github.argon4w.renderfox.opengl.format.GLInternalFormat;
+import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLRawTexture;
 import com.github.argon4w.renderfox.opengl.texture.object.raw.GLRawTexture;
 import org.lwjgl.system.MemoryUtil;
 
@@ -32,7 +33,7 @@ public class TextureStorageLegacy extends AbstractTextureStorage {
 
 	@Override
 	public void setupStorage(
-			GLRawTexture		texture,
+			IGLRawTexture		texture,
 			int					textureMipLevels,
 			int					textureWidth,
 			int					textureHeight,
@@ -55,7 +56,7 @@ public class TextureStorageLegacy extends AbstractTextureStorage {
 
 	@Override
 	public void setupStorageMultisampled(
-			GLRawTexture		texture,
+			IGLRawTexture		texture,
 			boolean				textureFixedSamples,
 			int					textureSamples,
 			int					textureWidth,

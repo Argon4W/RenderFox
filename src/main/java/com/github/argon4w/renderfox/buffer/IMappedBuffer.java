@@ -19,12 +19,12 @@
 
 package com.github.argon4w.renderfox.buffer;
 
+import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.view.IMappedDataView;
 
 public interface IMappedBuffer {
 
-	void				open	();
 	void				clear	();
-	void				flush	(long offset, long length);
+	IDataRange			flush	(IDataRange range);
 	IMappedDataView<?>	reserve	(long size);
 }

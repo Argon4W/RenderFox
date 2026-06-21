@@ -23,19 +23,36 @@ import com.github.argon4w.renderfox.opengl.binding.IGLBindingSource;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferBlockType;
 import com.github.argon4w.renderfox.opengl.buffer.function.GLBufferFunctionsHelper;
+import com.github.argon4w.renderfox.opengl.device.OpenGLDevice;
+import com.github.argon4w.renderfox.opengl.framebuffer.GLFramebufferStateManager;
 import com.github.argon4w.renderfox.opengl.framebuffer.GLFramebufferType;
+import com.github.argon4w.renderfox.opengl.framebuffer.constant.GLFramebufferAttachment;
+import com.github.argon4w.renderfox.opengl.framebuffer.object.feature.IGLFramebufferBase;
 import com.github.argon4w.renderfox.opengl.function.parameter.GLGlobalParameter;
 import com.github.argon4w.renderfox.opengl.function.parameter.IGLParameter;
 import com.github.argon4w.renderfox.opengl.texture.GLTextureType;
 import com.github.argon4w.renderfox.opengl.texture.pixel.GLPixelParameter;
 import org.lwjgl.opengl.GL13;
 
+import java.util.Map;
+
 public abstract class AbstractGLGlobalFunctionsHelper implements IGLGlobalFunctionsHelper {
+
+	private GLFramebufferStateManager framebufferStateManager;
+
+	public AbstractGLGlobalFunctionsHelper() {
+		this.framebufferStateManager = null;
+	}
 
 	public abstract int					getInt			(IGLParameter parameter);
 	public abstract int					getIntIndexed	(IGLParameter parameter, int index);
 	public abstract long				getLongIndexed	(IGLParameter parameter, int index);
 	public abstract IGLBindingSource	getBindingSource();
+
+	@Override
+	public void initialize(OpenGLDevice device) {
+		framebufferStateManager = device.getFramebufferContext().getFramebufferStateManager();
+	}
 
 	@Override
 	public int getBufferOffsetAlign(GLBufferBlockType bufferBlockType) {
@@ -79,7 +96,17 @@ public abstract class AbstractGLGlobalFunctionsHelper implements IGLGlobalFuncti
 
 	@Override
 	public int getMaxTextureSize() {
-		return getInt(GLGlobalParameter.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+		return getInt(GLGlobalParameter.MAX_TEXTURE_SIZE);
+	}
+
+	@Override
+	public int getMax3DTextureSize() {
+		return getInt(GLGlobalParameter.MAX_3D_TEXTURE_SIZE);
+	}
+
+	@Override
+	public int getMaxCubeMapTextureSize() {
+		return getInt(GLGlobalParameter.MAX_CUBE_MAP_TEXTURE_SIZE);
 	}
 
 	@Override
@@ -100,6 +127,46 @@ public abstract class AbstractGLGlobalFunctionsHelper implements IGLGlobalFuncti
 	@Override
 	public int getMaxIntegerSamples() {
 		return getInt(GLGlobalParameter.MAX_INTEGER_SAMPLES);
+	}
+
+	@Override
+	public GLFramebufferAttachment getDrawBuffer(int framebufferHandle, int index) {
+		return GLFramebufferAttachment.fromConstant(framebufferStateManager.runScoped(Map.of(GLFramebufferType.DRAW_FRAMEBUFFER, framebufferHandle), () -> getInt(GLGlobalParameter.DRAW_BUFFERS[index])));
+	}
+
+	@Override
+	public GLFramebufferAttachment getReadBuffer(int framebufferHandle) {
+		return GLFramebufferAttachment.fromConstant(framebufferStateManager.runScoped(Map.of(GLFramebufferType.READ_FRAMEBUFFER, framebufferHandle), () -> getInt(GLGlobalParameter.READ_BUFFER)));
+	}
+
+	@Override
+	public int getMaxDrawBuffers() {
+		return getInt(GLGlobalParameter.MAX_DRAW_BUFFERS);
+	}
+
+	@Override
+	public int getMaxColorAttachments() {
+		return getInt(GLGlobalParameter.MAX_COLOR_ATTACHMENTS);
+	}
+
+	@Override
+	public int getMaxFramebufferWidth() {
+		return getInt(GLGlobalParameter.MAX_FRAMEBUFFER_WIDTH);
+	}
+
+	@Override
+	public int getMaxFramebufferHeight() {
+		return getInt(GLGlobalParameter.MAX_FRAMEBUFFER_HEIGHT);
+	}
+
+	@Override
+	public int getMaxFramebufferLayers() {
+		return getInt(GLGlobalParameter.MAX_FRAMEBUFFER_LAYERS);
+	}
+
+	@Override
+	public int getMaxFramebufferSamples() {
+		return getInt(GLGlobalParameter.MAX_FRAMEBUFFER_SAMPLES);
 	}
 
 	@Override

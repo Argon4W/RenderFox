@@ -37,6 +37,8 @@ public class GLGlobalFunctionsHelperQuery extends AbstractGLGlobalFunctionsHelpe
 	}
 
 	public void initialize(OpenGLDevice device) {
+		super.initialize(device);
+
 		bindingSource = device.getBindingSource();
 	}
 

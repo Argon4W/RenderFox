@@ -22,10 +22,10 @@ package com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped;
 import com.github.argon4w.renderfox.data.coordinate.DataRange;
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.view.IDataView;
-import com.github.argon4w.renderfox.data.view.wrapped.MappingDataView;
+import com.github.argon4w.renderfox.data.view.wrapped.OffsetDataView;
 import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.IGLBufferDataView;
 
-public class GLMappedDataView extends MappingDataView<GLMappedDataView> implements IGLBufferDataView<GLMappedDataView> {
+public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implements IGLBufferDataView<GLMappedDataView> {
 
 	protected final	AbstractGLMappedBuffer	buffer;
 	protected final	long					offset;
@@ -53,67 +53,61 @@ public class GLMappedDataView extends MappingDataView<GLMappedDataView> implemen
 		this.offset		= 0;
 	}
 
-	GLMappedDataView reserve(long size) {
-		if (size < 0) {
-			throw new IllegalArgumentException("Size cannot be negative.");
-		}
-
-		if (position + size > limit) {
-			throw new IllegalArgumentException("Size + position cannot be greater than the limit.");
-		}
-
-		var slice = slice(position, size);
-
-		position += size;
-
-		return slice;
-	}
-
 	@Override
 	public IDataRange flush() {
-		buffer.flush(offset, limit());
-
-		return new DataRange(offset, limit());
+		return buffer.flush(new DataRange(
+				this.offset,
+				this.limit
+		));
 	}
 
 	@Override
-	public IDataRange flush(long offset, long length) {
-		if (offset < 0) {
+	public IDataRange flush(IDataRange range) {
+		if (range == null) {
+			throw new IllegalArgumentException("Range cannot be null.");
+		}
+
+		if (range.getOffset() < 0) {
 			throw new IllegalArgumentException("Offset cannot be negative.");
 		}
 
-		if (length < 0) {
+		if (range.getLength() < 0) {
 			throw new IllegalArgumentException("Length cannot be negative.");
 		}
 
-		if (offset + length > limit()) {
+		if (range.getOffset() + range.getLength() > limit()) {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of limit.");
 		}
 
-		buffer.flush(this.offset + offset, length);
-
-		return new DataRange(this.offset + offset, length);
+		return buffer.flush(new DataRange(
+				this.offset +	range.getOffset(),
+								range.getLength()
+		));
 	}
 
 	@Override
-	public GLMappedDataView slice(long offset, long length) {
-		if (offset < 0) {
+	public GLMappedDataView slice(IDataRange range) {
+		if (range == null) {
+			throw new IllegalArgumentException("Range cannot be null.");
+		}
+
+		if (range.getOffset() < 0) {
 			throw new IllegalArgumentException("Offset cannot be negative.");
 		}
 
-		if (length < 0) {
+		if (range.getLength() < 0) {
 			throw new IllegalArgumentException("Length cannot be negative.");
 		}
 
-		if (offset + length > limit()) {
+		if (range.getOffset() + range.getLength() > limit()) {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of view limit.");
 		}
 
 		return new GLMappedDataView(
 				this.buffer,
 				this.generation,
-				this.offset + offset,
-				length
+				this.offset +	range.getOffset(),
+								range.getLength()
 		);
 	}
 
@@ -122,13 +116,17 @@ public class GLMappedDataView extends MappingDataView<GLMappedDataView> implemen
 		return new GLMappedDataView(
 				buffer,
 				generation,
-				offset + position(),
-				remaining()
+				offset +	position	(),
+							remaining	()
 		);
 	}
 
 	@Override
 	public IDataView<?> getDataView() {
+		if (buffer.isDeleted()) {
+			throw new IllegalStateException("The buffer has been deleted.");
+		}
+
 		if (!buffer.isMapped()) {
 			throw new IllegalStateException("The buffer is not in a mapped state.");
 		}
@@ -141,16 +139,8 @@ public class GLMappedDataView extends MappingDataView<GLMappedDataView> implemen
 	}
 
 	@Override
-	protected long mapPosition(long position) {
-		if (position < 0) {
-			throw new IllegalArgumentException("Position cannot be negative.");
-		}
-
-		if (position > limit()) {
-			throw new IllegalArgumentException("Position cannot be greater than the value of view limit.");
-		}
-
-		return offset + position;
+	protected long getOffset() {
+		return offset;
 	}
 
 	@Override

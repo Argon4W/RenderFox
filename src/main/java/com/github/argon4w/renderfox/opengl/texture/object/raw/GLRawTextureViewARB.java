@@ -265,9 +265,8 @@ public class GLRawTextureViewARB extends AbstractGLRawTextureView {
 			throw new IllegalStateException("The texture has been deleted.");
 		}
 
+		this.textureHelper.delete();
 		this.deleted = true;
-
-		textureHelper.delete();
 	}
 
 	@Override

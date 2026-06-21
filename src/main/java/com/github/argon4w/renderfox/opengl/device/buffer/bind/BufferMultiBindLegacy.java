@@ -19,6 +19,7 @@
 
 package com.github.argon4w.renderfox.opengl.device.buffer.bind;
 
+import com.github.argon4w.renderfox.data.view.DataViews;
 import com.github.argon4w.renderfox.data.view.wrapped.StackDataView;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferBlockType;
 import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferBase;
@@ -42,15 +43,15 @@ public class BufferMultiBindLegacy extends AbstractBufferMultiBind {
 			int					bufferBlockCount,
 			long				bufferHandlesAddress
 	) {
-		try (var bufferHandlesView = StackDataView.asDataView(bufferHandlesAddress, (long) bufferBlockCount * Integer.BYTES)) {
-			for (var index = 0; index < bufferBlockCount; index ++) {
-				bufferContext.getBufferFunctions().bindBufferBase(
-						bufferBlockType.getTypeConstant(),
-						bufferBlockFirstIndex + index,
-						bufferHandlesView	.getInt			(index),
-						bufferBlockType		.getBufferType	()
-				);
-			}
+		var bufferHandlesView = DataViews.wrapInts(bufferHandlesAddress, bufferBlockCount);
+
+		for (var index = 0; index < bufferBlockCount; index ++) {
+			bufferContext.getBufferFunctions().bindBufferBase(
+					bufferBlockType.getTypeConstant(),
+					bufferBlockFirstIndex + index,
+					bufferHandlesView	.getInt			(index),
+					bufferBlockType		.getBufferType	()
+			);
 		}
 	}
 
@@ -63,20 +64,19 @@ public class BufferMultiBindLegacy extends AbstractBufferMultiBind {
 			long				bufferOffsetsAddress,
 			long				bufferLengthsAddress
 	) {
-		try (var bufferHandlesView = StackDataView.asDataView(bufferHandlesAddress, (long) bufferBlockCount * Integer	.BYTES);
-		     var bufferOffsetsView = StackDataView.asDataView(bufferOffsetsAddress, (long) bufferBlockCount * Long		.BYTES);
-		     var bufferLengthsView = StackDataView.asDataView(bufferLengthsAddress, (long) bufferBlockCount * Long		.BYTES)
-		) {
-			for (var index = 0; index < bufferBlockCount; index ++) {
-				bufferContext.getBufferFunctions().bindBufferRange(
-						bufferBlockType.getTypeConstant(),
-						bufferBlockFirstIndex + index,
-						bufferHandlesView	.getInt			(index),
-						bufferOffsetsView	.getLong		(index),
-						bufferLengthsView	.getLong		(index),
-						bufferBlockType		.getBufferType	()
-				);
-			}
+		var bufferHandlesView = DataViews.wrapInts	(bufferHandlesAddress, bufferBlockCount);
+		var bufferOffsetsView = DataViews.wrapLongs	(bufferOffsetsAddress, bufferBlockCount);
+		var bufferLengthsView = DataViews.wrapLongs	(bufferLengthsAddress, bufferBlockCount);
+
+		for (var index = 0; index < bufferBlockCount; index ++) {
+			bufferContext.getBufferFunctions().bindBufferRange(
+					bufferBlockType.getTypeConstant(),
+					bufferBlockFirstIndex + index,
+					bufferHandlesView	.getInt			(index),
+					bufferOffsetsView	.getLong		(index),
+					bufferLengthsView	.getLong		(index),
+					bufferBlockType		.getBufferType	()
+			);
 		}
 	}
 

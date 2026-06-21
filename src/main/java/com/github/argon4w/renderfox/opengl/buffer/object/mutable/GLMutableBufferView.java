@@ -73,4 +73,9 @@ public class GLMutableBufferView extends GLBufferWrapper {
 	public IGLBuffer getBuffer() {
 		return buffer.getBuffer().view(new DataRange(offset, length));
 	}
+
+	@Override
+	public void delete() {
+		throw new UnsupportedOperationException("Cannot delete a view of buffer.");
+	}
 }

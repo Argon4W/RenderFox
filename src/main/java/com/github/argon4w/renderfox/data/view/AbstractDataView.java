@@ -40,6 +40,9 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 	}
 
 	@Override
+	public abstract T slice(IDataRange range);
+
+	@Override
 	public <R extends IDataView<R>> R as(IDataViewDecorator<R> dataViewDecorator) {
 		return dataViewDecorator.decorate(this);
 	}
@@ -50,8 +53,8 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 	}
 
 	@Override
-	public IDataRange flush(long offset, long length) {
-		return new DataRange(offset, length);
+	public IDataRange flush(IDataRange range) {
+		return range;
 	}
 
 	@Override
@@ -602,5 +605,19 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 		position += length;
 
 		return (T) this;
+	}
+
+	@Override
+	public T slice(long length) {
+		var range = new DataRange(
+				position,
+				length
+		);
+
+		var view = slice(range);
+
+		position += length;
+
+		return view;
 	}
 }

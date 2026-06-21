@@ -20,7 +20,7 @@
 package com.github.argon4w.renderfox.opengl.buffer.function;
 
 import com.github.argon4w.renderfox.data.coordinate.DataRange;
-import com.github.argon4w.renderfox.data.view.wrapped.StackDataView;
+import com.github.argon4w.renderfox.data.view.DataViews;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferBlockType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.GLBufferMapAccessLegacy;
@@ -1072,31 +1072,29 @@ public class GLBufferFunctionsValidation implements IGLBufferFunctions {
 			throw new IllegalArgumentException("The range of binding points cannot exceeds the maximum index of binding points allowed of the given bufferType.");
 		}
 
-		try (var bufferHandlesView = StackDataView.asDataView(bufferHandlesAddress, (long) bufferCounts * Integer	.BYTES);
-		     var bufferOffsetsView = StackDataView.asDataView(bufferOffsetsAddress, (long) bufferCounts * Long		.BYTES);
-		     var bufferLengthsView = StackDataView.asDataView(bufferLengthsAddress, (long) bufferCounts * Long		.BYTES)
-		) {
-			for (var index = 0; index < bufferCounts; index ++) {
-				var bufferHandle = bufferHandlesView.getInt(index);
-				var bufferOffset = bufferOffsetsView.getInt(index);
-				var bufferLength = bufferLengthsView.getInt(index);
+		var bufferHandlesView = DataViews.wrapInts	(bufferHandlesAddress, bufferCounts);
+		var bufferOffsetsView = DataViews.wrapLongs	(bufferOffsetsAddress, bufferCounts);
+		var bufferLengthsView = DataViews.wrapLongs	(bufferLengthsAddress, bufferCounts);
 
-				if (bufferHandle != 0 && !bufferHelper.setBuffer(bufferHandle, bufferType).isBuffer()) {
-					throw new IllegalArgumentException("The bufferHandle at index %d is not zero or the name of an existing buffer object.".formatted(index));
-				}
+		for (var index = 0; index < bufferCounts; index ++) {
+			var bufferHandle = bufferHandlesView.getInt(index);
+			var bufferOffset = bufferOffsetsView.getInt(index);
+			var bufferLength = bufferLengthsView.getInt(index);
 
-				if (bufferLength < 0) {
-					throw new IllegalArgumentException("bufferLength at index %d cannot be less than zero.".formatted(index));
-				}
+			if (bufferHandle != 0 && !bufferHelper.setBuffer(bufferHandle, bufferType).isBuffer()) {
+				throw new IllegalArgumentException("The bufferHandle at index %d is not zero or the name of an existing buffer object.".formatted(index));
+			}
 
-				if (bufferOffset < 0) {
-					throw new IllegalArgumentException("bufferOffset at index %d cannot be less than zero.".formatted(index));
-				}
+			if (bufferLength < 0) {
+				throw new IllegalArgumentException("bufferLength at index %d cannot be less than zero.".formatted(index));
+			}
 
-				if (bufferOffset % helperFunctions.getBufferOffsetAlign(bufferBlockType) != 0) {
-					throw new IllegalArgumentException("bufferOffset at index %d violates target-specific alignment restrictions.".formatted(index));
-				}
+			if (bufferOffset < 0) {
+				throw new IllegalArgumentException("bufferOffset at index %d cannot be less than zero.".formatted(index));
+			}
 
+			if (bufferOffset % helperFunctions.getBufferOffsetAlign(bufferBlockType) != 0) {
+				throw new IllegalArgumentException("bufferOffset at index %d violates target-specific alignment restrictions.".formatted(index));
 			}
 		}
 

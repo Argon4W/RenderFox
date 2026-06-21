@@ -27,6 +27,7 @@ import com.github.argon4w.renderfox.opengl.texture.constant.filter.GLFilterMode;
 import com.github.argon4w.renderfox.opengl.texture.constant.filter.GLMipmapMode;
 import com.github.argon4w.renderfox.opengl.texture.constant.filter.GLTextureFilter;
 import com.github.argon4w.renderfox.opengl.texture.sampler.object.GLRawSampler;
+import com.github.argon4w.renderfox.opengl.texture.sampler.object.IGLSampler;
 
 public class SamplerCreatorLegacy extends AbstractSamplerCreator {
 
@@ -36,7 +37,7 @@ public class SamplerCreatorLegacy extends AbstractSamplerCreator {
 
 	@Override
 	protected void setupSampler(
-			GLRawSampler				sampler,
+			IGLSampler					sampler,
 			GLTextureCompareFunction	compareFunction,
 			GLTextureCompareMode		compareMode,
 			GLTextureWrapFunction		wrapS,

@@ -22,6 +22,7 @@ package com.github.argon4w.renderfox.opengl.framebuffer.function;
 import com.github.argon4w.renderfox.opengl.binding.IGLBindingSource;
 import com.github.argon4w.renderfox.opengl.device.OpenGLDevice;
 import com.github.argon4w.renderfox.opengl.dsa.IDirectStateAccess;
+import com.github.argon4w.renderfox.opengl.texture.GLTextureType;
 import org.lwjgl.opengl.GL30;
 
 public class GLFramebufferFunctionsDirect implements IGLFramebufferFunctions {
@@ -60,33 +61,36 @@ public class GLFramebufferFunctionsDirect implements IGLFramebufferFunctions {
 
 	@Override
 	public void framebufferTexture(
-			int framebufferHandle,
-			int framebufferAttachment,
-			int textureHandle,
-			int textureMipLevel
+			int				framebufferHandle,
+			int				framebufferAttachment,
+			int				textureHandle,
+			GLTextureType	textureType,
+			int				textureMipLevel
 	) {
 		directStateAccess.framebufferTexture(
 				framebufferHandle,
 				framebufferAttachment,
 				textureHandle,
-				textureMipLevel
+				textureType, textureMipLevel
 		);
 	}
 
 	@Override
 	public void framebufferTextureLayer(
-			int framebufferHandle,
-			int framebufferAttachment,
-			int textureHandle,
-			int textureMipLevel,
-			int framebufferLayer
+			int				framebufferHandle,
+			int				framebufferAttachment,
+			int				textureHandle,
+			GLTextureType	textureType,
+			int				textureMipLevel,
+			int				textureLayer
 	) {
 		directStateAccess.framebufferTextureLayer(
 				framebufferHandle,
 				framebufferAttachment,
 				textureHandle,
+				textureType,
 				textureMipLevel,
-				framebufferLayer
+				textureLayer
 		);
 	}
 

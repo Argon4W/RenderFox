@@ -17,21 +17,11 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.opengl.device;
+package com.github.argon4w.renderfox.opengl.texture.function.parameter;
 
-import com.github.argon4w.renderfox.opengl.framebuffer.function.IGLFramebufferFunctions;
+public class GLTextureParameterFeatures {
 
-public class GLFramebufferContext {
-
-	public GLFramebufferContext(OpenGLDevice device) {
-
-	}
-
-	public void initialize() {
-
-	}
-
-	public IGLFramebufferFunctions getFramebufferFunctions() {
-		return null;
-	}
+	public static final int READ_ONLY	= 1 << 0;
+	public static final int SAMPLER		= 1 << 1;
+	public static final int FLOAT		= 1 << 2;
 }

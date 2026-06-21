@@ -24,6 +24,8 @@ public interface IGLTextureHelperFunctions extends IGLTextureQueryFunctions {
 	void	activeTextureUnit			(int textureUnit);
 	int		getMaxTextureUnits			();
 	int		getMaxTextureSize			();
+	int		getMax3DTextureSize			();
+	int		getMaxCubeMapTextureSize	();
 	int		getMaxArrayTextureLayers	();
 	int		getMaxDepthTextureSamples	();
 	int		getMaxColorTextureSamples	();

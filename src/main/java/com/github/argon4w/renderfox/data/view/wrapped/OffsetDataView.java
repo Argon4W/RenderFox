@@ -23,14 +23,14 @@ import com.github.argon4w.renderfox.data.view.AbstractDataView;
 import com.github.argon4w.renderfox.data.view.IDataView;
 
 @SuppressWarnings("unchecked")
-public abstract class MappingDataView<T extends MappingDataView<T>> extends AbstractDataView<T> {
+public abstract class OffsetDataView<T extends OffsetDataView<T>> extends AbstractDataView<T> {
 
-	public MappingDataView(long capacity) {
+	public OffsetDataView(long capacity) {
 		super(capacity);
 	}
 
-	protected abstract IDataView<?>	getDataView();
-	protected abstract long			mapPosition(long position);
+	protected abstract IDataView<?>	getDataView	();
+	protected abstract long			getOffset	();
 
 	@Override
 	public long address() {
@@ -56,7 +56,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 			throw new IllegalStateException("DataView cannot be null.");
 		}
 
-		getDataView().putByte(mapPosition(position), value);
+		getDataView().putByte(getOffset() + position, value);
 		return (T) this;
 	}
 
@@ -66,7 +66,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 			throw new IllegalStateException("DataView cannot be null.");
 		}
 
-		getDataView().putShort(mapPosition(position), value);
+		getDataView().putShort(getOffset() + position, value);
 		return (T) this;
 	}
 
@@ -76,7 +76,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 			throw new IllegalStateException("DataView cannot be null.");
 		}
 
-		getDataView().putInt(mapPosition(position), value);
+		getDataView().putInt(getOffset() + position, value);
 		return (T) this;
 	}
 
@@ -86,7 +86,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 			throw new IllegalStateException("DataView cannot be null.");
 		}
 
-		getDataView().putLong(mapPosition(position), value);
+		getDataView().putLong(getOffset() + position, value);
 		return (T) this;
 	}
 
@@ -96,7 +96,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 			throw new IllegalStateException("DataView cannot be null.");
 		}
 
-		getDataView().putFloat(mapPosition(position), value);
+		getDataView().putFloat(getOffset() + position, value);
 		return (T) this;
 	}
 
@@ -106,7 +106,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 			throw new IllegalStateException("DataView cannot be null.");
 		}
 
-		getDataView().putDouble(mapPosition(position), value);
+		getDataView().putDouble(getOffset() + position, value);
 		return (T) this;
 	}
 
@@ -122,7 +122,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 		}
 
 		getDataView().putBytes(
-				mapPosition(position),
+				getOffset() + position,
 				value,
 				offset,
 				length
@@ -143,7 +143,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 		}
 
 		getDataView().putShorts(
-				mapPosition(position),
+				getOffset() + position,
 				value,
 				offset,
 				length
@@ -164,7 +164,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 		}
 
 		getDataView().putInts(
-				mapPosition(position),
+				getOffset() + position,
 				value,
 				offset,
 				length
@@ -185,7 +185,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 		}
 
 		getDataView().putLongs(
-				mapPosition(position),
+				getOffset() + position,
 				value,
 				offset,
 				length
@@ -206,7 +206,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 		}
 
 		getDataView().putFloats(
-				mapPosition(position),
+				getOffset() + position,
 				value,
 				offset,
 				length
@@ -227,7 +227,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 		}
 
 		getDataView().putDoubles(
-				mapPosition(position),
+				getOffset() + position,
 				value,
 				offset,
 				length
@@ -248,7 +248,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 		}
 
 		getDataView().putBuffer(
-				mapPosition(position),
+				getOffset() + position,
 				value,
 				offset,
 				length
@@ -269,7 +269,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 		}
 
 		getDataView().putBuffer(
-				mapPosition(position),
+				getOffset() + position,
 				valueAddress,
 				offset,
 				length
@@ -284,7 +284,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 			throw new IllegalStateException("DataView cannot be null.");
 		}
 
-		return getDataView().getByte(mapPosition(position));
+		return getDataView().getByte(getOffset() + position);
 	}
 
 	@Override
@@ -293,7 +293,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 			throw new IllegalStateException("DataView cannot be null.");
 		}
 
-		return getDataView().getShort(mapPosition(position));
+		return getDataView().getShort(getOffset() + position);
 	}
 
 	@Override
@@ -302,7 +302,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 			throw new IllegalStateException("DataView cannot be null.");
 		}
 
-		return getDataView().getInt(mapPosition(position));
+		return getDataView().getInt(getOffset() + position);
 	}
 
 	@Override
@@ -311,7 +311,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 			throw new IllegalStateException("DataView cannot be null.");
 		}
 
-		return getDataView().getLong(mapPosition(position));
+		return getDataView().getLong(getOffset() + position);
 	}
 
 	@Override
@@ -320,7 +320,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 			throw new IllegalStateException("DataView cannot be null.");
 		}
 
-		return getDataView().getFloat(mapPosition(position));
+		return getDataView().getFloat(getOffset() + position);
 	}
 
 	@Override
@@ -329,7 +329,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 			throw new IllegalStateException("DataView cannot be null.");
 		}
 
-		return getDataView().getDouble(mapPosition(position));
+		return getDataView().getDouble(getOffset() + position);
 	}
 
 	@Override
@@ -344,7 +344,7 @@ public abstract class MappingDataView<T extends MappingDataView<T>> extends Abst
 		}
 
 		getDataView().getBytes(
-				mapPosition(position),
+				getOffset() + position,
 				value,
 				offset,
 				length

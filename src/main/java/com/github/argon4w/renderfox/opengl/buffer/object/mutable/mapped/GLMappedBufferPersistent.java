@@ -19,7 +19,7 @@
 
 package com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped;
 
-import com.github.argon4w.renderfox.data.coordinate.DataRange;
+import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
@@ -28,8 +28,7 @@ import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
 
 public class GLMappedBufferPersistent extends AbstractGLMappedBuffer {
 
-	private IGLBufferDataView<?>	dataView;
-	private boolean					mapped;
+	private IGLBufferDataView<?> dataView;
 
 	public GLMappedBufferPersistent(
 			GLBufferContext		bufferContext,
@@ -50,38 +49,30 @@ public class GLMappedBufferPersistent extends AbstractGLMappedBuffer {
 				mapAccess
 		);
 
-		this.dataView	= null;
-		this.mapped		= false;
+		this.dataView = null;
 
 		map();
 	}
 
 	@Override
 	protected void map() {
-		mapped		= true;
-		dataView	= buffer.mapRangeData(new DataRange(bufferSize), mapAccess);
+		dataView = buffer.mapRangeData(buffer, mapAccess);
 	}
 
 	@Override
 	protected void unmap() {
 		dataView.close();
-		dataView	= null;
-		mapped		= false;
+		dataView = null;
 	}
 
 	@Override
-	public void flush(long offset, long length) {
-		dataView.flush(offset, length);
+	public IDataRange flush(IDataRange range) {
+		return dataView.flush(range);
 	}
 
 	@Override
 	protected IGLBufferDataView<?> getDataView() {
 		return dataView;
-	}
-
-	@Override
-	public boolean isMapped() {
-		return mapped;
 	}
 
 	@Override

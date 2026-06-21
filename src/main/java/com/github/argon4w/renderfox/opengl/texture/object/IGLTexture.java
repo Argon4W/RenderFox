@@ -26,14 +26,11 @@ import com.github.argon4w.renderfox.format.ColorFloat;
 import com.github.argon4w.renderfox.format.ColorInt;
 import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferBase;
 import com.github.argon4w.renderfox.opengl.texture.constant.GLTextureComponent;
-import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLTextureBase;
-import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLTextureBinding;
-import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLTextureMipmap;
-import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLTextureStore;
+import com.github.argon4w.renderfox.opengl.texture.object.feature.*;
 import com.github.argon4w.renderfox.opengl.texture.object.raw.IGLRawTextureView;
 import com.github.argon4w.renderfox.opengl.texture.pixel.GLImageTransferInfo;
 
-public interface IGLTexture extends IGLTextureBase, IGLTextureStore, IGLTextureBinding, IGLTextureMipmap {
+public interface IGLTexture extends IGLRawTextureBase, IGLTextureBinding, IGLTextureMipmap {
 
 	GLImageTransferInfo.Builder transfer(int transferMipLevel);
 

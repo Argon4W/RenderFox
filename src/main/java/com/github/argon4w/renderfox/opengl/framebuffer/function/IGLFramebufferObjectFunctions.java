@@ -19,6 +19,8 @@
 
 package com.github.argon4w.renderfox.opengl.framebuffer.function;
 
+import com.github.argon4w.renderfox.opengl.texture.GLTextureType;
+
 public interface IGLFramebufferObjectFunctions {
 
 	int createFramebuffer();
@@ -33,6 +35,7 @@ public interface IGLFramebufferObjectFunctions {
 			int				framebufferHandle,
 			int				framebufferAttachment,
 			int				textureHandle,
+			GLTextureType	textureType,
 			int				textureMipLevel
 	);
 
@@ -40,8 +43,9 @@ public interface IGLFramebufferObjectFunctions {
 			int				framebufferHandle,
 			int				framebufferAttachment,
 			int				textureHandle,
+			GLTextureType	textureType,
 			int				textureMipLevel,
-			int				framebufferLayer
+			int				textureLayer
 	);
 
 	void framebufferDrawBuffer(int framebufferHandle, int framebufferDrawBuffer);

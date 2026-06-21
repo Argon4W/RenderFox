@@ -36,11 +36,11 @@ import com.github.argon4w.renderfox.opengl.format.GLDataType;
 import com.github.argon4w.renderfox.opengl.format.GLFormat;
 import com.github.argon4w.renderfox.opengl.format.GLInternalFormat;
 
-public class GLRawBuffer extends AbstractGLBufferStore implements IGLRawBufferView, IGLBufferSetup {
+public class GLRawBuffer extends AbstractGLBufferStore implements IGLRawBuffer {
 
 	private final	GLBufferType			bufferType;
 	private final	GLBufferFunctionsHelper	bufferHelper;
-	private 		long					size;
+	private			long					size;
 
 	private			GLBufferStorageFlag		storageFlags;
 	private			GLBufferMapAccess		accessFlags;
@@ -429,21 +429,11 @@ public class GLRawBuffer extends AbstractGLBufferStore implements IGLRawBufferVi
 			throw new IllegalStateException("The buffer has been deleted.");
 		}
 
+		bufferHelper.delete();
+
 		this.setup		= false;
 		this.immutable	= false;
 		this.deleted	= true;
-
-		bufferHelper.delete();
-	}
-
-	@Override
-	public IDataRange withOffset(long newOffset) {
-		return new DataRange(newOffset, size);
-	}
-
-	@Override
-	public IDataRange withLength(long newLength) {
-		return new DataRange(0, newLength);
 	}
 
 	@Override

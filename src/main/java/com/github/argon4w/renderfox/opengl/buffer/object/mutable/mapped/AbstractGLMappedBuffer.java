@@ -27,6 +27,7 @@ import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBuff
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
 import com.github.argon4w.renderfox.opengl.buffer.object.mutable.GLMutableBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.IGLBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.IGLBufferDataView;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
 
@@ -36,6 +37,7 @@ public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements 
 	protected final	GLMappedDataView.Root	mapView;
 
 	private			long					generation;
+	private			boolean					mapped;
 
 	public AbstractGLMappedBuffer(
 			GLBufferContext		bufferContext,
@@ -55,6 +57,7 @@ public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements 
 				storageFlag
 		);
 
+		this.mapped		= false;
 		this.generation	= 0;
 		this.mapAccess	= mapAccess.copy();
 		this.mapView	= new GLMappedDataView.Root(this);
@@ -63,6 +66,7 @@ public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements 
 		this.mapAccess.remove(GLBufferAccessBit.MAP_COHERENT);
 	}
 
+	protected abstract void			open		();
 	protected abstract void			map			();
 	protected abstract void			unmap		();
 	protected abstract IDataView<?>	getDataView	();
@@ -87,7 +91,7 @@ public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements 
 			resize(mapView.position() + size);
 		}
 
-		return mapView.reserve(size);
+		return mapView.slice(size);
 	}
 
 	@Override
@@ -101,11 +105,18 @@ public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements 
 	@Override
 	public void beforeResize() {
 		unmap();
+		mapped = false;
 	}
 
 	@Override
 	public void afterResize() {
 		map();
+		mapped = true;
+	}
+
+	@Override
+	public boolean isMapped() {
+		return mapped;
 	}
 
 	public long getGeneration() {
@@ -115,10 +126,35 @@ public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements 
 	@Override
 	public IGLBufferDataView<?> mapRangeData(IDataRange mapRange, GLBufferMapAccess mapAccess) {
 		open();
+		return mapView.slice(mapRange);
+	}
 
-		return mapView.slice(
-				mapRange.getOffset(),
-				mapRange.getLength()
+	@Override
+	public IGLBuffer view(IDataRange viewRange) {
+		if (buffer.isDeleted()) {
+			throw new IllegalStateException("The buffer has been deleted.");
+		}
+
+		if (viewRange == null) {
+			throw new IllegalArgumentException("ViewRange cannot be null.");
+		}
+
+		if (viewRange.getOffset() < 0) {
+			throw new IllegalArgumentException("ViewOffset cannot be negative.");
+		}
+
+		if (viewRange.getLength() < 0) {
+			throw new IllegalArgumentException("ViewLength cannot be negative.");
+		}
+
+		if (viewRange.getOffset() + viewRange.getLength() > bufferSize) {
+			throw new IllegalArgumentException("ViewOffset + viewLength cannot be greater than the value of buffer size.");
+		}
+
+		return new GLMappedBufferView(
+				this,
+				viewRange.getOffset(),
+				viewRange.getLength()
 		);
 	}
 }

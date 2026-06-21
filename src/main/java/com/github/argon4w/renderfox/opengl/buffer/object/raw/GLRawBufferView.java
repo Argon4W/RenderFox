@@ -35,15 +35,14 @@ import com.github.argon4w.renderfox.util.RangeUtils;
 
 public class GLRawBufferView implements IGLRawBufferView {
 
-	private final GLRawBuffer	buffer;
-	private final long			offset;
-	private final long			length;
-
+	private final IGLRawBufferView	buffer;
+	private final long				offset;
+	private final long				length;
 
 	public GLRawBufferView(
-			GLRawBuffer	buffer,
-			long		offset,
-			long		length
+			IGLRawBufferView	buffer,
+			long				offset,
+			long				length
 	) {
 		this.buffer		= buffer;
 		this.offset		= offset;
@@ -276,16 +275,6 @@ public class GLRawBufferView implements IGLRawBufferView {
 				bufferOffset + offset,
 				bufferLength
 		);
-	}
-
-	@Override
-	public IDataRange withOffset(long newOffset) {
-		return new DataRange(newOffset, length);
-	}
-
-	@Override
-	public IDataRange withLength(long newLength) {
-		return new DataRange(offset, newLength);
 	}
 
 	@Override

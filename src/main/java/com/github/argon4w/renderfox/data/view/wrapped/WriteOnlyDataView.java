@@ -19,6 +19,7 @@
 
 package com.github.argon4w.renderfox.data.view.wrapped;
 
+import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.view.IDataView;
 
 public class WriteOnlyDataView extends DataViewWrapper<WriteOnlyDataView> {
@@ -129,7 +130,12 @@ public class WriteOnlyDataView extends DataViewWrapper<WriteOnlyDataView> {
 	}
 
 	@Override
-	public WriteOnlyDataView slice(long offset, long length) {
-		return new WriteOnlyDataView(super.slice(offset, length));
+	public IDataView<?> slice(long length) {
+		return new WriteOnlyDataView(super.slice(length));
+	}
+
+	@Override
+	public WriteOnlyDataView slice(IDataRange range) {
+		return new WriteOnlyDataView(super.slice(range));
 	}
 }

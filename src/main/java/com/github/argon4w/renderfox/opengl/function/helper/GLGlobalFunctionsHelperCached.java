@@ -23,6 +23,7 @@ import com.github.argon4w.renderfox.opengl.buffer.GLBufferBlockType;
 import com.github.argon4w.renderfox.opengl.device.OpenGLDevice;
 import com.github.argon4w.renderfox.opengl.function.IGLGlobalFunctions;
 import com.github.argon4w.renderfox.opengl.function.parameter.GLGlobalParameter;
+import com.github.argon4w.renderfox.opengl.function.parameter.IGLParameter;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 
@@ -33,10 +34,18 @@ public class GLGlobalFunctionsHelperCached extends GLGlobalFunctionsHelperQuery 
 
 	private int maxTextureUnits;
 	private int maxTextureSize;
+	private int max3DTextureSize;
+	private int maxCubeMapTextureSize;
 	private int maxArrayTextureLayers;
 	private int maxDepthTextureSamples;
 	private int maxColorTextureSamples;
 	private int maxIntegerSamples;
+	private int maxDrawBuffers;
+	private int maxColorAttachments;
+	private int maxFramebufferWidth;
+	private int maxFramebufferHeight;
+	private int maxFramebufferLayers;
+	private int maxFramebufferSamples;
 
 	public GLGlobalFunctionsHelperCached(IGLGlobalFunctions globalFunctions) {
 		super(globalFunctions);
@@ -46,26 +55,63 @@ public class GLGlobalFunctionsHelperCached extends GLGlobalFunctionsHelperQuery 
 
 		this.maxTextureUnits		= 0;
 		this.maxTextureSize			= 0;
+		this.max3DTextureSize		= 0;
+		this.maxCubeMapTextureSize	= 0;
 		this.maxArrayTextureLayers	= 0;
 		this.maxDepthTextureSamples	= 0;
 		this.maxColorTextureSamples	= 0;
 		this.maxIntegerSamples		= 0;
+		this.maxDrawBuffers			= 0;
+		this.maxColorAttachments	= 0;
+		this.maxFramebufferWidth	= 0;
+		this.maxFramebufferHeight	= 0;
+		this.maxFramebufferLayers	= 0;
+		this.maxFramebufferSamples	= 0;
 	}
 
 	public void initialize(OpenGLDevice device) {
+		super.initialize(device);
+
 		for (var bufferBlockType : GLBufferBlockType.values()) {
 			this.offsetAligns	.put(bufferBlockType, super.getBufferOffsetAlign(bufferBlockType));
 			this.maxBindings	.put(bufferBlockType, super.getBufferMaxBindings(bufferBlockType));
 		}
 
-		bindingSource			= device.getBindingSource();
+		maxTextureUnits			= super.getInt(GLGlobalParameter.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+		maxTextureSize			= super.getInt(GLGlobalParameter.MAX_TEXTURE_SIZE);
+		max3DTextureSize		= super.getInt(GLGlobalParameter.MAX_3D_TEXTURE_SIZE);
+		maxCubeMapTextureSize	= super.getInt(GLGlobalParameter.MAX_CUBE_MAP_TEXTURE_SIZE);
+		maxArrayTextureLayers	= super.getInt(GLGlobalParameter.MAX_ARRAY_TEXTURE_LAYERS);
+		maxDepthTextureSamples	= super.getInt(GLGlobalParameter.MAX_DEPTH_TEXTURE_SAMPLES);
+		maxColorTextureSamples	= super.getInt(GLGlobalParameter.MAX_COLOR_TEXTURE_SAMPLES);
+		maxIntegerSamples		= super.getInt(GLGlobalParameter.MAX_INTEGER_SAMPLES);
+		maxDrawBuffers			= super.getInt(GLGlobalParameter.MAX_DRAW_BUFFERS);
+		maxColorAttachments		= super.getInt(GLGlobalParameter.MAX_COLOR_ATTACHMENTS);
+		maxFramebufferWidth		= super.getInt(GLGlobalParameter.MAX_FRAMEBUFFER_WIDTH);
+		maxFramebufferHeight	= super.getInt(GLGlobalParameter.MAX_FRAMEBUFFER_HEIGHT);
+		maxFramebufferLayers	= super.getInt(GLGlobalParameter.MAX_FRAMEBUFFER_LAYERS);
+		maxFramebufferSamples	= super.getInt(GLGlobalParameter.MAX_FRAMEBUFFER_SAMPLES);
+	}
 
-		maxTextureUnits			= getInt(GLGlobalParameter.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
-		maxTextureSize			= getInt(GLGlobalParameter.MAX_TEXTURE_SIZE);
-		maxArrayTextureLayers	= getInt(GLGlobalParameter.MAX_ARRAY_TEXTURE_LAYERS);
-		maxDepthTextureSamples	= getInt(GLGlobalParameter.MAX_DEPTH_TEXTURE_SAMPLES);
-		maxColorTextureSamples	= getInt(GLGlobalParameter.MAX_COLOR_TEXTURE_SAMPLES);
-		maxIntegerSamples		= getInt(GLGlobalParameter.MAX_INTEGER_SAMPLES);
+	@Override
+	public int getInt(IGLParameter parameter) {
+		return switch (parameter) {
+			case GLGlobalParameter.MAX_COMBINED_TEXTURE_IMAGE_UNITS	-> maxTextureUnits;
+			case GLGlobalParameter.MAX_TEXTURE_SIZE					-> maxTextureSize;
+			case GLGlobalParameter.MAX_3D_TEXTURE_SIZE				-> max3DTextureSize;
+			case GLGlobalParameter.MAX_CUBE_MAP_TEXTURE_SIZE		-> maxCubeMapTextureSize;
+			case GLGlobalParameter.MAX_ARRAY_TEXTURE_LAYERS			-> maxArrayTextureLayers;
+			case GLGlobalParameter.MAX_DEPTH_TEXTURE_SAMPLES		-> maxDepthTextureSamples;
+			case GLGlobalParameter.MAX_COLOR_TEXTURE_SAMPLES		-> maxColorTextureSamples;
+			case GLGlobalParameter.MAX_INTEGER_SAMPLES				-> maxIntegerSamples;
+			case GLGlobalParameter.MAX_DRAW_BUFFERS					-> maxDrawBuffers;
+			case GLGlobalParameter.MAX_COLOR_ATTACHMENTS			-> maxColorAttachments;
+			case GLGlobalParameter.MAX_FRAMEBUFFER_WIDTH			-> maxFramebufferWidth;
+			case GLGlobalParameter.MAX_FRAMEBUFFER_HEIGHT			-> maxFramebufferHeight;
+			case GLGlobalParameter.MAX_FRAMEBUFFER_LAYERS			-> maxFramebufferLayers;
+			case GLGlobalParameter.MAX_FRAMEBUFFER_SAMPLES			-> maxFramebufferSamples;
+			default													-> super.getInt(parameter);
+		};
 	}
 
 	@Override
@@ -89,6 +135,16 @@ public class GLGlobalFunctionsHelperCached extends GLGlobalFunctionsHelperQuery 
 	}
 
 	@Override
+	public int getMax3DTextureSize() {
+		return max3DTextureSize;
+	}
+
+	@Override
+	public int getMaxCubeMapTextureSize() {
+		return maxCubeMapTextureSize;
+	}
+
+	@Override
 	public int getMaxArrayTextureLayers() {
 		return maxArrayTextureLayers;
 	}
@@ -106,5 +162,35 @@ public class GLGlobalFunctionsHelperCached extends GLGlobalFunctionsHelperQuery 
 	@Override
 	public int getMaxIntegerSamples() {
 		return maxIntegerSamples;
+	}
+
+	@Override
+	public int getMaxDrawBuffers() {
+		return maxDrawBuffers;
+	}
+
+	@Override
+	public int getMaxColorAttachments() {
+		return maxColorAttachments;
+	}
+
+	@Override
+	public int getMaxFramebufferWidth() {
+		return maxFramebufferWidth;
+	}
+
+	@Override
+	public int getMaxFramebufferHeight() {
+		return maxFramebufferHeight;
+	}
+
+	@Override
+	public int getMaxFramebufferLayers() {
+		return maxFramebufferLayers;
+	}
+
+	@Override
+	public int getMaxFramebufferSamples() {
+		return maxFramebufferSamples;
 	}
 }

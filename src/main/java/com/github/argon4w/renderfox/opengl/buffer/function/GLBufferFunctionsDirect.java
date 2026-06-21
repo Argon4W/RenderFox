@@ -19,7 +19,6 @@
 
 package com.github.argon4w.renderfox.opengl.buffer.function;
 
-import com.github.argon4w.renderfox.data.view.wrapped.StackDataView;
 import com.github.argon4w.renderfox.opengl.binding.IGLBindingSource;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.device.OpenGLDevice;

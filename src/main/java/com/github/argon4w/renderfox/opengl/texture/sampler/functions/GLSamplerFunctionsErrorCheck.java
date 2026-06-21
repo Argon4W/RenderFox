@@ -35,7 +35,7 @@ public class GLSamplerFunctionsErrorCheck implements IGLSamplerFunctions {
 	public void initialize(OpenGLDevice device) {
 		samplerFunctions.initialize(device);
 
-		errorChecker = new GLErrorChecker(device);
+		errorChecker = device.getErrorChecker();
 	}
 
 	@Override

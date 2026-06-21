@@ -24,7 +24,6 @@ import com.github.argon4w.renderfox.opengl.texture.GLTextureType;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opengl.ARBDirectStateAccess;
 
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 
@@ -293,10 +292,11 @@ public class DirectStateAccessARB extends DirectStateAccessLegacy {
 
 	@Override
 	public void framebufferTexture(
-			int framebufferHandle,
-			int framebufferAttachment,
-			int textureHandle,
-			int textureMipLevel
+			int				framebufferHandle,
+			int				framebufferAttachment,
+			int				textureHandle,
+			GLTextureType	textureType,
+			int				textureMipLevel
 	) {
 		ARBDirectStateAccess.glNamedFramebufferTexture(
 				framebufferHandle,
@@ -308,18 +308,19 @@ public class DirectStateAccessARB extends DirectStateAccessLegacy {
 
 	@Override
 	public void framebufferTextureLayer(
-			int framebufferHandle,
-			int framebufferAttachment,
-			int textureHandle,
-			int textureMipLevel,
-			int framebufferLayer
+			int				framebufferHandle,
+			int				framebufferAttachment,
+			int				textureHandle,
+			GLTextureType	textureType,
+			int				textureMipLevel,
+			int				textureLayer
 	) {
 		ARBDirectStateAccess.glNamedFramebufferTextureLayer(
 				framebufferHandle,
 				framebufferAttachment,
 				textureHandle,
 				textureMipLevel,
-				framebufferLayer
+				textureLayer
 		);
 	}
 
