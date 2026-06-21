@@ -661,7 +661,13 @@ public class GLFramebufferFunctionsValidation implements IGLFramebufferFunctions
 			}
 
 			for (var index = 0; index < helperFunctions.getMaxDrawBuffers(); index ++) {
-				var drawAttachmentType = drawFramebuffer.getAttachmentComponentType(helperFunctions.getDrawBuffer(framebufferHandleWrite, index));
+				var drawAttachment = helperFunctions.getDrawBuffer(framebufferHandleWrite, index);
+
+				if (drawAttachment == GLFramebufferAttachment.NONE) {
+					continue;
+				}
+
+				var drawAttachmentType = drawFramebuffer.getAttachmentComponentType(drawAttachment);
 
 				if (drawAttachmentType == GLTextureComponentType.INVALID) {
 					throw new IllegalArgumentException("Invalid readAttachmentType.");
@@ -703,7 +709,7 @@ public class GLFramebufferFunctionsValidation implements IGLFramebufferFunctions
 			throw new IllegalArgumentException("FramebufferTarget is not GL_DRAW_FRAMEBUFFER, GL_READ_FRAMEBUFFER or GL_FRAMEBUFFER.");
 		}
 
-		if (framebufferHandle != 0 && framebufferFunctions.isFramebuffer(framebufferHandle)) {
+		if (framebufferHandle != 0 && !framebufferFunctions.isFramebuffer(framebufferHandle)) {
 			throw new IllegalArgumentException("FramebufferHandle is not zero or the name of an existing framebuffer object.");
 		}
 

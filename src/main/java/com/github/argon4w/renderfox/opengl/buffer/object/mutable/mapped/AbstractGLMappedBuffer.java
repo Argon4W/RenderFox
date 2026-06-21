@@ -36,8 +36,7 @@ public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements 
 	protected final	GLBufferMapAccess		mapAccess;
 	protected final	GLMappedDataView.Root	mapView;
 
-	private			long					generation;
-	private			boolean					mapped;
+	protected		long					generation;
 
 	public AbstractGLMappedBuffer(
 			GLBufferContext		bufferContext,
@@ -57,7 +56,6 @@ public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements 
 				storageFlag
 		);
 
-		this.mapped		= false;
 		this.generation	= 0;
 		this.mapAccess	= mapAccess.copy();
 		this.mapView	= new GLMappedDataView.Root(this);
@@ -105,18 +103,11 @@ public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements 
 	@Override
 	public void beforeResize() {
 		unmap();
-		mapped = false;
 	}
 
 	@Override
 	public void afterResize() {
 		map();
-		mapped = true;
-	}
-
-	@Override
-	public boolean isMapped() {
-		return mapped;
 	}
 
 	public long getGeneration() {

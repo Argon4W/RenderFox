@@ -49,8 +49,6 @@ public class GLMappedBufferPersistent extends AbstractGLMappedBuffer {
 				mapAccess
 		);
 
-		this.dataView = null;
-
 		map();
 	}
 

@@ -43,6 +43,7 @@ public class GLFramebufferContext {
 
 	private			IGLRawFramebuffer				globalReadFramebuffer;
 	private			IGLRawFramebuffer				globalDrawFramebuffer;
+	private			boolean							globalFramebufferInitialized;
 
 	public GLFramebufferContext(OpenGLDevice device) {
 		this.device						= device;
@@ -50,19 +51,14 @@ public class GLFramebufferContext {
 		this.framebufferFunctions		= createFramebufferFunctions	();
 		this.framebufferHelper			= createFramebufferHelper		();
 
-		this.globalReadFramebuffer		= null;
-		this.globalDrawFramebuffer		= null;
+		this.globalReadFramebuffer			= null;
+		this.globalDrawFramebuffer			= null;
+		this.globalFramebufferInitialized	= false;
 	}
 
 	public void initialize() {
 		framebufferStateManager	.initialize(device);
 		framebufferFunctions	.initialize(device);
-
-		globalReadFramebuffer = createRawFramebuffer();
-		globalDrawFramebuffer = createRawFramebuffer();
-
-		globalReadFramebuffer.setReadAttachment(GLFramebufferAttachment.COLOR_ATTACHMENT_0);
-		globalDrawFramebuffer.setDrawAttachment(GLFramebufferAttachment.COLOR_ATTACHMENT_0);
 	}
 
 	public void copyTextureToTexture(
@@ -84,6 +80,16 @@ public class GLFramebufferContext {
 
 		if (copyExtent == null) {
 			throw new IllegalArgumentException("CopyExtent cannot be null.");
+		}
+
+		if (!globalFramebufferInitialized) {
+			globalFramebufferInitialized = true;
+
+			globalReadFramebuffer = createRawFramebuffer();
+			globalDrawFramebuffer = createRawFramebuffer();
+
+			globalReadFramebuffer.setReadAttachment(GLFramebufferAttachment.COLOR_ATTACHMENT_0);
+			globalDrawFramebuffer.setDrawAttachment(GLFramebufferAttachment.COLOR_ATTACHMENT_0);
 		}
 
 		var internalFormatRead = readTexture.getInternalFormat(copyMipLevelRead);

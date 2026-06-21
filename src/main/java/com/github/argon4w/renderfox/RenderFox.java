@@ -19,9 +19,9 @@
 
 package com.github.argon4w.renderfox;
 
-import com.github.argon4w.renderfox.data.coordinate.DataRange;
+import com.github.argon4w.renderfox.data.coordinate.Offset3D;
+import com.github.argon4w.renderfox.data.coordinate.extent.Extent3D;
 import com.github.argon4w.renderfox.format.ColorFloat;
-import com.github.argon4w.renderfox.opengl.buffer.GLBufferBlockType;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferAccessBit;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageBit;
@@ -124,6 +124,12 @@ public class RenderFox {
 				.getTextureCreator	()
 				.createTexture		(textureInfo);
 
+		// Create the copy destination texture.
+		var destTexture = device
+				.getTextureContext	()
+				.getTextureCreator	()
+				.createTexture		(textureInfo);
+
 		// Create a transfer info for uploading data to the texture.
 		// We want our uploaded data to be 14 * 14 pixels and pasted (uploaded) it to not the origin but (1, 1).
 		var transfer = texture
@@ -192,10 +198,21 @@ public class RenderFox {
 				pixelRange.withOffset(0L)
 		);
 
-		// Generate the mipmap for the texture.
-		texture.generateMipmap();
+		// Copy the part of content of texture to our destination texture.
+		device.getFramebufferContext().copyTextureToTexture(
+				texture,
+				destTexture,
+				new Offset3D(0, 0),
+				new Offset3D(4, 4),
+				new Extent3D(8, 8),
+				0,
+				0
+		);
 
-		// Bind the texture to texture unit 9 for observation.
-		texture.bindTextureUnit(9);
+		// Generate the mipmap for the destination texture.
+		destTexture.generateMipmap();
+
+		// Bind the destination texture to texture unit 9 for observation.
+		destTexture.bindTextureUnit(9);
 	}
 }

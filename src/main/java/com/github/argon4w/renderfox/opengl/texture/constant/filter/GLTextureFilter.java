@@ -41,6 +41,7 @@ public enum GLTextureFilter {
 	LINEAR_MIPMAP_LINEAR	(GL11.GL_LINEAR_MIPMAP_LINEAR,		false,	GLMipmapMode.LINEAR,	GLFilterMode.LINEAR),;
 
 	private static final Int2ReferenceMap		<GLTextureFilter>														TABLE;
+	private static final Reference2ReferenceMap	<GLFilterMode, GLTextureFilter>											MIPMAP_INVALID_TABLE;
 	private static final Reference2ReferenceMap	<GLFilterMode, GLTextureFilter>											MIPMAP_LINEAR_TABLE;
 	private static final Reference2ReferenceMap	<GLFilterMode, GLTextureFilter>											MIPMAP_NEAREST_TABLE;
 	private static final Reference2ReferenceMap	<GLMipmapMode, Reference2ReferenceMap<GLFilterMode, GLTextureFilter>>	MIPMAP_LOOKUP_TABLE;
@@ -48,9 +49,11 @@ public enum GLTextureFilter {
 	static {
 		TABLE					= new Int2ReferenceOpenHashMap		<>();
 		MIPMAP_LINEAR_TABLE		= new Reference2ReferenceOpenHashMap<>();
+		MIPMAP_INVALID_TABLE	= new Reference2ReferenceOpenHashMap<>();
 		MIPMAP_NEAREST_TABLE	= new Reference2ReferenceOpenHashMap<>();
 		MIPMAP_LOOKUP_TABLE		= new Reference2ReferenceOpenHashMap<>();
 
+		MIPMAP_LOOKUP_TABLE.put(GLMipmapMode.INVALID,	MIPMAP_INVALID_TABLE);
 		MIPMAP_LOOKUP_TABLE.put(GLMipmapMode.NEAREST,	MIPMAP_NEAREST_TABLE);
 		MIPMAP_LOOKUP_TABLE.put(GLMipmapMode.LINEAR,	MIPMAP_LINEAR_TABLE);
 
