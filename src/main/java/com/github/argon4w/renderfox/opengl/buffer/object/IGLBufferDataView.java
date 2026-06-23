@@ -17,7 +17,7 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.opengl.buffer.object.wrapped;
+package com.github.argon4w.renderfox.opengl.buffer.object;
 
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.view.IMappedDataView;

@@ -17,7 +17,7 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.opengl.buffer.object.wrapped;
+package com.github.argon4w.renderfox.opengl.buffer.object;
 
 import com.github.argon4w.renderfox.data.coordinate.DataRange;
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
@@ -31,9 +31,9 @@ public class GLBufferDataView extends OffsetDataView<GLBufferDataView> implement
 	private final long			offset;
 
 	public GLBufferDataView(
-			IGLBuffer		buffer,
-			IDataView<?>	dataView,
-			long			length
+			IGLBuffer			buffer,
+			IDataView<?>		dataView,
+			long				length
 	) {
 		super(length);
 
@@ -57,9 +57,15 @@ public class GLBufferDataView extends OffsetDataView<GLBufferDataView> implement
 
 	@Override
 	public IDataRange flush() {
-		buffer.getRawBuffer().flushMappedRange(offset, limit());
+		buffer.getRawBuffer().flushMappedRange(
+				this.offset,
+				this.limit
+		);
 
-		return new DataRange(offset, limit());
+		return new DataRange(
+				this.offset,
+				this.limit
+		);
 	}
 
 	@Override
@@ -96,8 +102,8 @@ public class GLBufferDataView extends OffsetDataView<GLBufferDataView> implement
 		return new GLBufferDataView(
 				this.buffer,
 				this.dataView,
-				this.offset + position(),
-				remaining()
+				this.offset +	position	(),
+								remaining	()
 		);
 	}
 
@@ -128,18 +134,13 @@ public class GLBufferDataView extends OffsetDataView<GLBufferDataView> implement
 	}
 
 	@Override
-	protected long getOffset() {
-		return offset;
-	}
-
-	@Override
 	public IDataView<?> getDataView() {
 		return dataView;
 	}
 
 	@Override
-	public long address() {
-		return super.address() + offset;
+	protected long getOffset() {
+		return offset;
 	}
 
 	@Override

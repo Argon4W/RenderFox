@@ -21,7 +21,7 @@ package com.github.argon4w.renderfox.data.size;
 
 public interface IMutableSizeObject {
 
-	void onResize		(long bytes);
+	void onResize		(long size, long bytes);
 	void doResize		(long size, long bytes);
 	void beforeResize	();
 	void afterResize	();
@@ -39,7 +39,7 @@ public interface IMutableSizeObject {
 
 		beforeResize();
 
-		onResize	(bytes);
+		onResize	(size, bytes);
 		doResize	(size, bytes);
 		setSize		(size + bytes);
 

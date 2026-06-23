@@ -17,7 +17,7 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.opengl.buffer.object.wrapped;
+package com.github.argon4w.renderfox.opengl.buffer.object;
 
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.view.AddressDataView;
@@ -31,7 +31,7 @@ import com.github.argon4w.renderfox.opengl.buffer.function.parameter.GLBufferMap
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.GLBufferUsage;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
-import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferBase;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferBase;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 import com.github.argon4w.renderfox.opengl.format.GLDataType;
 import com.github.argon4w.renderfox.opengl.format.GLFormat;
@@ -409,9 +409,9 @@ public class GLBuffer implements IGLBuffer {
 
 	@Override
 	public void copyRangeDataTo(
-			IGLBufferBase	bufferWrite,
-			IDataRange		bufferCopyRangeRead,
-			IDataRange		bufferCopyRangeWrite
+			IGLRawBufferBase	bufferWrite,
+			IDataRange			bufferCopyRangeRead,
+			IDataRange			bufferCopyRangeWrite
 	) {
 		if (bufferCopyRangeRead == null) {
 			throw new IllegalArgumentException("BufferCopyRangeRead cannot be null.");
@@ -419,6 +419,10 @@ public class GLBuffer implements IGLBuffer {
 
 		if (bufferCopyRangeWrite == null) {
 			throw new IllegalArgumentException("BufferCopyRangeWrite cannot be null.");
+		}
+
+		if (bufferWrite == null) {
+			throw new IllegalArgumentException("BufferWrite cannot be null.");
 		}
 
 		buffer.copyRangeDataTo(
@@ -431,9 +435,9 @@ public class GLBuffer implements IGLBuffer {
 
 	@Override
 	public void copyRangeDataFrom(
-			IGLBufferBase	bufferRead,
-			IDataRange		bufferCopyRangeRead,
-			IDataRange		bufferCopyRangeWrite
+			IGLRawBufferBase	bufferRead,
+			IDataRange			bufferCopyRangeRead,
+			IDataRange			bufferCopyRangeWrite
 	) {
 		if (bufferCopyRangeRead == null) {
 			throw new IllegalArgumentException("BufferCopyRangeRead cannot be null.");
@@ -441,6 +445,10 @@ public class GLBuffer implements IGLBuffer {
 
 		if (bufferCopyRangeWrite == null) {
 			throw new IllegalArgumentException("BufferCopyRangeWrite cannot be null.");
+		}
+
+		if (bufferRead == null) {
+			throw new IllegalArgumentException("BufferRead cannot be null.");
 		}
 
 		buffer.copyRangeDataFrom(
@@ -464,15 +472,18 @@ public class GLBuffer implements IGLBuffer {
 	@Override
 	public void bindRange(
 			GLBufferBlockType	bufferBlockType,
-			int					bufferTargetIndex,
-			long				bufferBindOffset,
-			long				bufferBindSize
+			IDataRange			bufferTargetRange,
+			int					bufferTargetIndex
 	) {
+		if (bufferTargetRange == null) {
+			throw new IllegalArgumentException("BufferTargetRange cannot be null.");
+		}
+
 		buffer.bindRange(
 				bufferBlockType,
 				bufferTargetIndex,
-				bufferBindOffset,
-				bufferBindSize
+				bufferTargetRange.getOffset(),
+				bufferTargetRange.getLength()
 		);
 	}
 

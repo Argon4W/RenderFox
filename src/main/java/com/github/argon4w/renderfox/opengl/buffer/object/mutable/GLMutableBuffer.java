@@ -24,11 +24,11 @@ import com.github.argon4w.renderfox.data.size.IMutableSizeObject;
 import com.github.argon4w.renderfox.data.size.IResizeMethod;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
-import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.GLBufferWrapper;
-import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.IGLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.GLBufferView;
+import com.github.argon4w.renderfox.opengl.buffer.object.IGLBuffer;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
 
-public class GLMutableBuffer extends GLBufferWrapper implements IMutableSizeObject {
+public class GLMutableBuffer extends GLBufferView implements IMutableSizeObject {
 
 	protected final	GLBufferContext		bufferContext;
 	protected final	GLBufferType		bufferType;
@@ -92,31 +92,20 @@ public class GLMutableBuffer extends GLBufferWrapper implements IMutableSizeObje
 			return;
 		}
 
-		var newSize		= size + bytes;
-		var newBuffer	= bufferContext.getBufferCreator().createBuffer(
-				newSize,
-				bufferType,
-				storageFlag
+		var newBuffer = this.bufferContext.getBufferCreator().createBuffer(
+				size + bytes,
+				this.bufferType,
+				this.storageFlag
 		);
 
-		buffer.copyRangeDataTo(
+		this.buffer.copyRangeDataTo(
 				newBuffer,
 				this,
 				this
 		);
 
-		buffer.delete();
-		buffer = newBuffer;
-	}
-
-	@Override
-	public void setSize(long size) {
-		this.bufferSize = size;
-	}
-
-	@Override
-	public long getSize() {
-		return bufferSize;
+		this.buffer.delete();
+		this.buffer = newBuffer;
 	}
 
 	@Override
@@ -125,12 +114,32 @@ public class GLMutableBuffer extends GLBufferWrapper implements IMutableSizeObje
 	}
 
 	@Override
+	public void setSize(long size) {
+		bufferSize = size;
+	}
+
+	@Override
+	public long getSize() {
+		return bufferSize;
+	}
+
+	@Override
+	public long getLength() {
+		return bufferSize;
+	}
+
+	@Override
+	public long getOffset() {
+		return 0;
+	}
+
+	@Override
 	public IGLBuffer getBuffer() {
 		return buffer;
 	}
 
 	@Override
-	public void onResize(long bytes) {
+	public void onResize(long size, long bytes) {
 
 	}
 

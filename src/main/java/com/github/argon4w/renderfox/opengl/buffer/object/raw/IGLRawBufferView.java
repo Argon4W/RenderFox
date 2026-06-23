@@ -24,7 +24,7 @@ import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferBase;
 import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferOperation;
 import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferStore;
 
-public interface IGLRawBufferView extends IGLBufferBase, IGLBufferStore, IGLBufferOperation, IDataRange {
+public interface IGLRawBufferView extends IGLRawBufferBase, IGLBufferStore, IGLBufferOperation {
 
 	IGLRawBufferView view(long offset, long length);
 }

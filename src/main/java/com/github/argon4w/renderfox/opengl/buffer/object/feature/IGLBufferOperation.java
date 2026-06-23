@@ -52,9 +52,9 @@ public interface IGLBufferOperation extends IGLBufferBinding, IGLBufferTransfer 
 	long map(GLBufferMapAccessLegacy mapAccess);
 
 	long mapRange(
-			long				mapOffset,
-			long				mapLength,
-			GLBufferMapAccess	mapAccess
+			long					mapOffset,
+			long					mapLength,
+			GLBufferMapAccess		mapAccess
 	);
 
 	void unmap();

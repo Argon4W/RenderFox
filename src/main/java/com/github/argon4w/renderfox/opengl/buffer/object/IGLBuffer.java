@@ -17,19 +17,20 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.opengl.buffer.object.wrapped;
+package com.github.argon4w.renderfox.opengl.buffer.object;
 
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.format.ColorFloat;
 import com.github.argon4w.renderfox.format.ColorInt;
+import com.github.argon4w.renderfox.opengl.buffer.GLBufferBlockType;
+import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
-import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferBase;
-import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferBinding;
 import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferStore;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferBase;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 import com.github.argon4w.renderfox.opengl.format.GLInternalFormat;
 
-public interface IGLBuffer extends IGLBufferBase, IGLBufferStore, IGLBufferBinding, IDataRange {
+public interface IGLBuffer extends IGLRawBufferBase, IGLBufferStore {
 
 	IGLBufferDataView<?> mapRangeData(IDataRange mapDataRange, GLBufferMapAccess mapAccess);
 
@@ -83,15 +84,25 @@ public interface IGLBuffer extends IGLBufferBase, IGLBufferStore, IGLBufferBindi
 	);
 
 	void copyRangeDataTo(
-			IGLBufferBase	bufferWrite,
-			IDataRange		bufferCopyRangeRead,
-			IDataRange		bufferCopyRangeWrite
+			IGLRawBufferBase	bufferWrite,
+			IDataRange			bufferCopyRangeRead,
+			IDataRange			bufferCopyRangeWrite
 	);
 
 	void copyRangeDataFrom(
-			IGLBufferBase	bufferRead,
-			IDataRange		bufferCopyRangeRead,
-			IDataRange		bufferCopyRangeWrite
+			IGLRawBufferBase	bufferRead,
+			IDataRange			bufferCopyRangeRead,
+			IDataRange			bufferCopyRangeWrite
+	);
+
+	void bind(GLBufferType bufferType);
+
+	void bindBase(GLBufferBlockType bufferBlockType, int bindTargetIndex);
+
+	void bindRange(
+			GLBufferBlockType	bufferBlockType,
+			IDataRange			bufferTargetRange,
+			int					bufferTargetIndex
 	);
 
 	IGLBuffer view(IDataRange viewRange);

@@ -20,21 +20,16 @@
 package com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped;
 
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
-import com.github.argon4w.renderfox.format.ColorFloat;
-import com.github.argon4w.renderfox.format.ColorInt;
-import com.github.argon4w.renderfox.opengl.buffer.GLBufferBlockType;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
-import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferBase;
-import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
-import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.IGLBufferDataView;
+import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
-import com.github.argon4w.renderfox.opengl.format.GLInternalFormat;
 
 public class GLMappedBufferLegacy extends AbstractGLMappedBuffer {
 
-	private IGLBufferDataView<?> dataView;
+	private IGLBufferDataView<?>	dataView;
+	private int						dataViewCount;
 
 	public GLMappedBufferLegacy(
 			GLBufferContext		bufferContext,
@@ -55,271 +50,66 @@ public class GLMappedBufferLegacy extends AbstractGLMappedBuffer {
 				mapAccess
 		);
 
-		this.dataView = null;
+		this.dataView		= null;
+		this.dataViewCount	= 0;
+	}
+
+	private void unmapBuffer() {
+		if (dataView != null) {
+			dataView.close();
+		}
+	}
+
+	private void mapBuffer() {
+		if (dataView == null) {
+			dataView = buffer.mapRangeData(buffer, mapAccess);
+		}
+	}
+
+	@Override
+	public void open() {
+		if (++ dataViewCount > 0) {
+			mapBuffer();
+		}
+	}
+
+	@Override
+	protected void close() {
+		if (-- dataViewCount == 0) {
+			unmapBuffer();
+		}
 	}
 
 	@Override
 	protected void map() {
-		dataView = buffer.mapRangeData(buffer, mapAccess);
+		if (dataViewCount > 0) {
+			mapBuffer();
+		}
 	}
 
 	@Override
 	protected void unmap() {
-		dataView.close();
-		dataView = null;
+		if (dataViewCount > 0) {
+			unmapBuffer();
+		}
+	}
+
+	@Override
+	public void clear() {
+		if (dataViewCount > 0) {
+			throw new IllegalStateException("Cannot clear the mapped buffer while it is still occupied.");
+		}
+
+		super.clear();
 	}
 
 	@Override
 	public IDataRange flush(IDataRange range) {
-		unmap();
 		return range;
 	}
 
 	@Override
 	protected IGLBufferDataView<?> getDataView() {
 		return dataView;
-	}
-
-	@Override
-	public void open() {
-		map();
-	}
-
-	@Override
-	public void clearAllData(byte value) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.clearAllData(value);
-	}
-
-	@Override
-	public void clearAllData(GLInternalFormat internalFormat, ColorFloat clearColor) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.clearAllData(internalFormat, clearColor);
-	}
-
-	@Override
-	public void clearAllData(GLInternalFormat internalFormat, ColorInt clearColor) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.clearAllData(internalFormat, clearColor);
-	}
-
-	@Override
-	public void clearAllData(
-			GLInternalFormat	internalFormat,
-			float				clearColorDepth,
-			int					clearColorStencil
-	) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.clearAllData(
-				internalFormat,
-				clearColorDepth,
-				clearColorStencil
-		);
-	}
-
-	@Override
-	public void clearAllData(GLInternalFormat internalFormat, float clearColorDepth) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.clearAllData(internalFormat, clearColorDepth);
-	}
-
-	@Override
-	public void clearAllData(GLInternalFormat internalFormat, int clearColorStencil) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.clearAllData(internalFormat, clearColorStencil);
-	}
-
-	@Override
-	public void clearRangeData(IDataRange clearRangeElement, byte value) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.clearRangeData(clearRangeElement, value);
-	}
-
-	@Override
-	public void clearRangeData(
-			GLInternalFormat	internalFormat,
-			IDataRange			clearRangeElement,
-			ColorFloat			clearColor
-	) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.clearRangeData(
-				internalFormat,
-				clearRangeElement,
-				clearColor
-		);
-	}
-
-	@Override
-	public void clearRangeData(
-			GLInternalFormat	internalFormat,
-			IDataRange			clearRangeElement,
-			ColorInt			clearColor
-	) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.clearRangeData(
-				internalFormat,
-				clearRangeElement,
-				clearColor
-		);
-	}
-
-	@Override
-	public void clearRangeData(
-			GLInternalFormat	internalFormat,
-			IDataRange			clearRangeElement,
-			float				clearColorDepth,
-			int					clearColorStencil
-	) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.clearRangeData(
-				internalFormat,
-				clearRangeElement,
-				clearColorDepth,
-				clearColorStencil
-		);
-	}
-
-	@Override
-	public void clearRangeData(
-			GLInternalFormat	internalFormat,
-			IDataRange			clearRangeElement,
-			float				clearColorDepth
-	) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.clearRangeData(
-				internalFormat,
-				clearRangeElement,
-				clearColorDepth
-		);
-	}
-
-	@Override
-	public void clearRangeData(
-			GLInternalFormat	internalFormat,
-			IDataRange			clearRangeElement,
-			int					clearColorStencil
-	) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.clearRangeData(
-				internalFormat,
-				clearRangeElement,
-				clearColorStencil
-		);
-	}
-
-	@Override
-	public IGLRawBufferView getRawBuffer() {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		return super.getRawBuffer();
-	}
-
-	@Override
-	public void bind(GLBufferType bufferType) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.bind(bufferType);
-	}
-
-	@Override
-	public void bindBase(GLBufferBlockType bufferBlockType, int bindTargetIndex) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.bindBase(bufferBlockType, bindTargetIndex);
-	}
-
-	@Override
-	public void bindRange(
-			GLBufferBlockType	bufferBlockType,
-			int					bufferTargetIndex,
-			long				bufferBindOffset,
-			long				bufferBindSize
-	) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.bindRange(
-				bufferBlockType,
-				bufferTargetIndex,
-				bufferBindOffset,
-				bufferBindSize
-		);
-	}
-
-	@Override
-	public void copyRangeDataTo(
-			IGLBufferBase bufferWrite,
-			IDataRange		bufferCopyRangeRead,
-			IDataRange		bufferCopyRangeWrite
-	) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.copyRangeDataTo(
-				bufferWrite,
-				bufferCopyRangeRead,
-				bufferCopyRangeWrite
-		);
-	}
-
-	@Override
-	public void copyRangeDataFrom(
-			IGLBufferBase	bufferRead,
-			IDataRange		bufferCopyRangeRead,
-			IDataRange		bufferCopyRangeWrite
-	) {
-		if (isMapped()) {
-			throw new IllegalStateException("Buffer is occupied.");
-		}
-
-		super.copyRangeDataFrom(
-				bufferRead,
-				bufferCopyRangeRead,
-				bufferCopyRangeWrite
-		);
 	}
 }

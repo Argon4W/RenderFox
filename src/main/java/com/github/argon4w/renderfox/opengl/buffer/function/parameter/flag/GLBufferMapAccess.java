@@ -37,7 +37,7 @@ public class GLBufferMapAccess {
 		this.bitFlags = 0;
 	}
 
-	public int getRawFlags() {
+	public int getFlags() {
 		return bitFlags;
 	}
 
@@ -51,6 +51,10 @@ public class GLBufferMapAccess {
 
 	public void remove(GLBufferAccessBit accessBit) {
 		bitFlags &= ~accessBit.getBitMask();
+	}
+
+	public boolean same(GLBufferMapAccess access) {
+		return access.bitFlags == this.bitFlags;
 	}
 
 	public boolean has(GLBufferAccessBit accessBit) {

@@ -33,7 +33,6 @@ import com.github.argon4w.renderfox.opengl.texture.GLTextureType;
 import com.github.argon4w.renderfox.opengl.texture.constant.filter.GLFilterMode;
 import com.github.argon4w.renderfox.opengl.texture.constant.filter.GLTextureFilter;
 import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLRawTextureBase;
-import com.github.argon4w.renderfox.opengl.texture.object.raw.IGLRawTextureView;
 
 public class GLFramebufferFunctionsHelper extends AbstractGLFramebufferStore implements IGLRawFramebuffer {
 
@@ -159,7 +158,7 @@ public class GLFramebufferFunctionsHelper extends AbstractGLFramebufferStore imp
 				attachment			.getConstant		(),
 				attachmentTexture	.getTextureHandle	(),
 				attachmentTexture	.getTextureType		(),
-				attachmentTexture	.getRealLevel		(attachmentTextureMipLevel)
+				attachmentTexture	.getMipLevel		(attachmentTextureMipLevel)
 		);
 	}
 
@@ -465,7 +464,7 @@ public class GLFramebufferFunctionsHelper extends AbstractGLFramebufferStore imp
 				blitWritePositionYStart,
 				blitWritePositionXEnd,
 				blitWritePositionYEnd,
-				blitWriteBuffer						.getRawFlags(),
+				blitWriteBuffer						.getFlags	(),
 				GLTextureFilter.from(blitFilterMode).getConstant()
 		);
 	}
@@ -515,7 +514,7 @@ public class GLFramebufferFunctionsHelper extends AbstractGLFramebufferStore imp
 				blitWritePositionYStart,
 				blitWritePositionXEnd,
 				blitWritePositionYEnd,
-				blitWriteBuffer						.getRawFlags(),
+				blitWriteBuffer						.getFlags	(),
 				GLTextureFilter.from(blitFilterMode).getConstant()
 		);
 	}

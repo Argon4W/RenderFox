@@ -55,7 +55,7 @@ public abstract class AbstractGLTextureStore implements IGLTextureStore, IGLText
 	}
 
 	@Override
-	public int getRealLevel(int mipLevel) {
+	public int getMipLevel(int mipLevel) {
 		return mipLevel;
 	}
 

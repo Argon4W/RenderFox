@@ -239,7 +239,7 @@ public class GLRawTextureViewLegacy extends AbstractGLRawTextureView {
 	}
 
 	@Override
-	public int getRealLevel(int mipLevel) {
+	public int getMipLevel(int mipLevel) {
 		return texture.getBaseLevel() + mipLevel;
 	}
 

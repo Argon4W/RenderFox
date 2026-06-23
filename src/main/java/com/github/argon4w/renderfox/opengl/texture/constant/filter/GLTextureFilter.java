@@ -25,9 +25,6 @@ import com.github.argon4w.renderfox.opengl.function.helper.IGLGlobalFunctionsHel
 import com.github.argon4w.renderfox.opengl.texture.GLTextureType;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceMap;
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceMaps;
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import org.lwjgl.opengl.GL11;
 
 public enum GLTextureFilter {
@@ -40,26 +37,24 @@ public enum GLTextureFilter {
 	NEAREST_MIPMAP_LINEAR	(GL11.GL_NEAREST_MIPMAP_LINEAR,		false,	GLMipmapMode.NEAREST,	GLFilterMode.LINEAR),
 	LINEAR_MIPMAP_LINEAR	(GL11.GL_LINEAR_MIPMAP_LINEAR,		false,	GLMipmapMode.LINEAR,	GLFilterMode.LINEAR),;
 
-	private static final Int2ReferenceMap		<GLTextureFilter>														TABLE;
-	private static final Reference2ReferenceMap	<GLFilterMode, GLTextureFilter>											MIPMAP_INVALID_TABLE;
-	private static final Reference2ReferenceMap	<GLFilterMode, GLTextureFilter>											MIPMAP_LINEAR_TABLE;
-	private static final Reference2ReferenceMap	<GLFilterMode, GLTextureFilter>											MIPMAP_NEAREST_TABLE;
-	private static final Reference2ReferenceMap	<GLMipmapMode, Reference2ReferenceMap<GLFilterMode, GLTextureFilter>>	MIPMAP_LOOKUP_TABLE;
+	private static final Int2ReferenceMap<GLTextureFilter>	TABLE_CONSTANT;
+	private static final GLTextureFilter[][]				TABLE_MIPMAP;
 
 	static {
-		TABLE					= new Int2ReferenceOpenHashMap		<>();
-		MIPMAP_LINEAR_TABLE		= new Reference2ReferenceOpenHashMap<>();
-		MIPMAP_INVALID_TABLE	= new Reference2ReferenceOpenHashMap<>();
-		MIPMAP_NEAREST_TABLE	= new Reference2ReferenceOpenHashMap<>();
-		MIPMAP_LOOKUP_TABLE		= new Reference2ReferenceOpenHashMap<>();
+		TABLE_CONSTANT	= new Int2ReferenceOpenHashMap<>();
+		TABLE_MIPMAP	= new GLTextureFilter			[3][];
 
-		MIPMAP_LOOKUP_TABLE.put(GLMipmapMode.INVALID,	MIPMAP_INVALID_TABLE);
-		MIPMAP_LOOKUP_TABLE.put(GLMipmapMode.NEAREST,	MIPMAP_NEAREST_TABLE);
-		MIPMAP_LOOKUP_TABLE.put(GLMipmapMode.LINEAR,	MIPMAP_LINEAR_TABLE);
+		TABLE_MIPMAP[GLMipmapMode.INVALID	.ordinal()] = new GLTextureFilter[3];
+		TABLE_MIPMAP[GLMipmapMode.NEAREST	.ordinal()] = new GLTextureFilter[3];
+		TABLE_MIPMAP[GLMipmapMode.LINEAR	.ordinal()] = new GLTextureFilter[3];
 
 		for (var mode : GLTextureFilter.values()) {
-			TABLE											.put(mode.getConstant	(), mode);
-			MIPMAP_LOOKUP_TABLE.get(mode.getMipmapMode())	.put(mode.getFilterMode	(), mode);
+			var constant	= mode.constant;
+			var mipMode		= mode.mipmapMode.ordinal();
+			var filterMode	= mode.filterMode.ordinal();
+
+			TABLE_CONSTANT.put(constant, mode);
+			TABLE_MIPMAP[mipMode][filterMode] = mode;
 		}
 	}
 
@@ -97,7 +92,7 @@ public enum GLTextureFilter {
 	}
 
 	public static GLTextureFilter fromConstant(int constant) {
-		return TABLE.getOrDefault(constant, INVALID);
+		return TABLE_CONSTANT.getOrDefault(constant, INVALID);
 	}
 
 	public static GLTextureFilter from(GLFilterMode filterMode) {
@@ -105,7 +100,7 @@ public enum GLTextureFilter {
 	}
 
 	public static GLTextureFilter from(GLFilterMode filterMode, GLMipmapMode mipmapMode) {
-		return MIPMAP_LOOKUP_TABLE.getOrDefault(mipmapMode, Reference2ReferenceMaps.emptyMap()).getOrDefault(filterMode, INVALID);
+		return TABLE_MIPMAP[mipmapMode.ordinal()][filterMode.ordinal()];
 	}
 
 	public static class TextureDefinedConstants extends AbstractGLDefinedConstants<GLTextureType> {

@@ -23,7 +23,7 @@ import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
-import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.IGLBufferDataView;
+import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
 
 public class GLMappedBufferPersistent extends AbstractGLMappedBuffer {
@@ -49,18 +49,20 @@ public class GLMappedBufferPersistent extends AbstractGLMappedBuffer {
 				mapAccess
 		);
 
-		map();
-	}
-
-	@Override
-	protected void map() {
-		dataView = buffer.mapRangeData(buffer, mapAccess);
+		this.dataView = this.buffer.mapRangeData(
+				this.buffer,
+				this.mapAccess
+		);
 	}
 
 	@Override
 	protected void unmap() {
 		dataView.close();
-		dataView = null;
+	}
+
+	@Override
+	protected void map() {
+		dataView = buffer.mapRangeData(buffer, mapAccess);
 	}
 
 	@Override
@@ -75,6 +77,11 @@ public class GLMappedBufferPersistent extends AbstractGLMappedBuffer {
 
 	@Override
 	public void open() {
+
+	}
+
+	@Override
+	public void close() {
 
 	}
 }

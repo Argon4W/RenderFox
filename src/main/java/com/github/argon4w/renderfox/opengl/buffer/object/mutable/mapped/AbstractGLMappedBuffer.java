@@ -27,8 +27,7 @@ import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBuff
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
 import com.github.argon4w.renderfox.opengl.buffer.object.mutable.GLMutableBuffer;
-import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.IGLBuffer;
-import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.IGLBufferDataView;
+import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
 
 public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements IGLMappedBuffer {
@@ -65,9 +64,11 @@ public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements 
 	}
 
 	protected abstract void			open		();
+	protected abstract void			close		();
 	protected abstract void			map			();
 	protected abstract void			unmap		();
 	protected abstract IDataView<?>	getDataView	();
+	protected abstract IDataRange	flush		(IDataRange range);
 
 	@Override
 	public IMappedDataView<?> reserve(long size) {
@@ -77,19 +78,38 @@ public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements 
 			throw new IllegalArgumentException("Size cannot be negative.");
 		}
 
-		if (buffer.isDeleted()) {
+		if (this.buffer.isDeleted()) {
 			throw new IllegalStateException("The buffer has been deleted.");
 		}
 
-		if (!isMapped()) {
+		if (!this.buffer.isMapped()) {
 			throw new IllegalStateException("The buffer is not in a mapped state.");
 		}
 
-		if (mapView.remaining() < size) {
-			resize(mapView.position() + size);
+		if (this.mapView.remaining() < size) {
+			resize(this.mapView.position() + size);
 		}
 
-		return mapView.slice(size);
+		return this.mapView.slice(size);
+	}
+
+	@Override
+	public IGLBufferDataView<?> mapRangeData(IDataRange mapRange, GLBufferMapAccess mapAccess) {
+		open();
+
+		if (this.buffer.isDeleted()) {
+			throw new IllegalStateException("The buffer has been deleted.");
+		}
+
+		if (!this.buffer.isMapped()) {
+			throw new IllegalStateException("The buffer is not in a mapped state.");
+		}
+
+		if (!this.mapAccess.same(mapAccess)) {
+			throw new IllegalStateException("The mapAccess is not equal to the pre-defined mapAccess in the buffer.");
+		}
+
+		return mapView.slice(mapRange);
 	}
 
 	@Override
@@ -115,13 +135,7 @@ public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements 
 	}
 
 	@Override
-	public IGLBufferDataView<?> mapRangeData(IDataRange mapRange, GLBufferMapAccess mapAccess) {
-		open();
-		return mapView.slice(mapRange);
-	}
-
-	@Override
-	public IGLBuffer view(IDataRange viewRange) {
+	public GLMappedBufferView view(IDataRange viewRange) {
 		if (buffer.isDeleted()) {
 			throw new IllegalStateException("The buffer has been deleted.");
 		}
@@ -144,8 +158,9 @@ public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements 
 
 		return new GLMappedBufferView(
 				this,
-				viewRange.getOffset(),
-				viewRange.getLength()
+				mapView		.slice		(viewRange),
+				viewRange	.getOffset	(),
+				viewRange	.getLength	()
 		);
 	}
 }

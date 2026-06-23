@@ -19,19 +19,21 @@
 
 package com.github.argon4w.renderfox.opengl.buffer.object.feature;
 
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferBase;
+
 public interface IGLBufferTransfer {
 
 	void copyRangeDataTo(
-			IGLBufferBase	bufferWrite,
-			long			bufferCopyOffsetRead,
-			long			bufferCopyOffsetWrite,
-			long			bufferCopySize
+			IGLRawBufferBase	bufferWrite,
+			long				bufferCopyOffsetRead,
+			long				bufferCopyOffsetWrite,
+			long				bufferCopySize
 	);
 
 	void copyRangeDataFrom(
-			IGLBufferBase	bufferRead,
-			long			bufferCopyOffsetRead,
-			long			bufferCopyOffsetWrite,
-			long			bufferCopySize
+			IGLRawBufferBase	bufferRead,
+			long				bufferCopyOffsetRead,
+			long				bufferCopyOffsetWrite,
+			long				bufferCopySize
 	);
 }

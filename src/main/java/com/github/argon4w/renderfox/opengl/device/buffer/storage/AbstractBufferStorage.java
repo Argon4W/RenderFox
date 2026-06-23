@@ -24,11 +24,12 @@ import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
 import com.github.argon4w.renderfox.opengl.buffer.object.GLBufferCreateInfo;
+import com.github.argon4w.renderfox.opengl.buffer.object.mutable.GLMutableBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.GLMappedBufferCreateInfo;
 import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.IGLMappedBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBuffer;
-import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.GLBuffer;
-import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.IGLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.GLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.IGLBuffer;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
 import org.lwjgl.system.MemoryUtil;
 
@@ -188,6 +189,87 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 		);
 
 		return new GLBuffer(buffer);
+	}
+
+	@Override
+	public IGLBuffer createMutableBuffer(
+			long				bufferSize,
+			GLBufferType		bufferType,
+			GLBufferStorageFlag	storageFlag
+	) {
+		return createMutableBuffer(
+				MemoryUtil.NULL,
+				MemoryUtil.NULL,
+				bufferSize,
+				bufferType,
+				storageFlag
+		);
+	}
+
+	@Override
+	public IGLBuffer createMutableBuffer(
+			IDataView<?>		bufferData,
+			GLBufferType		bufferType,
+			GLBufferStorageFlag	storageFlag
+	) {
+		if (bufferData == null) {
+			throw new IllegalArgumentException("BufferData cannot be null.");
+		}
+
+		return createMutableBuffer(
+				bufferData,
+				bufferData.position	(),
+				bufferData.remaining(),
+				bufferType,
+				storageFlag
+		);
+	}
+
+	@Override
+	public IGLBuffer createMutableBuffer(
+			IDataView<?>		bufferData,
+			long				bufferDataOffset,
+			long				bufferDataSize,
+			GLBufferType		bufferType,
+			GLBufferStorageFlag	storageFlag
+	) {
+		if (bufferData == null) {
+			throw new IllegalArgumentException("BufferData cannot be null.");
+		}
+
+		if (!bufferData.isOffHeap()) {
+			throw new IllegalArgumentException("BufferData is not an off-heap data view.");
+		}
+
+		if (bufferDataOffset + bufferDataSize > bufferData.limit()) {
+			throw new IllegalArgumentException("BufferDataOffset + bufferDataSize cannot be greater than the value of buffer limit.");
+		}
+
+		return createMutableBuffer(
+				bufferData.address(),
+				bufferDataOffset,
+				bufferDataSize,
+				bufferType,
+				storageFlag
+		);
+	}
+
+	@Override
+	public IGLBuffer createMutableBuffer(
+			long				bufferDataAddress,
+			long				bufferDataOffset,
+			long				bufferDataSize,
+			GLBufferType		bufferType,
+			GLBufferStorageFlag	storageFlag
+	) {
+		return new GLMutableBuffer(
+				bufferContext,
+				bufferDataAddress,
+				bufferDataOffset,
+				bufferDataSize,
+				bufferType,
+				storageFlag
+		);
 	}
 
 	@Override

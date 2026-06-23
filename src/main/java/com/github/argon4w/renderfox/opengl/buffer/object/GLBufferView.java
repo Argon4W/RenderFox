@@ -17,8 +17,9 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.opengl.buffer.object.wrapped;
+package com.github.argon4w.renderfox.opengl.buffer.object;
 
+import com.github.argon4w.renderfox.data.coordinate.DataRange;
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.format.ColorFloat;
 import com.github.argon4w.renderfox.format.ColorInt;
@@ -28,13 +29,15 @@ import com.github.argon4w.renderfox.opengl.buffer.function.parameter.GLBufferMap
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.GLBufferUsage;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
-import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferBase;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferBase;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 import com.github.argon4w.renderfox.opengl.format.GLInternalFormat;
 
-public abstract class GLBufferWrapper implements IGLBuffer {
+public abstract class GLBufferView implements IGLBuffer {
 
-	public abstract IGLBuffer getBuffer();
+	public abstract IGLBuffer	getBuffer();
+	public abstract long		getOffset();
+	public abstract long		getLength();
 
 	@Override
 	public IGLBufferDataView<?> mapRangeData(IDataRange dataRange, GLBufferMapAccess mapAccess) {
@@ -42,7 +45,21 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
-		return getBuffer().mapRangeData(dataRange, mapAccess);
+		if (dataRange == null) {
+			throw new IllegalArgumentException("DataRange cannot be null.");
+		}
+
+		if (dataRange.getOffset() + dataRange.getLength() > getLength()) {
+			throw new IllegalArgumentException("Offset + length cannot be greater than the value of length of the wrapper.");
+		}
+
+		return getBuffer().mapRangeData(
+				new DataRange(
+						getOffset() +	dataRange.getOffset(),
+										dataRange.getLength()
+				),
+				mapAccess
+		);
 	}
 
 	@Override
@@ -51,7 +68,7 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
-		getBuffer().clearAllData(value);
+		getBuffer().clearRangeData(this, value);
 	}
 
 	@Override
@@ -60,7 +77,11 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
-		getBuffer().clearAllData(internalFormat, clearColor);
+		getBuffer().clearRangeData(
+				internalFormat,
+				this,
+				clearColor
+		);
 	}
 
 	@Override
@@ -69,7 +90,11 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
-		getBuffer().clearAllData(internalFormat, clearColor);
+		getBuffer().clearRangeData(
+				internalFormat,
+				this,
+				clearColor
+		);
 	}
 
 	@Override
@@ -82,8 +107,9 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
-		getBuffer().clearAllData(
+		getBuffer().clearRangeData(
 				internalFormat,
+				this,
 				clearColorDepth,
 				clearColorStencil
 		);
@@ -95,7 +121,11 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
-		getBuffer().clearAllData(internalFormat, clearColorDepth);
+		getBuffer().clearRangeData(
+				internalFormat,
+				this,
+				clearColorDepth
+		);
 	}
 
 	@Override
@@ -104,7 +134,11 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
-		getBuffer().clearAllData(internalFormat, clearColorStencil);
+		getBuffer().clearRangeData(
+				internalFormat,
+				this,
+				clearColorStencil
+		);
 	}
 
 	@Override
@@ -113,7 +147,21 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
-		getBuffer().clearRangeData(clearRangeElement, value);
+		if (clearRangeElement == null) {
+			throw new IllegalArgumentException("ClearRangeElement cannot be null.");
+		}
+
+		if (clearRangeElement.getOffset() + clearRangeElement.getLength() > getLength()) {
+			throw new IllegalArgumentException("Offset + length cannot be greater than the value of length of the wrapper.");
+		}
+
+		getBuffer().clearRangeData(
+				new DataRange(
+						getOffset() +	clearRangeElement.getOffset(),
+										clearRangeElement.getLength()
+				),
+				value
+		);
 	}
 
 	@Override
@@ -126,9 +174,20 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
+		if (clearRangeElement == null) {
+			throw new IllegalArgumentException("ClearRangeElement cannot be null.");
+		}
+
+		if (clearRangeElement.getOffset() + clearRangeElement.getLength() > getLength()) {
+			throw new IllegalArgumentException("Offset + length cannot be greater than the value of length of the wrapper.");
+		}
+
 		getBuffer().clearRangeData(
 				internalFormat,
-				clearRangeElement,
+				new DataRange(
+						getOffset() +	clearRangeElement.getOffset(),
+										clearRangeElement.getLength()
+				),
 				clearColor
 		);
 	}
@@ -143,9 +202,20 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
+		if (clearRangeElement == null) {
+			throw new IllegalArgumentException("ClearRangeElement cannot be null.");
+		}
+
+		if (clearRangeElement.getOffset() + clearRangeElement.getLength() > getLength()) {
+			throw new IllegalArgumentException("Offset + length cannot be greater than the value of length of the wrapper.");
+		}
+
 		getBuffer().clearRangeData(
 				internalFormat,
-				clearRangeElement,
+				new DataRange(
+						getOffset() +	clearRangeElement.getOffset(),
+										clearRangeElement.getLength()
+				),
 				clearColor
 		);
 	}
@@ -161,9 +231,20 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
+		if (clearRangeElement == null) {
+			throw new IllegalArgumentException("ClearRangeElement cannot be null.");
+		}
+
+		if (clearRangeElement.getOffset() + clearRangeElement.getLength() > getLength()) {
+			throw new IllegalArgumentException("Offset + length cannot be greater than the value of length of the wrapper.");
+		}
+
 		getBuffer().clearRangeData(
 				internalFormat,
-				clearRangeElement,
+				new DataRange(
+						getOffset() +	clearRangeElement.getOffset(),
+										clearRangeElement.getLength()
+				),
 				clearColorDepth,
 				clearColorStencil
 		);
@@ -179,9 +260,20 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
+		if (clearRangeElement == null) {
+			throw new IllegalArgumentException("ClearRangeElement cannot be null.");
+		}
+
+		if (clearRangeElement.getOffset() + clearRangeElement.getLength() > getLength()) {
+			throw new IllegalArgumentException("Offset + length cannot be greater than the value of length of the wrapper.");
+		}
+
 		getBuffer().clearRangeData(
 				internalFormat,
-				clearRangeElement,
+				new DataRange(
+						getOffset() +	clearRangeElement.getOffset(),
+										clearRangeElement.getLength()
+				),
 				clearColorDepth
 		);
 	}
@@ -196,9 +288,20 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
+		if (clearRangeElement == null) {
+			throw new IllegalArgumentException("ClearRangeElement cannot be null.");
+		}
+
+		if (clearRangeElement.getOffset() + clearRangeElement.getLength() > getLength()) {
+			throw new IllegalArgumentException("Offset + length cannot be greater than the value of length of the wrapper.");
+		}
+
 		getBuffer().clearRangeData(
 				internalFormat,
-				clearRangeElement,
+				new DataRange(
+						getOffset() +	clearRangeElement.getOffset(),
+										clearRangeElement.getLength()
+				),
 				clearColorStencil
 		);
 	}
@@ -227,58 +330,93 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
-		getBuffer().bindBase(bufferBlockType, bindTargetIndex);
+		getBuffer().bindRange(
+				bufferBlockType,
+				this,
+				bindTargetIndex
+		);
 	}
 
 	@Override
 	public void bindRange(
 			GLBufferBlockType	bufferBlockType,
-			int					bufferTargetIndex,
-			long				bufferBindOffset,
-			long				bufferBindSize
+			IDataRange			bufferTargetRange,
+			int					bufferTargetIndex
 	) {
 		if (getBuffer() == null) {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
+		if (bufferTargetRange == null) {
+			throw new IllegalArgumentException("BufferTargetRange cannot be null.");
+		}
+
+		if (bufferTargetRange.getOffset() + bufferTargetRange.getLength() > getLength()) {
+			throw new IllegalArgumentException("Offset + length cannot be greater than the value of length of the wrapper.");
+		}
+
 		getBuffer().bindRange(
 				bufferBlockType,
-				bufferTargetIndex,
-				bufferBindOffset,
-				bufferBindSize
+				new DataRange(
+						getOffset() +	bufferTargetRange.getOffset(),
+										bufferTargetRange.getLength()
+				),
+				bufferTargetIndex
 		);
 	}
 
 	@Override
 	public void copyRangeDataTo(
-			IGLBufferBase	bufferWrite,
-			IDataRange		bufferCopyRangeRead,
-			IDataRange		bufferCopyRangeWrite
+			IGLRawBufferBase	bufferWrite,
+			IDataRange			bufferCopyRangeRead,
+			IDataRange			bufferCopyRangeWrite
 	) {
 		if (getBuffer() == null) {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
+		if (bufferCopyRangeRead == null) {
+			throw new IllegalArgumentException("BufferCopyRangeRead cannot be null.");
+		}
+
+		if (bufferCopyRangeRead.getOffset() + bufferCopyRangeRead.getLength() > getLength()) {
+			throw new IllegalArgumentException("Offset + length cannot be greater than the value of length of the wrapper.");
+		}
+
 		getBuffer().copyRangeDataTo(
 				bufferWrite,
-				bufferCopyRangeRead,
+				new DataRange(
+						getOffset() +	bufferCopyRangeRead.getOffset(),
+										bufferCopyRangeRead.getLength()
+				),
 				bufferCopyRangeWrite
 		);
 	}
 
 	@Override
 	public void copyRangeDataFrom(
-			IGLBufferBase	bufferRead,
-			IDataRange		bufferCopyRangeRead,
-			IDataRange		bufferCopyRangeWrite
+			IGLRawBufferBase	bufferRead,
+			IDataRange			bufferCopyRangeRead,
+			IDataRange			bufferCopyRangeWrite
 	) {
 		if (getBuffer() == null) {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
+		if (bufferCopyRangeRead == null) {
+			throw new IllegalArgumentException("BufferCopyRangeRead cannot be null.");
+		}
+
+		if (bufferCopyRangeRead.getOffset() + bufferCopyRangeRead.getLength() > getLength()) {
+			throw new IllegalArgumentException("Offset + length cannot be greater than the value of length of the wrapper.");
+		}
+
 		getBuffer().copyRangeDataFrom(
 				bufferRead,
-				bufferCopyRangeRead,
+				new DataRange(
+						getOffset() +	bufferCopyRangeRead.getOffset(),
+										bufferCopyRangeRead.getLength()
+				),
 				bufferCopyRangeWrite
 		);
 	}
@@ -299,15 +437,6 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 		}
 
 		return getBuffer().getBufferType();
-	}
-
-	@Override
-	public int getBufferSize() {
-		if (getBuffer() == null) {
-			throw new IllegalStateException("buffer cannot be null.");
-		}
-
-		return getBuffer().getBufferSize();
 	}
 
 	@Override
@@ -419,29 +548,16 @@ public abstract class GLBufferWrapper implements IGLBuffer {
 	}
 
 	@Override
-	public long getOffset() {
-		if (getBuffer() == null) {
-			throw new IllegalStateException("buffer cannot be null.");
-		}
-
-		return getBuffer().getOffset();
-	}
-
-	@Override
-	public long getLength() {
-		if (getBuffer() == null) {
-			throw new IllegalStateException("buffer cannot be null.");
-		}
-
-		return getBuffer().getLength();
-	}
-
-	@Override
 	public void delete() {
 		if (getBuffer() == null) {
 			throw new IllegalStateException("buffer cannot be null.");
 		}
 
 		getBuffer().delete();
+	}
+
+	@Override
+	public int getBufferSize() {
+		return (int) getLength();
 	}
 }

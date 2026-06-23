@@ -20,26 +20,29 @@
 package com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped;
 
 import com.github.argon4w.renderfox.buffer.IMappedBuffer;
-import com.github.argon4w.renderfox.data.coordinate.DataRange;
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.view.IMappedDataView;
-import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.GLBufferWrapper;
-import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.IGLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.GLBufferView;
+import com.github.argon4w.renderfox.opengl.buffer.object.IGLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
 
-public class GLMappedBufferView extends GLBufferWrapper implements IMappedBuffer {
+public class GLMappedBufferView extends GLBufferView implements IMappedBuffer {
 
 	private final AbstractGLMappedBuffer	buffer;
+	private final IGLBufferDataView<?>		dataView;
 	private final long						offset;
 	private final long						length;
 
 	public GLMappedBufferView(
 			AbstractGLMappedBuffer	buffer,
+			IGLBufferDataView<?>	dataView,
 			long					offset,
 			long					length
 	) {
-		this.buffer = buffer;
-		this.offset = offset;
-		this.length = length;
+		this.buffer		= buffer;
+		this.dataView	= dataView;
+		this.offset		= offset;
+		this.length		= length;
 	}
 
 	@Override
@@ -56,11 +59,11 @@ public class GLMappedBufferView extends GLBufferWrapper implements IMappedBuffer
 			throw new IllegalArgumentException("Size cannot be greater than length of the buffer view.");
 		}
 
-		return buffer.reserve(size);
+		return dataView.slice(size);
 	}
 
 	@Override
-	public IGLBuffer view(IDataRange viewRange) {
+	public GLMappedBufferView view(IDataRange viewRange) {
 		if (buffer.isDeleted()) {
 			throw new IllegalStateException("The buffer has been deleted.");
 		}
@@ -83,6 +86,7 @@ public class GLMappedBufferView extends GLBufferWrapper implements IMappedBuffer
 
 		return new GLMappedBufferView(
 				this.buffer,
+				this.dataView.slice(viewRange),
 				this.offset +	viewRange.getOffset(),
 								viewRange.getLength()
 		);
@@ -90,12 +94,17 @@ public class GLMappedBufferView extends GLBufferWrapper implements IMappedBuffer
 
 	@Override
 	public IGLBuffer getBuffer() {
-		return buffer.view(new DataRange(offset, length));
+		return buffer;
 	}
 
 	@Override
-	public IDataRange flush(IDataRange range) {
-		throw new UnsupportedOperationException("Cannot flush a view of buffer.");
+	public long getOffset() {
+		return offset;
+	}
+
+	@Override
+	public long getLength() {
+		return length;
 	}
 
 	@Override
@@ -106,5 +115,20 @@ public class GLMappedBufferView extends GLBufferWrapper implements IMappedBuffer
 	@Override
 	public void delete() {
 		throw new UnsupportedOperationException("Cannot delete a view of buffer.");
+	}
+
+	@Override
+	public IDataRange getMapRange() {
+		throw new UnsupportedOperationException("Cannot get the map range from a view of buffer.");
+	}
+
+	@Override
+	public long getMapOffset() {
+		throw new UnsupportedOperationException("Cannot get the map offset from a view of buffer.");
+	}
+
+	@Override
+	public long getMapLength() {
+		throw new UnsupportedOperationException("Cannot get the map length from a view of buffer.");
 	}
 }

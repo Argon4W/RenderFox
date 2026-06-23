@@ -29,8 +29,6 @@ import com.github.argon4w.renderfox.opengl.buffer.function.parameter.GLBufferUsa
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
 import com.github.argon4w.renderfox.opengl.buffer.object.feature.AbstractGLBufferStore;
-import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferBase;
-import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferSetup;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
 import com.github.argon4w.renderfox.opengl.format.GLDataType;
 import com.github.argon4w.renderfox.opengl.format.GLFormat;
@@ -144,10 +142,10 @@ public class GLRawBuffer extends AbstractGLBufferStore implements IGLRawBuffer {
 
 	@Override
 	public void copyRangeDataTo(
-			IGLBufferBase	bufferWrite,
-			long			bufferCopyOffsetRead,
-			long			bufferCopyOffsetWrite,
-			long			bufferCopySize
+			IGLRawBufferBase	bufferWrite,
+			long				bufferCopyOffsetRead,
+			long				bufferCopyOffsetWrite,
+			long				bufferCopySize
 	) {
 		if (deleted) {
 			throw new IllegalStateException("The buffer has been deleted.");
@@ -159,7 +157,7 @@ public class GLRawBuffer extends AbstractGLBufferStore implements IGLRawBuffer {
 
 		bufferHelper.copyRangeDataTo(
 				bufferWrite,
-				bufferCopyOffsetRead,
+				bufferCopyOffsetRead + getOffset(),
 				bufferCopyOffsetWrite,
 				bufferCopySize
 		);
@@ -167,10 +165,10 @@ public class GLRawBuffer extends AbstractGLBufferStore implements IGLRawBuffer {
 
 	@Override
 	public void copyRangeDataFrom(
-			IGLBufferBase	bufferRead,
-			long			bufferCopyOffsetRead,
-			long			bufferCopyOffsetWrite,
-			long			bufferCopySize
+			IGLRawBufferBase	bufferRead,
+			long				bufferCopyOffsetRead,
+			long				bufferCopyOffsetWrite,
+			long				bufferCopySize
 	) {
 		if (deleted) {
 			throw new IllegalStateException("The buffer has been deleted.");

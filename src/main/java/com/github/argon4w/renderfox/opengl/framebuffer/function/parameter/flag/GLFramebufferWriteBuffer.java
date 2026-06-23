@@ -37,7 +37,7 @@ public class GLFramebufferWriteBuffer {
 		this.bitFlags = 0;
 	}
 
-	public int getRawFlags() {
+	public int getFlags() {
 		return bitFlags;
 	}
 

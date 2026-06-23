@@ -19,12 +19,11 @@
 
 package com.github.argon4w.renderfox.opengl.buffer.object.mutable;
 
-import com.github.argon4w.renderfox.data.coordinate.DataRange;
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
-import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.GLBufferWrapper;
-import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.IGLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.GLBufferView;
+import com.github.argon4w.renderfox.opengl.buffer.object.IGLBuffer;
 
-public class GLMutableBufferView extends GLBufferWrapper {
+public class GLMutableBufferView extends GLBufferView {
 
 	private final GLMutableBuffer	buffer;
 	private final long				offset;
@@ -64,18 +63,43 @@ public class GLMutableBufferView extends GLBufferWrapper {
 
 		return new GLMutableBufferView(
 				this.buffer,
-				this.offset + viewRange.getOffset(),
-				viewRange.getLength()
+				this.offset +	viewRange.getOffset(),
+								viewRange.getLength()
 		);
 	}
 
 	@Override
 	public IGLBuffer getBuffer() {
-		return buffer.getBuffer().view(new DataRange(offset, length));
+		return buffer;
+	}
+
+	@Override
+	public long getOffset() {
+		return offset;
+	}
+
+	@Override
+	public long getLength() {
+		return length;
 	}
 
 	@Override
 	public void delete() {
 		throw new UnsupportedOperationException("Cannot delete a view of buffer.");
+	}
+
+	@Override
+	public IDataRange getMapRange() {
+		throw new UnsupportedOperationException("Cannot get the map range from a view of buffer.");
+	}
+
+	@Override
+	public long getMapOffset() {
+		throw new UnsupportedOperationException("Cannot get the map offset from a view of buffer.");
+	}
+
+	@Override
+	public long getMapLength() {
+		throw new UnsupportedOperationException("Cannot get the map length from a view of buffer.");
 	}
 }

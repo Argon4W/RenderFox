@@ -21,7 +21,7 @@ package com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped;
 
 import com.github.argon4w.renderfox.buffer.IMappedBuffer;
 import com.github.argon4w.renderfox.data.size.IMutableSizeObject;
-import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.IGLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.IGLBuffer;
 
 public interface IGLMappedBuffer extends IMutableSizeObject, IMappedBuffer, IGLBuffer {
 

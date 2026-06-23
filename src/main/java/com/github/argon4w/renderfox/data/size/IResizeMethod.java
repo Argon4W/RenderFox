@@ -24,7 +24,7 @@ public interface IResizeMethod {
 	IResizeMethod LEAST		= atLeast -> atLeast;
 	IResizeMethod TWICE		= atLeast -> atLeast * 2L;
 	IResizeMethod TRIPLE	= atLeast -> atLeast * 3L;
-	IResizeMethod POWER		= atLeast -> Long.highestOneBit(atLeast) << 1L;
+	IResizeMethod POWER		= atLeast -> 1L << (64L - Long.numberOfLeadingZeros(atLeast - 1));
 
 	long resize(long atLeast);
 }

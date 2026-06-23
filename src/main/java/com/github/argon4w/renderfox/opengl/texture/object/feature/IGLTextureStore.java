@@ -26,7 +26,7 @@ public interface IGLTextureStore  {
 
 	int					getBaseLevel			();
 	int					getMaxLevel				();
-	int					getRealLevel			(int mipLevel);
+	int					getMipLevel				(int mipLevel);
 	int					getWidth				(int mipLevel);
 	int					getHeight				(int mipLevel);
 	int					getDepth				(int mipLevel);

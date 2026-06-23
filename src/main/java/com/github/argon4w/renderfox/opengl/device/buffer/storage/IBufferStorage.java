@@ -26,7 +26,7 @@ import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBuff
 import com.github.argon4w.renderfox.opengl.buffer.object.GLBufferCreateInfo;
 import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.GLMappedBufferCreateInfo;
 import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.IGLMappedBuffer;
-import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.IGLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.IGLBuffer;
 
 public interface IBufferStorage {
 
@@ -54,6 +54,34 @@ public interface IBufferStorage {
 	);
 
 	IGLBuffer createBuffer(
+			long				bufferDataAddress,
+			long				bufferDataOffset,
+			long				bufferDataSize,
+			GLBufferType		bufferType,
+			GLBufferStorageFlag	storageFlag
+	);
+
+	IGLBuffer createMutableBuffer(
+			long				bufferSize,
+			GLBufferType		bufferType,
+			GLBufferStorageFlag	storageFlag
+	);
+
+	IGLBuffer createMutableBuffer(
+			IDataView<?>		bufferData,
+			GLBufferType		bufferType,
+			GLBufferStorageFlag	storageFlag
+	);
+
+	IGLBuffer createMutableBuffer(
+			IDataView<?>		bufferData,
+			long				bufferDataOffset,
+			long				bufferDataSize,
+			GLBufferType		bufferType,
+			GLBufferStorageFlag	storageFlag
+	);
+
+	IGLBuffer createMutableBuffer(
 			long				bufferDataAddress,
 			long				bufferDataOffset,
 			long				bufferDataSize,

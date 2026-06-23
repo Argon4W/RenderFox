@@ -28,11 +28,9 @@ import com.github.argon4w.renderfox.opengl.buffer.function.parameter.GLBufferUsa
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
 import com.github.argon4w.renderfox.opengl.buffer.object.feature.AbstractGLBufferStore;
-import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferBase;
-import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferOperation;
-import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferSetup;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.GLRawBufferView;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferBase;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 import com.github.argon4w.renderfox.opengl.format.GLDataType;
 import com.github.argon4w.renderfox.opengl.format.GLFormat;
@@ -89,7 +87,7 @@ public class GLBufferFunctionsHelper extends AbstractGLBufferStore implements IG
 				bufferHandle,
 				bufferSize,
 				bufferDataAddress,
-				storageFlag.getRawFlags(),
+				storageFlag.getFlags(),
 				bufferType
 		);
 	}
@@ -215,10 +213,10 @@ public class GLBufferFunctionsHelper extends AbstractGLBufferStore implements IG
 
 	@Override
 	public void copyRangeDataTo(
-			IGLBufferBase	bufferWrite,
-			long			bufferCopyOffsetRead,
-			long			bufferCopyOffsetWrite,
-			long			bufferCopySize
+			IGLRawBufferBase	bufferWrite,
+			long				bufferCopyOffsetRead,
+			long				bufferCopyOffsetWrite,
+			long				bufferCopySize
 	) {
 		if (bufferHandle == -1) {
 			throw new IllegalStateException("BufferHandle has not yet been set.");
@@ -240,17 +238,17 @@ public class GLBufferFunctionsHelper extends AbstractGLBufferStore implements IG
 				bufferHandle,
 				bufferWrite.getBufferHandle(),
 				bufferCopyOffsetRead,
-				bufferCopyOffsetWrite,
+				bufferCopyOffsetWrite + bufferWrite.getOffset(),
 				bufferCopySize
 		);
 	}
 
 	@Override
 	public void copyRangeDataFrom(
-			IGLBufferBase	bufferRead,
-			long			bufferCopyOffsetRead,
-			long			bufferCopyOffsetWrite,
-			long			bufferCopySize
+			IGLRawBufferBase	bufferRead,
+			long				bufferCopyOffsetRead,
+			long				bufferCopyOffsetWrite,
+			long				bufferCopySize
 	) {
 		if (bufferHandle == -1) {
 			throw new IllegalStateException("BufferHandle has not yet been set.");
@@ -271,7 +269,7 @@ public class GLBufferFunctionsHelper extends AbstractGLBufferStore implements IG
 		bufferFunctions.copyBufferSubData(
 				bufferRead.getBufferHandle(),
 				bufferHandle,
-				bufferCopyOffsetRead,
+				bufferCopyOffsetRead + bufferRead.getOffset(),
 				bufferCopyOffsetWrite,
 				bufferCopySize
 		);
@@ -446,7 +444,7 @@ public class GLBufferFunctionsHelper extends AbstractGLBufferStore implements IG
 				bufferHandle,
 				mapOffset,
 				mapLength,
-				mapAccess.getRawFlags(),
+				mapAccess.getFlags(),
 				bufferType
 		);
 	}

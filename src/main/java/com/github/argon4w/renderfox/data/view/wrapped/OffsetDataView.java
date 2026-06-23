@@ -38,7 +38,7 @@ public abstract class OffsetDataView<T extends OffsetDataView<T>> extends Abstra
 			throw new IllegalStateException("DataView cannot be null.");
 		}
 
-		return getDataView().address();
+		return getDataView().address() + getOffset();
 	}
 
 	@Override

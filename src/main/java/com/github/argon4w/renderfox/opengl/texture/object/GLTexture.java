@@ -436,8 +436,8 @@ public class GLTexture implements IGLTexture {
 	}
 
 	@Override
-	public int getRealLevel(int mipLevel) {
-		return texture.getRealLevel(mipLevel);
+	public int getMipLevel(int mipLevel) {
+		return texture.getMipLevel(mipLevel);
 	}
 
 	@Override

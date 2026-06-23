@@ -23,7 +23,7 @@ import com.github.argon4w.renderfox.data.coordinate.DataRange;
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.view.IDataView;
 import com.github.argon4w.renderfox.data.view.wrapped.OffsetDataView;
-import com.github.argon4w.renderfox.opengl.buffer.object.wrapped.IGLBufferDataView;
+import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
 
 public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implements IGLBufferDataView<GLMappedDataView> {
 
@@ -40,22 +40,28 @@ public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implement
 	) {
 		super(length);
 
-		this.buffer		= buffer;
 		this.generation	= generation;
+		this.buffer		= buffer;
 		this.offset		= offset;
 	}
 
 	public GLMappedDataView(AbstractGLMappedBuffer buffer) {
 		super(buffer.getSize());
 
-		this.buffer		= buffer;
 		this.generation	= buffer.getGeneration();
+		this.buffer		= buffer;
 		this.offset		= 0;
 	}
 
 	@Override
+	public void close() {
+		this	.flush();
+		buffer	.close();
+	}
+
+	@Override
 	public IDataRange flush() {
-		return buffer.flush(new DataRange(
+		return this.buffer.flush(new DataRange(
 				this.offset,
 				this.limit
 		));
@@ -143,20 +149,15 @@ public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implement
 		return offset;
 	}
 
-	@Override
-	public long address() {
-		return super.address() + offset;
-	}
-
-	@Override
-	public void close() {
-		flush();
-	}
-
 	public static class Root extends GLMappedDataView {
 
 		public Root(AbstractGLMappedBuffer buffer) {
 			super(buffer);
+		}
+
+		@Override
+		public Root position(long position) {
+			throw new UnsupportedOperationException("Unsupported Operation.");
 		}
 
 		@Override

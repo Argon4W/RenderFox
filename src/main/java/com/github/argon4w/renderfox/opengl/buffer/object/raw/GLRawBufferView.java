@@ -19,7 +19,6 @@
 
 package com.github.argon4w.renderfox.opengl.buffer.object.raw;
 
-import com.github.argon4w.renderfox.data.coordinate.DataRange;
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferBlockType;
@@ -27,7 +26,6 @@ import com.github.argon4w.renderfox.opengl.buffer.function.parameter.GLBufferMap
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.GLBufferUsage;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
-import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferBase;
 import com.github.argon4w.renderfox.opengl.format.GLDataType;
 import com.github.argon4w.renderfox.opengl.format.GLFormat;
 import com.github.argon4w.renderfox.opengl.format.GLInternalFormat;
@@ -93,10 +91,10 @@ public class GLRawBufferView implements IGLRawBufferView {
 
 	@Override
 	public void copyRangeDataTo(
-			IGLBufferBase	bufferWrite,
-			long			bufferCopyOffsetRead,
-			long			bufferCopyOffsetWrite,
-			long			bufferCopySize
+			IGLRawBufferBase	bufferWrite,
+			long				bufferCopyOffsetRead,
+			long				bufferCopyOffsetWrite,
+			long				bufferCopySize
 	) {
 		if (bufferCopySize > length - bufferCopyOffsetRead) {
 			throw new IllegalArgumentException("Cannot copy data with size that exceeds the range of the buffer view.");
@@ -112,10 +110,10 @@ public class GLRawBufferView implements IGLRawBufferView {
 
 	@Override
 	public void copyRangeDataFrom(
-			IGLBufferBase	bufferRead,
-			long			bufferCopyOffsetRead,
-			long			bufferCopyOffsetWrite,
-			long			bufferCopySize
+			IGLRawBufferBase	bufferRead,
+			long				bufferCopyOffsetRead,
+			long				bufferCopyOffsetWrite,
+			long				bufferCopySize
 	) {
 		if (bufferCopySize > length - bufferCopyOffsetWrite) {
 			throw new IllegalArgumentException("Cannot copy data with size that exceeds the range of the buffer view.");
@@ -198,7 +196,7 @@ public class GLRawBufferView implements IGLRawBufferView {
 
 	@Override
 	public void flushMappedRange(long flushOffset, long flushLength) {
-		buffer.flushMappedRange(flushOffset, flushLength);
+		throw new UnsupportedOperationException("Cannot flush mapped buffer data on a view of buffer.");
 	}
 
 	@Override
