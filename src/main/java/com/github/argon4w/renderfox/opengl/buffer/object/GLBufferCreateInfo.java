@@ -22,7 +22,7 @@ package com.github.argon4w.renderfox.opengl.buffer.object;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageBit;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
-import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.GLMappedBufferCreateInfo;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.GLMappedBufferCreateInfo;
 
 public class GLBufferCreateInfo {
 

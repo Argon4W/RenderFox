@@ -26,9 +26,9 @@ public interface IMutableSizeObject {
 	void beforeResize	();
 	void afterResize	();
 
-	void			setSize		(long size);
-	long			getSize		();
-	IResizeMethod	getMethod	();
+	void			setSize			(long size);
+	long			getSize			();
+	IResizeMethod	getResizeMethod	();
 
 	default void expand(long bytes) {
 		if (bytes <= 0) {
@@ -47,7 +47,7 @@ public interface IMutableSizeObject {
 	}
 
 	default void resize(long atLeast) {
-		resizeTo(getMethod().resize(atLeast));
+		resizeTo(getResizeMethod().resize(atLeast));
 	}
 
 	default void resizeTo(long newBufferSize) {

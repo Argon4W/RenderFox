@@ -24,16 +24,20 @@ import com.github.argon4w.renderfox.data.size.IMutableSizeObject;
 import com.github.argon4w.renderfox.data.size.IResizeMethod;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
-import com.github.argon4w.renderfox.opengl.buffer.object.GLBufferView;
-import com.github.argon4w.renderfox.opengl.buffer.object.IGLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.AbstractGLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.GLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
+import org.lwjgl.system.MemoryUtil;
 
-public class GLMutableBuffer extends GLBufferView implements IMutableSizeObject {
+public class GLMutableBuffer extends AbstractGLBuffer implements IMutableSizeObject {
 
 	protected final	GLBufferContext		bufferContext;
+	protected final IResizeMethod		resizeMethod;
 	protected final	GLBufferType		bufferType;
 	protected final	GLBufferStorageFlag	storageFlag;
-	protected		IGLBuffer			buffer;
+	protected		IGLRawBuffer		buffer;
 	protected 		long				bufferSize;
 
 	public GLMutableBuffer(
@@ -46,19 +50,22 @@ public class GLMutableBuffer extends GLBufferView implements IMutableSizeObject 
 	) {
 		this.bufferType		= bufferType;
 		this.bufferContext	= bufferContext;
+		this.resizeMethod	= bufferContext.getResizeMethod();
 		this.storageFlag	= storageFlag;
 		this.bufferSize		= bufferLength;
-		this.buffer			= bufferContext.getBufferCreator().createBuffer(
+		this.buffer			= bufferContext.createRawBuffer(bufferType);
+
+		bufferContext.getBufferCreator().setupStorage(
+				this.buffer,
 				bufferDataAddress,
 				bufferOffset,
 				bufferLength,
-				bufferType,
 				storageFlag
 		);
 	}
 
 	@Override
-	public IGLBuffer view(IDataRange viewRange) {
+	public GLBuffer view(IDataRange viewRange) {
 		if (buffer.isDeleted()) {
 			throw new IllegalStateException("The buffer has been deleted.");
 		}
@@ -79,10 +86,12 @@ public class GLMutableBuffer extends GLBufferView implements IMutableSizeObject 
 			throw new IllegalArgumentException("ViewOffset + viewLength cannot be greater than the value of buffer size.");
 		}
 
-		return new GLMutableBufferView(
-				this,
-				viewRange.getOffset(),
-				viewRange.getLength()
+		return new GLBuffer(
+				new GLMutableRawBufferView(
+						this,
+						viewRange.getOffset(),
+						viewRange.getLength()
+				)
 		);
 	}
 
@@ -92,16 +101,21 @@ public class GLMutableBuffer extends GLBufferView implements IMutableSizeObject 
 			return;
 		}
 
-		var newBuffer = this.bufferContext.getBufferCreator().createBuffer(
+		var newBuffer = this.bufferContext.createRawBuffer(bufferType);
+
+		this.bufferContext.getBufferCreator().setupStorage(
+				newBuffer,
+				MemoryUtil.NULL,
+				MemoryUtil.NULL,
 				size + bytes,
-				this.bufferType,
 				this.storageFlag
 		);
 
-		this.buffer.copyRangeDataTo(
-				newBuffer,
-				this,
-				this
+		newBuffer.copyRangeDataFrom(
+				this.buffer,
+				this.buffer	.getOffset(),
+				newBuffer	.getOffset(),
+				size
 		);
 
 		this.buffer.delete();
@@ -109,8 +123,13 @@ public class GLMutableBuffer extends GLBufferView implements IMutableSizeObject 
 	}
 
 	@Override
-	public IResizeMethod getMethod() {
-		return bufferContext.getResizeMethod();
+	public IResizeMethod getResizeMethod() {
+		return resizeMethod;
+	}
+
+	@Override
+	public IGLRawBufferView getRawBuffer() {
+		return buffer;
 	}
 
 	@Override
@@ -121,21 +140,6 @@ public class GLMutableBuffer extends GLBufferView implements IMutableSizeObject 
 	@Override
 	public long getSize() {
 		return bufferSize;
-	}
-
-	@Override
-	public long getLength() {
-		return bufferSize;
-	}
-
-	@Override
-	public long getOffset() {
-		return 0;
-	}
-
-	@Override
-	public IGLBuffer getBuffer() {
-		return buffer;
 	}
 
 	@Override

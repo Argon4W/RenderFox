@@ -24,15 +24,24 @@ import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
 import com.github.argon4w.renderfox.opengl.buffer.object.GLBufferCreateInfo;
-import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.GLMappedBufferCreateInfo;
-import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.IGLMappedBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.GLMappedBufferCreateInfo;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.IGLMappedBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.IGLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBuffer;
 
 public interface IBufferStorage {
 
 	IGLBuffer		createBuffer		(GLBufferCreateInfo			info);
 	IGLMappedBuffer	createMappedBuffer	(GLMappedBufferCreateInfo	info);
 
+	void setupStorage(
+			IGLRawBuffer		buffer,
+			long				bufferDataAddress,
+			long				bufferDataOffset,
+			long				bufferDataSize,
+			GLBufferStorageFlag	storageFlag
+	);
+
 	IGLBuffer createBuffer(
 			long				bufferSize,
 			GLBufferType		bufferType,
@@ -119,5 +128,15 @@ public interface IBufferStorage {
 			GLBufferType		bufferType,
 			GLBufferStorageFlag	storageFlag,
 			GLBufferMapAccess	mapAccess
+	);
+
+	IGLMappedBuffer createMappedBuffer(
+			long				bufferDataAddress,
+			long				bufferDataOffset,
+			long				bufferDataSize,
+			GLBufferType		bufferType,
+			GLBufferStorageFlag	storageFlag,
+			GLBufferMapAccess	mapAccess,
+			IGLMappedBuffer		prototype
 	);
 }

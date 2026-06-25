@@ -17,62 +17,31 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped;
+package com.github.argon4w.renderfox.opengl.buffer.object.mapped;
 
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
-import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
+import com.github.argon4w.renderfox.data.view.IDataView;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
 import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
-import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 
 public class GLMappedBufferPersistent extends AbstractGLMappedBuffer {
 
-	private IGLBufferDataView<?> dataView;
+	private final IGLBufferDataView<?> dataView;
 
 	public GLMappedBufferPersistent(
-			GLBufferContext		bufferContext,
-			long				bufferDataAddress,
-			long				bufferOffset,
-			long				bufferLength,
-			GLBufferType		bufferType,
 			GLBufferStorageFlag	storageFlag,
-			GLBufferMapAccess	mapAccess
+			GLBufferMapAccess	mapAccess,
+			IGLRawBufferView	buffer
 	) {
 		super(
-				bufferContext,
-				bufferDataAddress,
-				bufferOffset,
-				bufferLength,
-				bufferType,
 				storageFlag,
-				mapAccess
+				mapAccess,
+				buffer
 		);
 
-		this.dataView = this.buffer.mapRangeData(
-				this.buffer,
-				this.mapAccess
-		);
-	}
-
-	@Override
-	protected void unmap() {
-		dataView.close();
-	}
-
-	@Override
-	protected void map() {
-		dataView = buffer.mapRangeData(buffer, mapAccess);
-	}
-
-	@Override
-	public IDataRange flush(IDataRange range) {
-		return dataView.flush(range);
-	}
-
-	@Override
-	protected IGLBufferDataView<?> getDataView() {
-		return dataView;
+		this.dataView = mapBuffer();
 	}
 
 	@Override
@@ -83,5 +52,28 @@ public class GLMappedBufferPersistent extends AbstractGLMappedBuffer {
 	@Override
 	public void close() {
 
+	}
+
+	@Override
+	public void disable() {
+
+	}
+
+	@Override
+	public IDataView<?> getView() {
+		return dataView;
+	}
+
+	@Override
+	public IDataRange flush(IDataRange range) {
+		return dataView.flush(range);
+	}
+
+	@Override
+	public void delete() {
+		dataView.flush();
+		dataView.close();
+
+		super.delete();
 	}
 }

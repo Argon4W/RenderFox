@@ -17,11 +17,14 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.opengl.buffer.object.raw;
+package com.github.argon4w.renderfox.opengl.buffer.object.mapped;
 
-import com.github.argon4w.renderfox.data.coordinate.IDataRange;
-import com.github.argon4w.renderfox.opengl.buffer.object.feature.IGLBufferBase;
+import com.github.argon4w.renderfox.buffer.IMappedBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.IGLBuffer;
 
-public interface IGLRawBufferBase extends IGLBufferBase, IDataRange {
+public interface IGLMappedBuffer extends IMappedBuffer, IGLBuffer {
 
+	long	getRemaining	();
+	long	getPosition		();
+	int		getGeneration	();
 }

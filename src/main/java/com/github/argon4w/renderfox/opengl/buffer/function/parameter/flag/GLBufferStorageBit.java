@@ -40,6 +40,11 @@ public enum GLBufferStorageBit implements IBitMask {
 									|	GL44.GL_MAP_COHERENT_BIT
 									|	GL44.GL_CLIENT_STORAGE_BIT;
 
+	public static final int COMMON_BITS =	GL30.GL_MAP_READ_BIT
+										|	GL30.GL_MAP_WRITE_BIT
+										|	GL44.GL_MAP_PERSISTENT_BIT
+										|	GL44.GL_MAP_COHERENT_BIT;
+
 	private final int bitMask;
 
 	GLBufferStorageBit(int bitMask) {

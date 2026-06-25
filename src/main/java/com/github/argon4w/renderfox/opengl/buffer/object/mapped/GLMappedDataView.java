@@ -17,7 +17,7 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped;
+package com.github.argon4w.renderfox.opengl.buffer.object.mapped;
 
 import com.github.argon4w.renderfox.data.coordinate.DataRange;
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
@@ -27,13 +27,13 @@ import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
 
 public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implements IGLBufferDataView<GLMappedDataView> {
 
-	protected final	AbstractGLMappedBuffer	buffer;
+	protected final IGLMappedBufferInternal	buffer;
 	protected final	long					offset;
 
 	protected		long					generation;
 
 	public GLMappedDataView(
-			AbstractGLMappedBuffer	buffer,
+			IGLMappedBufferInternal	buffer,
 			long					generation,
 			long					offset,
 			long					length
@@ -45,8 +45,8 @@ public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implement
 		this.offset		= offset;
 	}
 
-	public GLMappedDataView(AbstractGLMappedBuffer buffer) {
-		super(buffer.getSize());
+	public GLMappedDataView(IGLMappedBufferInternal buffer) {
+		super(buffer.getBufferSize());
 
 		this.generation	= buffer.getGeneration();
 		this.buffer		= buffer;
@@ -141,7 +141,7 @@ public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implement
 			throw new IllegalStateException("This view of the buffer is outdated.");
 		}
 
-		return buffer.getDataView();
+		return buffer.getView();
 	}
 
 	@Override
@@ -151,13 +151,8 @@ public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implement
 
 	public static class Root extends GLMappedDataView {
 
-		public Root(AbstractGLMappedBuffer buffer) {
+		public Root(IGLMappedBufferInternal buffer) {
 			super(buffer);
-		}
-
-		@Override
-		public Root position(long position) {
-			throw new UnsupportedOperationException("Unsupported Operation.");
 		}
 
 		@Override
@@ -180,7 +175,7 @@ public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implement
 			return capacity;
 		}
 
-		void sync() {
+		public void sync() {
 			this.generation = buffer.getGeneration();
 		}
 	}

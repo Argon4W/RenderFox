@@ -17,7 +17,7 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped;
+package com.github.argon4w.renderfox.opengl.buffer.object.mapped;
 
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferAccessBit;

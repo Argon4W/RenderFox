@@ -41,6 +41,10 @@ public class GLBufferMapAccess {
 		return bitFlags;
 	}
 
+	public int getCommonFlags() {
+		return bitFlags & GLBufferAccessBit.COMMON_BITS;
+	}
+
 	public void add(GLBufferAccessBit accessBit) {
 		bitFlags |= accessBit.getBitMask();
 	}
@@ -53,8 +57,12 @@ public class GLBufferMapAccess {
 		bitFlags &= ~accessBit.getBitMask();
 	}
 
-	public boolean same(GLBufferMapAccess access) {
-		return access.bitFlags == this.bitFlags;
+	public boolean allow(GLBufferMapAccess that) {
+		return (this.bitFlags & that.bitFlags) == that.bitFlags;
+	}
+
+	public boolean allow(GLBufferStorageFlag storageFlag) {
+		return (storageFlag.getCommonFlags() & getCommonFlags()) == getCommonFlags();
 	}
 
 	public boolean has(GLBufferAccessBit accessBit) {
@@ -95,16 +103,6 @@ public class GLBufferMapAccess {
 
 	public GLBufferMapAccess copy() {
 		return new GLBufferMapAccess(bitFlags);
-	}
-
-	public boolean matches(GLBufferStorageFlag storageFlag) {
-		for (var accessBit : GLBufferAccessBit.values()) {
-			if (has(accessBit) && !accessBit.isIn(storageFlag)) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	public static GLBufferMapAccess of() {

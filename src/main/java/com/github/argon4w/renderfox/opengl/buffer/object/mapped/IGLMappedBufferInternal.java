@@ -17,12 +17,15 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped;
+package com.github.argon4w.renderfox.opengl.buffer.object.mapped;
 
-import com.github.argon4w.renderfox.buffer.IMappedBuffer;
-import com.github.argon4w.renderfox.data.size.IMutableSizeObject;
-import com.github.argon4w.renderfox.opengl.buffer.object.IGLBuffer;
+import com.github.argon4w.renderfox.data.coordinate.IDataRange;
+import com.github.argon4w.renderfox.data.view.IDataView;
 
-public interface IGLMappedBuffer extends IMutableSizeObject, IMappedBuffer, IGLBuffer {
+public interface IGLMappedBufferInternal extends IGLMappedBuffer {
 
+	void			open	();
+	void			close	();
+	IDataView<?>	getView	();
+	IDataRange		flush	(IDataRange range);
 }

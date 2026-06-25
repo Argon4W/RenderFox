@@ -44,6 +44,11 @@ public enum GLBufferAccessBit implements IBitMask {
 									|	GL30.GL_MAP_FLUSH_EXPLICIT_BIT
 									|	GL30.GL_MAP_UNSYNCHRONIZED_BIT;
 
+	public static final int COMMON_BITS =	GL30.GL_MAP_READ_BIT
+										|	GL30.GL_MAP_WRITE_BIT
+										|	GL44.GL_MAP_PERSISTENT_BIT
+										|	GL44.GL_MAP_COHERENT_BIT;
+
 	private final int					bitMask;
 	private final GLBufferStorageBit storageBit;
 
@@ -59,10 +64,6 @@ public enum GLBufferAccessBit implements IBitMask {
 
 	public boolean isIn(int mapAccess) {
 		return (mapAccess & bitMask) != 0;
-	}
-
-	public boolean isIn(GLBufferStorageFlag flag) {
-		return storageBit == GLBufferStorageBit.INVALID || flag.has(storageBit);
 	}
 
 	public static boolean hasInvalidBits(int flags) {

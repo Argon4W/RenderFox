@@ -516,7 +516,7 @@ public class GLBufferFunctionsValidation implements IGLBufferFunctions {
 			throw new IllegalArgumentException("GL_MAP_FLUSH_EXPLICIT is set and GL_MAP_WRITE_BIT is not set.");
 		}
 
-		if (!mapAccess.matches(bufferHelper.getStorageFlag())) {
+		if (!mapAccess.allow(bufferHelper.getStorageFlag())) {
 			throw new IllegalArgumentException("Any of GL_MAP_READ_BIT, GL_MAP_WRITE_BIT, GL_MAP_PERSISTENT_BIT, or GL_MAP_COHERENT_BIT are set, but the same bit is not included in the buffer's storage flags.");
 		}
 

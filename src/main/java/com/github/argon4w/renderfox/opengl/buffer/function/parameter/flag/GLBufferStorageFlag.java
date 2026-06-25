@@ -41,6 +41,10 @@ public class GLBufferStorageFlag {
 		return bitFlags;
 	}
 
+	public int getCommonFlags() {
+		return bitFlags & GLBufferStorageBit.COMMON_BITS;
+	}
+
 	public void add(GLBufferStorageBit flagBit) {
 		bitFlags |= flagBit.getBitMask();
 	}

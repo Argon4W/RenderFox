@@ -19,6 +19,7 @@
 
 package com.github.argon4w.renderfox;
 
+import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.coordinate.Offset3D;
 import com.github.argon4w.renderfox.data.coordinate.extent.Extent3D;
 import com.github.argon4w.renderfox.format.ColorFloat;
@@ -26,7 +27,7 @@ import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferAccessBit;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageBit;
 import com.github.argon4w.renderfox.opengl.buffer.object.GLBufferCreateInfo;
-import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.GLMappedBufferCreateInfo;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.GLMappedBufferCreateInfo;
 import com.github.argon4w.renderfox.opengl.device.OpenGLDevice;
 import com.github.argon4w.renderfox.opengl.device.OpenGLDeviceCreateInfo;
 import com.github.argon4w.renderfox.opengl.texture.object.GLTextureCreateInfo;
@@ -140,47 +141,52 @@ public class RenderFox {
 				.withHeight			(14)
 				.build				();
 
-		// Allocate a slice of memory in our staging buffer and decorate it with our transfer info
-		// to make writing pixels easier through ImageDataView.
-		var pixels = stagingBuffer.reserve(1024).as(transfer);
+		// The reserved staging buffer range for later flushing.
+		var stagingRange = (IDataRange) null;
 
-		// Now we can put actual 14 * 14 image data into the memory.
-		for		(var pixelX = 0; pixelX < 14; pixelX ++) {
-			for	(var pixelY = 0; pixelY < 14; pixelY ++) {
+		// Allocate a slice of memory in our staging buffer.
+		try(var view = stagingBuffer.reserve(1024)) {
+			// Decorate it with our transfer info to make writing pixels easier through ImageDataView.
+			var pixels= view.as(transfer);
 
-				var fx = pixelX / 14.0f;
-				var fy = pixelY / 14.0f;
+			// Now we can put actual 14 * 14 image data into the memory.
+			for		(var pixelX = 0; pixelX < 14; pixelX ++) {
+				for	(var pixelY = 0; pixelY < 14; pixelY ++) {
 
-				pixels.putTexelRGBA8(
-						pixelX,
-						pixelY,
-						(int) (fx * 255.0f),
-						(int) (fy * 255.0f),
-						0,
-						255
-				);
+					var fx = pixelX / 14.0f;
+					var fy = pixelY / 14.0f;
+
+					pixels.putTexelRGBA8(
+							pixelX,
+							pixelY,
+							(int) (fx * 255.0f),
+							(int) (fy * 255.0f),
+							0,
+							255
+					);
+				}
 			}
+
+			pixels.putTexelRGBA8(
+					0,
+					0,
+					255,
+					255,
+					255,
+					255
+			);
+
+			// Flush and close the data view to make it visible to GPU for following operations.
+			// Also, we now have the range of what we actually wrote to.
+			stagingRange = view.flush();
 		}
-
-		pixels.putTexelRGBA8(
-				0,
-				0,
-				255,
-				255,
-				255,
-				255
-		);
-
-		// Flush the data to make it visible to GPU for following operations.
-		// Also, we now have the range of what we actually wrote to.
-		var pixelRange = pixels.flush();
 
 		// Copy the host-side data in staging buffer to the start of device-side pixel buffer
 		// from the range we wrote the staging buffer.
 		stagingBuffer.copyRangeDataTo(
 				pixelBuffer,
-				pixelRange,
-				pixelRange.withOffset(0L)
+				stagingRange,
+				stagingRange.withOffset(0L)
 		);
 
 		// Free all allocated space from staging buffer because we have done using it.
@@ -195,7 +201,7 @@ public class RenderFox {
 		texture.uploadRangeImageFromBuffer(
 				transfer,
 				pixelBuffer,
-				pixelRange.withOffset(0L)
+				stagingRange.withOffset(0L)
 		);
 
 		// Copy the part of content of texture to our destination texture.

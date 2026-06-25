@@ -23,9 +23,8 @@ import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.GLBufferUsage;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
-import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.GLMappedBufferLegacy;
-import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.IGLMappedBuffer;
-import com.github.argon4w.renderfox.opengl.buffer.object.raw.GLRawBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.GLMappedBufferLegacy;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.IGLMappedBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBuffer;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
 
@@ -36,7 +35,7 @@ public class BufferStorageLegacy extends AbstractBufferStorage {
 	}
 
 	@Override
-	protected void setupStorage(
+	public void setupStorage(
 			IGLRawBuffer		buffer,
 			long				bufferDataAddress,
 			long				bufferDataOffset,
@@ -57,16 +56,37 @@ public class BufferStorageLegacy extends AbstractBufferStorage {
 			long				bufferDataSize,
 			GLBufferType		bufferType,
 			GLBufferStorageFlag	storageFlag,
-			GLBufferMapAccess	mapAccess
+			GLBufferMapAccess	mapAccess,
+			IGLMappedBuffer		prototype
 	) {
-		return new GLMappedBufferLegacy(
-				bufferContext,
+		var buffer = bufferContext.createRawBuffer(bufferType);
+
+		setupStorage(
+				buffer,
 				bufferDataAddress,
 				bufferDataOffset,
 				bufferDataSize,
-				bufferType,
-				storageFlag,
-				mapAccess
+				storageFlag
 		);
+
+		if (prototype == null) {
+			return new GLMappedBufferLegacy(
+					storageFlag,
+					mapAccess,
+					buffer,
+					0
+			);
+		}
+
+		if (prototype instanceof GLMappedBufferLegacy legacy) {
+			return new GLMappedBufferLegacy(
+					storageFlag,
+					mapAccess,
+					buffer,
+					legacy.getCount()
+			);
+		}
+
+		throw new IllegalArgumentException("Incorrect prototype mapped buffer type.");
 	}
 }

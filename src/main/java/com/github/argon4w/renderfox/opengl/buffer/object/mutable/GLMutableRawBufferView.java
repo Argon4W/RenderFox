@@ -17,16 +17,20 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.opengl.buffer.object.raw;
+package com.github.argon4w.renderfox.opengl.buffer.object.mutable;
 
-public class GLRawBufferView extends AbstractGLRawBufferView {
+import com.github.argon4w.renderfox.opengl.buffer.object.IGLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.AbstractGLRawBufferView;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 
-	private final IGLRawBufferView buffer;
+public class GLMutableRawBufferView extends AbstractGLRawBufferView {
 
-	public GLRawBufferView(
-			IGLRawBufferView	buffer,
-			long				offset,
-			long				length
+	private final IGLBuffer buffer;
+
+	public GLMutableRawBufferView(
+			IGLBuffer	buffer,
+			long		offset,
+			long		length
 	) {
 		super(offset, length);
 
@@ -34,12 +38,12 @@ public class GLRawBufferView extends AbstractGLRawBufferView {
 	}
 
 	@Override
-	public IGLRawBufferView getBuffer() {
-		return buffer;
+	protected IGLRawBufferView getBuffer() {
+		return buffer.getRawBuffer();
 	}
 
 	@Override
-	public GLRawBufferView view(long offset, long length) {
+	public IGLRawBufferView view(long offset, long length) {
 		if (offset < 0) {
 			throw new IllegalArgumentException("Offset cannot be negative.");
 		}
@@ -56,8 +60,8 @@ public class GLRawBufferView extends AbstractGLRawBufferView {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the view length.");
 		}
 
-		return new GLRawBufferView(
-				this.getBuffer(),
+		return new GLMutableRawBufferView(
+				this.buffer,
 				this.getOffset() +	offset,
 									length
 		);

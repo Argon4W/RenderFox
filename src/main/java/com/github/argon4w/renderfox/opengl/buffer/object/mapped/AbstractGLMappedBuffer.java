@@ -17,58 +17,44 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped;
+package com.github.argon4w.renderfox.opengl.buffer.object.mapped;
 
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
-import com.github.argon4w.renderfox.data.view.IDataView;
 import com.github.argon4w.renderfox.data.view.IMappedDataView;
-import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
-import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferAccessBit;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
-import com.github.argon4w.renderfox.opengl.buffer.object.mutable.GLMutableBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.GLBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
-import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 
-public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements IGLMappedBuffer {
+public abstract class AbstractGLMappedBuffer extends GLBuffer implements IGLMappedBufferInternal {
 
+	protected final GLBufferStorageFlag		storageFlag;
 	protected final	GLBufferMapAccess		mapAccess;
-	protected final	GLMappedDataView.Root	mapView;
-
-	protected		long					generation;
+	protected final GLMappedDataView.Root	mapView;
+	private			int						mapGeneration;
 
 	public AbstractGLMappedBuffer(
-			GLBufferContext		bufferContext,
-			long				bufferDataAddress,
-			long				bufferOffset,
-			long				bufferLength,
-			GLBufferType		bufferType,
 			GLBufferStorageFlag	storageFlag,
-			GLBufferMapAccess	mapAccess
+			GLBufferMapAccess	mapAccess,
+			IGLRawBufferView	buffer
 	) {
-		super(
-				bufferContext,
-				bufferDataAddress,
-				bufferOffset,
-				bufferLength,
-				bufferType,
-				storageFlag
-		);
+		super(buffer);
 
-		this.generation	= 0;
-		this.mapAccess	= mapAccess.copy();
-		this.mapView	= new GLMappedDataView.Root(this);
-
-		this.mapAccess.remove(GLBufferAccessBit.MAP_PERSISTENT);
-		this.mapAccess.remove(GLBufferAccessBit.MAP_COHERENT);
+		this.mapGeneration	= 0;
+		this.storageFlag	= storageFlag			.copy();
+		this.mapAccess		= mapAccess				.copy();
+		this.mapView		= new GLMappedDataView	.Root(this);
 	}
 
-	protected abstract void			open		();
-	protected abstract void			close		();
-	protected abstract void			map			();
-	protected abstract void			unmap		();
-	protected abstract IDataView<?>	getDataView	();
-	protected abstract IDataRange	flush		(IDataRange range);
+	public abstract void disable();
+
+	protected IGLBufferDataView<?> mapBuffer() {
+		return super.mapRangeData(
+				this,
+				this.mapAccess
+		);
+	}
 
 	@Override
 	public IMappedDataView<?> reserve(long size) {
@@ -78,65 +64,43 @@ public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements 
 			throw new IllegalArgumentException("Size cannot be negative.");
 		}
 
-		if (this.buffer.isDeleted()) {
+		if (this.isDeleted()) {
 			throw new IllegalStateException("The buffer has been deleted.");
 		}
 
-		if (!this.buffer.isMapped()) {
+		if (!this.isMapped()) {
 			throw new IllegalStateException("The buffer is not in a mapped state.");
 		}
 
 		if (this.mapView.remaining() < size) {
-			resize(this.mapView.position() + size);
+			throw new IllegalStateException("The buffer has not enough space to reserve.");
 		}
 
 		return this.mapView.slice(size);
 	}
 
 	@Override
-	public IGLBufferDataView<?> mapRangeData(IDataRange mapRange, GLBufferMapAccess mapAccess) {
+	public IGLBufferDataView<?> mapRangeData(IDataRange mapDataRange, GLBufferMapAccess mapAccess) {
 		open();
 
-		if (this.buffer.isDeleted()) {
+		if (this.isDeleted()) {
 			throw new IllegalStateException("The buffer has been deleted.");
 		}
 
-		if (!this.buffer.isMapped()) {
+		if (!this.isMapped()) {
 			throw new IllegalStateException("The buffer is not in a mapped state.");
 		}
 
-		if (!this.mapAccess.same(mapAccess)) {
-			throw new IllegalStateException("The mapAccess is not equal to the pre-defined mapAccess in the buffer.");
+		if (!this.mapAccess.allow(mapAccess)) {
+			throw new IllegalStateException("The mapAccess contains bits that are not in the pre-defined mapAccess in this buffer.");
 		}
 
-		return mapView.slice(mapRange);
-	}
-
-	@Override
-	public void clear() {
-		generation ++;
-
-		mapView.clear	();
-		mapView.sync	();
-	}
-
-	@Override
-	public void beforeResize() {
-		unmap();
-	}
-
-	@Override
-	public void afterResize() {
-		map();
-	}
-
-	public long getGeneration() {
-		return generation;
+		return this.mapView.slice(mapDataRange);
 	}
 
 	@Override
 	public GLMappedBufferView view(IDataRange viewRange) {
-		if (buffer.isDeleted()) {
+		if (isDeleted()) {
 			throw new IllegalStateException("The buffer has been deleted.");
 		}
 
@@ -152,15 +116,39 @@ public abstract class AbstractGLMappedBuffer extends GLMutableBuffer implements 
 			throw new IllegalArgumentException("ViewLength cannot be negative.");
 		}
 
-		if (viewRange.getOffset() + viewRange.getLength() > bufferSize) {
+		if (viewRange.getOffset() + viewRange.getLength() > getBufferSize()) {
 			throw new IllegalArgumentException("ViewOffset + viewLength cannot be greater than the value of buffer size.");
 		}
 
 		return new GLMappedBufferView(
 				this,
-				mapView		.slice		(viewRange),
-				viewRange	.getOffset	(),
-				viewRange	.getLength	()
+				this.mapView.slice	(viewRange),
+				this.buffer	.view	(
+						viewRange.getOffset(),
+						viewRange.getLength()
+				)
 		);
+	}
+
+	@Override
+	public void clear() {
+		this.mapGeneration	++;
+		this.mapView.clear	();
+		this.mapView.sync	();
+	}
+
+	@Override
+	public long getRemaining() {
+		return mapView.remaining();
+	}
+
+	@Override
+	public long getPosition() {
+		return mapView.position();
+	}
+
+	@Override
+	public int getGeneration() {
+		return mapGeneration;
 	}
 }

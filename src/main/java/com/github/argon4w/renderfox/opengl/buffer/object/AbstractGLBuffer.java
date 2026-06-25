@@ -1,0 +1,578 @@
+/*
+ * Copyright (C) 2026  Argon4W
+ *
+ * This file is part of RenderFox.
+ *
+ * RenderFox is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * RenderFox is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.github.argon4w.renderfox.opengl.buffer.object;
+
+import com.github.argon4w.renderfox.data.coordinate.IDataRange;
+import com.github.argon4w.renderfox.data.view.AddressDataView;
+import com.github.argon4w.renderfox.data.view.IDataViewDecorator;
+import com.github.argon4w.renderfox.data.view.wrapped.StackDataView;
+import com.github.argon4w.renderfox.format.ColorFloat;
+import com.github.argon4w.renderfox.format.ColorInt;
+import com.github.argon4w.renderfox.opengl.buffer.GLBufferBlockType;
+import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
+import com.github.argon4w.renderfox.opengl.buffer.function.parameter.GLBufferMapAccessLegacy;
+import com.github.argon4w.renderfox.opengl.buffer.function.parameter.GLBufferUsage;
+import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
+import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferBase;
+import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
+import com.github.argon4w.renderfox.opengl.format.GLDataType;
+import com.github.argon4w.renderfox.opengl.format.GLFormat;
+import com.github.argon4w.renderfox.opengl.format.GLInternalFormat;
+
+public abstract class AbstractGLBuffer implements IGLBuffer {
+
+	@Override
+	public IGLBufferDataView<?> mapRangeData(IDataRange mapDataRange, GLBufferMapAccess mapAccess) {
+		if (mapDataRange == null) {
+			throw new IllegalArgumentException("MapDataRange cannot be null");
+		}
+
+		if (mapAccess == null) {
+			throw new IllegalArgumentException("MapAccess cannot be null.");
+		}
+
+		if (mapAccess.isEmpty()) {
+			throw new IllegalArgumentException("MapAccess cannot be empty.");
+		}
+
+		var mapOffset = mapDataRange.getOffset();
+		var mapLength = mapDataRange.getLength();
+
+		var address = getRawBuffer().mapRange(
+				mapOffset,
+				mapLength,
+				mapAccess
+		);
+
+		var dataView = AddressDataView.of(address, mapLength);
+
+		dataView = !mapAccess.canWrite	() ? dataView.as(IDataViewDecorator.READ_ONLY)	: dataView;
+		dataView = !mapAccess.canRead	() ? dataView.as(IDataViewDecorator.WRITE_ONLY)	: dataView;
+
+		return new GLBufferDataView(
+				this,
+				dataView,
+				mapLength
+		);
+	}
+
+	@Override
+	public void clearAllData(byte value) {
+		try (var dataView = StackDataView.aByte(value)) {
+			getRawBuffer().clearAllData(
+					GLInternalFormat.R8UI,
+					GLFormat		.RED_INTEGER,
+					GLDataType		.BYTE,
+					dataView		.address()
+			);
+		}
+	}
+
+	@Override
+	public void clearAllData(GLInternalFormat internalFormat, ColorFloat clearColor) {
+		if (clearColor == null) {
+			throw new IllegalArgumentException("ClearColor cannot be null.");
+		}
+
+		if (internalFormat == null) {
+			throw new IllegalArgumentException("InternalFormat cannot be null.");
+		}
+
+		if (internalFormat == GLInternalFormat.INVALID) {
+			throw new IllegalArgumentException("Invalid internalFormat.");
+		}
+
+		try (var dataView = StackDataView.ofFloats(4L)) {
+			getRawBuffer().clearAllData(
+					internalFormat,
+					internalFormat.getFormat(),
+					internalFormat.getType	(),
+					dataView
+							.putFloat	(0L,	clearColor.getRed	())
+							.putFloat	(4L,	clearColor.getGreen	())
+							.putFloat	(8L,	clearColor.getBlue	())
+							.putFloat	(12L,	clearColor.getAlpha	())
+							.address	()
+			);
+		}
+	}
+
+	@Override
+	public void clearAllData(GLInternalFormat internalFormat, ColorInt clearColor) {
+		if (clearColor == null) {
+			throw new IllegalArgumentException("ClearColor cannot be null.");
+		}
+
+		if (internalFormat == null) {
+			throw new IllegalArgumentException("InternalFormat cannot be null.");
+		}
+
+		if (internalFormat == GLInternalFormat.INVALID) {
+			throw new IllegalArgumentException("Invalid internalFormat.");
+		}
+
+		try (var dataView = StackDataView.ofInts(4L)) {
+			getRawBuffer().clearAllData(
+					internalFormat,
+					internalFormat.getFormat(),
+					internalFormat.getType	(),
+					dataView
+							.putInt	(0L,	clearColor.getRed	())
+							.putInt	(4L,	clearColor.getGreen	())
+							.putInt	(8L,	clearColor.getBlue	())
+							.putInt	(12L,	clearColor.getAlpha	())
+							.address()
+			);
+		}
+	}
+
+	@Override
+	public void clearAllData(
+			GLInternalFormat	internalFormat,
+			float				clearDepth,
+			int					clearStencil
+	) {
+		if (internalFormat == null) {
+			throw new IllegalArgumentException("InternalFormat cannot be null.");
+		}
+
+		if (internalFormat == GLInternalFormat.INVALID) {
+			throw new IllegalArgumentException("Invalid internalFormat.");
+		}
+
+		try (var dataView = StackDataView.of(8L)) {
+			getRawBuffer().clearAllData(
+					internalFormat,
+					internalFormat.getFormat(),
+					internalFormat.getType	(),
+					dataView
+							.putFloat	(0L, clearDepth)
+							.putInt		(4L, clearStencil)
+							.address	()
+			);
+		}
+	}
+
+	@Override
+	public void clearAllData(GLInternalFormat internalFormat, float clearDepth) {
+		if (internalFormat == null) {
+			throw new IllegalArgumentException("InternalFormat cannot be null.");
+		}
+
+		if (internalFormat == GLInternalFormat.INVALID) {
+			throw new IllegalArgumentException("Invalid internalFormat.");
+		}
+
+		try (var dataView = StackDataView.aFloat(clearDepth)) {
+			getRawBuffer().clearAllData(
+					internalFormat,
+					internalFormat	.getFormat	(),
+					internalFormat	.getType	(),
+					dataView		.address	()
+			);
+		}
+	}
+
+	@Override
+	public void clearAllData(GLInternalFormat internalFormat, int clearStencil) {
+		if (internalFormat == null) {
+			throw new IllegalArgumentException("InternalFormat cannot be null.");
+		}
+
+		if (internalFormat == GLInternalFormat.INVALID) {
+			throw new IllegalArgumentException("Invalid internalFormat.");
+		}
+
+		try (var dataView = StackDataView.aInt(clearStencil)) {
+			getRawBuffer().clearAllData(
+					internalFormat,
+					internalFormat	.getFormat	(),
+					internalFormat	.getType	(),
+					dataView		.address	()
+			);
+		}
+	}
+
+	@Override
+	public void clearRangeData(IDataRange clearRangeElement, byte value) {
+		if (clearRangeElement == null) {
+			throw new IllegalArgumentException("ClearRangeClement cannot be null.");
+		}
+
+		try (var dataView = StackDataView.aByte(value)) {
+			getRawBuffer().clearRangeData(
+					GLInternalFormat.R8UI,
+					GLInternalFormat.R8UI.getFormatSize() * clearRangeElement.getOffset(),
+					GLInternalFormat.R8UI.getFormatSize() * clearRangeElement.getLength(),
+					GLFormat		.RED_INTEGER,
+					GLDataType		.BYTE,
+					dataView		.address()
+			);
+		}
+	}
+
+	@Override
+	public void clearRangeData(
+			GLInternalFormat	internalFormat,
+			IDataRange			clearRangeElement,
+			ColorFloat			clearColor
+	) {
+		if (clearColor == null) {
+			throw new IllegalArgumentException("ClearColor cannot be null.");
+		}
+
+		if (clearRangeElement == null) {
+			throw new IllegalArgumentException("ClearRangeClement cannot be null.");
+		}
+
+		if (internalFormat == null) {
+			throw new IllegalArgumentException("InternalFormat cannot be null.");
+		}
+
+		if (internalFormat == GLInternalFormat.INVALID) {
+			throw new IllegalArgumentException("Invalid internalFormat.");
+		}
+
+		try (var dataView = StackDataView.ofFloats(4L)) {
+			getRawBuffer().clearRangeData(
+					internalFormat,
+					internalFormat.getFormatSize() * clearRangeElement.getOffset(),
+					internalFormat.getFormatSize() * clearRangeElement.getLength(),
+					internalFormat.getFormat	(),
+					internalFormat.getType		(),
+					dataView
+							.putFloat	(0L,	clearColor.getRed	())
+							.putFloat	(4L,	clearColor.getGreen	())
+							.putFloat	(8L,	clearColor.getBlue	())
+							.putFloat	(12L,	clearColor.getAlpha	())
+							.address	()
+			);
+		}
+	}
+
+	@Override
+	public void clearRangeData(
+			GLInternalFormat	internalFormat,
+			IDataRange			clearRangeElement,
+			ColorInt			clearColor
+	) {
+		if (clearColor == null) {
+			throw new IllegalArgumentException("ClearColor cannot be null.");
+		}
+
+		if (clearRangeElement == null) {
+			throw new IllegalArgumentException("ClearRangeClement cannot be null.");
+		}
+
+		if (internalFormat == null) {
+			throw new IllegalArgumentException("InternalFormat cannot be null.");
+		}
+
+		if (internalFormat == GLInternalFormat.INVALID) {
+			throw new IllegalArgumentException("Invalid internalFormat.");
+		}
+
+		try (var dataView = StackDataView.ofInts(4L)) {
+			getRawBuffer().clearRangeData(
+					internalFormat,
+					internalFormat.getFormatSize() * clearRangeElement.getOffset(),
+					internalFormat.getFormatSize() * clearRangeElement.getLength(),
+					internalFormat.getFormat	(),
+					internalFormat.getType		(),
+					dataView
+							.putInt	(0L,	clearColor.getRed	())
+							.putInt	(4L,	clearColor.getGreen	())
+							.putInt	(8L,	clearColor.getBlue	())
+							.putInt	(12L,	clearColor.getAlpha	())
+							.address()
+			);
+		}
+	}
+
+	@Override
+	public void clearRangeData(
+			GLInternalFormat	internalFormat,
+			IDataRange			clearRangeElement,
+			float				clearDepth,
+			int					clearStencil
+	) {
+		if (clearRangeElement == null) {
+			throw new IllegalArgumentException("ClearRangeClement cannot be null.");
+		}
+
+		if (internalFormat == null) {
+			throw new IllegalArgumentException("InternalFormat cannot be null.");
+		}
+
+		if (internalFormat == GLInternalFormat.INVALID) {
+			throw new IllegalArgumentException("Invalid internalFormat.");
+		}
+
+		try (var dataView = StackDataView.of(8L)) {
+			getRawBuffer().clearRangeData(
+					internalFormat,
+					internalFormat.getFormatSize() * clearRangeElement.getOffset(),
+					internalFormat.getFormatSize() * clearRangeElement.getLength(),
+					internalFormat.getFormat	(),
+					internalFormat.getType		(),
+					dataView
+							.putFloat	(0L, clearDepth)
+							.putInt		(4L, clearStencil)
+							.address	()
+			);
+		}
+	}
+
+	@Override
+	public void clearRangeData(
+			GLInternalFormat	internalFormat,
+			IDataRange			clearRangeElement,
+			float				clearDepth
+	) {
+		if (clearRangeElement == null) {
+			throw new IllegalArgumentException("ClearRangeClement cannot be null.");
+		}
+
+		if (internalFormat == null) {
+			throw new IllegalArgumentException("InternalFormat cannot be null.");
+		}
+
+		if (internalFormat == GLInternalFormat.INVALID) {
+			throw new IllegalArgumentException("Invalid internalFormat.");
+		}
+
+		try (var dataView = StackDataView.aFloat(clearDepth)) {
+			getRawBuffer().clearRangeData(
+					internalFormat,
+					internalFormat	.getFormatSize	() * clearRangeElement.getOffset(),
+					internalFormat	.getFormatSize	() * clearRangeElement.getLength(),
+					internalFormat	.getFormat		(),
+					internalFormat	.getType		(),
+					dataView		.address		()
+			);
+		}
+	}
+
+	@Override
+	public void clearRangeData(
+			GLInternalFormat	internalFormat,
+			IDataRange			clearRangeElement,
+			int					clearStencil
+	) {
+		if (clearRangeElement == null) {
+			throw new IllegalArgumentException("ClearRangeClement cannot be null.");
+		}
+
+		if (internalFormat == null) {
+			throw new IllegalArgumentException("InternalFormat cannot be null.");
+		}
+
+		if (internalFormat == GLInternalFormat.INVALID) {
+			throw new IllegalArgumentException("Invalid internalFormat.");
+		}
+
+		try (var dataView = StackDataView.aInt(clearStencil)) {
+			getRawBuffer().clearRangeData(
+					internalFormat,
+					internalFormat	.getFormatSize	() * clearRangeElement.getOffset(),
+					internalFormat	.getFormatSize	() * clearRangeElement.getLength(),
+					internalFormat	.getFormat		(),
+					internalFormat	.getType		(),
+					dataView		.address		()
+			);
+		}
+	}
+
+	@Override
+	public void copyRangeDataTo(
+			IGLRawBufferBase	bufferWrite,
+			IDataRange			bufferCopyRangeRead,
+			IDataRange			bufferCopyRangeWrite
+	) {
+		if (bufferCopyRangeRead == null) {
+			throw new IllegalArgumentException("BufferCopyRangeRead cannot be null.");
+		}
+
+		if (bufferCopyRangeWrite == null) {
+			throw new IllegalArgumentException("BufferCopyRangeWrite cannot be null.");
+		}
+
+		if (bufferWrite == null) {
+			throw new IllegalArgumentException("BufferWrite cannot be null.");
+		}
+
+		getRawBuffer().copyRangeDataTo(
+				bufferWrite,
+				bufferCopyRangeRead	.getOffset(),
+				bufferCopyRangeWrite.getOffset(),
+				bufferCopyRangeRead	.getLength()
+		);
+	}
+
+	@Override
+	public void copyRangeDataFrom(
+			IGLRawBufferBase	bufferRead,
+			IDataRange			bufferCopyRangeRead,
+			IDataRange			bufferCopyRangeWrite
+	) {
+		if (bufferCopyRangeRead == null) {
+			throw new IllegalArgumentException("BufferCopyRangeRead cannot be null.");
+		}
+
+		if (bufferCopyRangeWrite == null) {
+			throw new IllegalArgumentException("BufferCopyRangeWrite cannot be null.");
+		}
+
+		if (bufferRead == null) {
+			throw new IllegalArgumentException("BufferRead cannot be null.");
+		}
+
+		getRawBuffer().copyRangeDataFrom(
+				bufferRead,
+				bufferCopyRangeRead	.getOffset(),
+				bufferCopyRangeWrite.getOffset(),
+				bufferCopyRangeRead	.getLength()
+		);
+	}
+
+	@Override
+	public void bind(GLBufferType bufferType) {
+		getRawBuffer().bind(bufferType);
+	}
+
+	@Override
+	public void bindBase(GLBufferBlockType bufferBlockType, int bindTargetIndex) {
+		getRawBuffer().bindBase(bufferBlockType, bindTargetIndex);
+	}
+
+	@Override
+	public void bindRange(
+			GLBufferBlockType	bufferBlockType,
+			IDataRange			bufferTargetRange,
+			int					bufferTargetIndex
+	) {
+		if (bufferTargetRange == null) {
+			throw new IllegalArgumentException("BufferTargetRange cannot be null.");
+		}
+
+		getRawBuffer().bindRange(
+				bufferBlockType,
+				bufferTargetIndex,
+				bufferTargetRange.getOffset(),
+				bufferTargetRange.getLength()
+		);
+	}
+
+	@Override
+	public IGLRawBufferView getRawBuffer() {
+		return getRawBuffer();
+	}
+
+	@Override
+	public int getBufferHandle() {
+		return getRawBuffer().getBufferHandle();
+	}
+
+	@Override
+	public GLBufferType getBufferType() {
+		return getRawBuffer().getBufferType();
+	}
+
+	@Override
+	public int getBufferSize() {
+		return getRawBuffer().getBufferSize();
+	}
+
+	@Override
+	public boolean isImmutable() {
+		return getRawBuffer().isImmutable();
+	}
+
+	@Override
+	public boolean isMapped() {
+		return getRawBuffer().isMapped();
+	}
+
+	@Override
+	public long getMapOffset() {
+		return getRawBuffer().getMapOffset();
+	}
+
+	@Override
+	public long getMapLength() {
+		return getRawBuffer().getMapLength();
+	}
+
+	@Override
+	public IDataRange getMapRange() {
+		return getRawBuffer().getMapRange();
+	}
+
+	@Override
+	public GLBufferStorageFlag getStorageFlag() {
+		return getRawBuffer().getStorageFlag();
+	}
+
+	@Override
+	public GLBufferMapAccess getAccessFlag() {
+		return getRawBuffer().getAccessFlag();
+	}
+
+	@Override
+	public GLBufferUsage getBufferUsage() {
+		return getRawBuffer().getBufferUsage();
+	}
+
+	@Override
+	public GLBufferMapAccessLegacy getAccess() {
+		return getRawBuffer().getAccess();
+	}
+
+	@Override
+	public boolean isPersistent() {
+		return getRawBuffer().isPersistent();
+	}
+
+	@Override
+	public boolean isDynamic() {
+		return getRawBuffer().isDynamic();
+	}
+
+	@Override
+	public boolean isDeleted() {
+		return getRawBuffer().isDeleted();
+	}
+
+	@Override
+	public long getOffset() {
+		return getRawBuffer().getOffset();
+	}
+
+	@Override
+	public long getLength() {
+		return getRawBuffer().getLength();
+	}
+
+	@Override
+	public void delete() {
+		getRawBuffer().delete();
+	}
+}

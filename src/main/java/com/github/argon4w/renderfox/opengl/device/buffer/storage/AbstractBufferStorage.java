@@ -25,8 +25,8 @@ import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBuff
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
 import com.github.argon4w.renderfox.opengl.buffer.object.GLBufferCreateInfo;
 import com.github.argon4w.renderfox.opengl.buffer.object.mutable.GLMutableBuffer;
-import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.GLMappedBufferCreateInfo;
-import com.github.argon4w.renderfox.opengl.buffer.object.mutable.mapped.IGLMappedBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.GLMappedBufferCreateInfo;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.IGLMappedBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.GLBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.IGLBuffer;
@@ -41,21 +41,14 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 		this.bufferContext = bufferContext;
 	}
 
-	protected abstract void setupStorage(
-			IGLRawBuffer		buffer,
-			long				bufferDataAddress,
-			long				bufferDataOffset,
-			long				bufferDataSize,
-			GLBufferStorageFlag	storageFlag
-	);
-
 	protected abstract IGLMappedBuffer setupMapped(
 			long				bufferDataAddress,
 			long				bufferDataOffset,
 			long				bufferDataSize,
 			GLBufferType		bufferType,
 			GLBufferStorageFlag	storageFlag,
-			GLBufferMapAccess	mapAccess
+			GLBufferMapAccess	mapAccess,
+			IGLMappedBuffer		prototype
 	);
 
 	protected IGLMappedBuffer setupPersistent(
@@ -64,7 +57,8 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 			long				bufferDataSize,
 			GLBufferType		bufferType,
 			GLBufferStorageFlag	storageFlag,
-			GLBufferMapAccess	mapAccess
+			GLBufferMapAccess	mapAccess,
+			IGLMappedBuffer		prototype
 	) {
 		return setupMapped(
 				bufferDataAddress,
@@ -72,7 +66,8 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 				bufferDataSize,
 				bufferType,
 				storageFlag,
-				mapAccess
+				mapAccess,
+				prototype
 		);
 	}
 
@@ -350,6 +345,27 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 			GLBufferStorageFlag	storageFlag,
 			GLBufferMapAccess	mapAccess
 	) {
+		return createMappedBuffer(
+				bufferDataAddress,
+				bufferDataOffset,
+				bufferDataSize,
+				bufferType,
+				storageFlag,
+				mapAccess,
+				null
+		);
+	}
+
+	@Override
+	public IGLMappedBuffer createMappedBuffer(
+			long				bufferDataAddress,
+			long				bufferDataOffset,
+			long				bufferDataSize,
+			GLBufferType		bufferType,
+			GLBufferStorageFlag	storageFlag,
+			GLBufferMapAccess	mapAccess,
+			IGLMappedBuffer		prototype
+	) {
 		if (storageFlag == null) {
 			throw new IllegalArgumentException("StorageFlag cannot be null.");
 		}
@@ -369,7 +385,8 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 					bufferDataSize,
 					bufferType,
 					storageFlag,
-					mapAccess
+					mapAccess,
+					prototype
 			);
 		}
 
@@ -379,7 +396,8 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 				bufferDataSize,
 				bufferType,
 				storageFlag,
-				mapAccess
+				mapAccess,
+				prototype
 		);
 	}
 }
