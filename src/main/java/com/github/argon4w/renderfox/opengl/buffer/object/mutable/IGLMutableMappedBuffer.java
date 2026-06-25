@@ -17,13 +17,10 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.data.coordinate;
+package com.github.argon4w.renderfox.opengl.buffer.object.mutable;
 
-public interface IDataRange {
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.IGLMappedBuffer;
 
-	long				getOffset	();
-	long				getLength	();
-	default long		getRequired	() 					{ return getOffset() + getLength();				}
-	default IDataRange	withOffset	(long newOffset)	{ return new DataRange(newOffset, getLength());	}
-	default IDataRange	withLength	(long newLength)	{ return new DataRange(getOffset(), newLength);	}
+public interface IGLMutableMappedBuffer extends IGLMutableBuffer, IGLMappedBuffer {
+
 }

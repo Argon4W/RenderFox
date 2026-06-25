@@ -520,7 +520,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 
 	@Override
 	public long address() {
-		return address;
+		return address + offset;
 	}
 
 	@Override

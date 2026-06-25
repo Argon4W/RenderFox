@@ -27,12 +27,15 @@ import com.github.argon4w.renderfox.opengl.buffer.object.GLBufferCreateInfo;
 import com.github.argon4w.renderfox.opengl.buffer.object.mapped.GLMappedBufferCreateInfo;
 import com.github.argon4w.renderfox.opengl.buffer.object.mapped.IGLMappedBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.IGLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.mutable.IGLMutableBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.mutable.IGLMutableMappedBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBuffer;
 
 public interface IBufferStorage {
 
-	IGLBuffer		createBuffer		(GLBufferCreateInfo			info);
-	IGLMappedBuffer	createMappedBuffer	(GLMappedBufferCreateInfo	info);
+	IGLBuffer				createBuffer				(GLBufferCreateInfo			info);
+	IGLMappedBuffer			createMappedBuffer			(GLMappedBufferCreateInfo	info);
+	IGLMutableMappedBuffer	createMutableMappedBuffer	(GLMappedBufferCreateInfo	info);
 
 	void setupStorage(
 			IGLRawBuffer		buffer,
@@ -70,19 +73,19 @@ public interface IBufferStorage {
 			GLBufferStorageFlag	storageFlag
 	);
 
-	IGLBuffer createMutableBuffer(
+	IGLMutableBuffer createMutableBuffer(
 			long				bufferSize,
 			GLBufferType		bufferType,
 			GLBufferStorageFlag	storageFlag
 	);
 
-	IGLBuffer createMutableBuffer(
+	IGLMutableBuffer createMutableBuffer(
 			IDataView<?>		bufferData,
 			GLBufferType		bufferType,
 			GLBufferStorageFlag	storageFlag
 	);
 
-	IGLBuffer createMutableBuffer(
+	IGLMutableBuffer createMutableBuffer(
 			IDataView<?>		bufferData,
 			long				bufferDataOffset,
 			long				bufferDataSize,
@@ -90,7 +93,7 @@ public interface IBufferStorage {
 			GLBufferStorageFlag	storageFlag
 	);
 
-	IGLBuffer createMutableBuffer(
+	IGLMutableBuffer createMutableBuffer(
 			long				bufferDataAddress,
 			long				bufferDataOffset,
 			long				bufferDataSize,
@@ -138,5 +141,37 @@ public interface IBufferStorage {
 			GLBufferStorageFlag	storageFlag,
 			GLBufferMapAccess	mapAccess,
 			IGLMappedBuffer		prototype
+	);
+
+	IGLMutableMappedBuffer createMutableMappedBuffer(
+			long				bufferSize,
+			GLBufferType		bufferType,
+			GLBufferStorageFlag	storageFlag,
+			GLBufferMapAccess	mapAccess
+	);
+
+	IGLMutableMappedBuffer createMutableMappedBuffer(
+			IDataView<?>		bufferData,
+			GLBufferType		bufferType,
+			GLBufferStorageFlag	storageFlag,
+			GLBufferMapAccess	mapAccess
+	);
+
+	IGLMutableMappedBuffer createMutableMappedBuffer(
+			IDataView<?>		bufferData,
+			long				bufferDataOffset,
+			long				bufferDataSize,
+			GLBufferType		bufferType,
+			GLBufferStorageFlag	storageFlag,
+			GLBufferMapAccess	mapAccess
+	);
+
+	IGLMutableMappedBuffer createMutableMappedBuffer(
+			long				bufferDataAddress,
+			long				bufferDataOffset,
+			long				bufferDataSize,
+			GLBufferType		bufferType,
+			GLBufferStorageFlag	storageFlag,
+			GLBufferMapAccess	mapAccess
 	);
 }

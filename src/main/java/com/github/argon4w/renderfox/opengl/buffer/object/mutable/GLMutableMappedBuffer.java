@@ -38,7 +38,7 @@ import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
 import org.lwjgl.system.MemoryUtil;
 
-public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMappedBufferInternal, IMutableSizeObject {
+public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMutableMappedBuffer, IGLMappedBufferInternal {
 
 	private final	GLBufferContext			bufferContext;
 	private final	IResizeMethod			resizeMethod;
@@ -117,8 +117,8 @@ public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMapped
 			throw new IllegalArgumentException("ViewLength cannot be negative.");
 		}
 
-		if (viewRange.getOffset() + viewRange.getLength() > bufferSize) {
-			throw new IllegalArgumentException("ViewOffset + viewLength cannot be greater than the value of buffer size.");
+		if (viewRange.getRequired() > bufferSize) {
+			resize(viewRange.getRequired());
 		}
 
 		return new GLMappedBufferView(
@@ -146,6 +146,10 @@ public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMapped
 
 		if (!this.mapAccess.allow(mapAccess)) {
 			throw new IllegalStateException("The mapAccess contains bits that are not in the pre-defined mapAccess in this buffer.");
+		}
+
+		if (this.bufferSize < mapDataRange.getRequired()) {
+			resize(mapDataRange.getRequired());
 		}
 
 		return this.mapView.slice(mapDataRange);
@@ -200,13 +204,13 @@ public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMapped
 	}
 
 	@Override
-	public IResizeMethod getResizeMethod() {
-		return resizeMethod;
+	public IGLRawBufferView getRawBuffer() {
+		return buffer.getRawBuffer();
 	}
 
 	@Override
-	public IGLRawBufferView getRawBuffer() {
-		return buffer.getRawBuffer();
+	public IResizeMethod getResizeMethod() {
+		return resizeMethod;
 	}
 
 	@Override

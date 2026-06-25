@@ -31,7 +31,7 @@ import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
 import org.lwjgl.system.MemoryUtil;
 
-public class GLMutableBuffer extends AbstractGLBuffer implements IMutableSizeObject {
+public class GLMutableBuffer extends AbstractGLBuffer implements IGLMutableBuffer {
 
 	protected final	GLBufferContext		bufferContext;
 	protected final IResizeMethod		resizeMethod;
