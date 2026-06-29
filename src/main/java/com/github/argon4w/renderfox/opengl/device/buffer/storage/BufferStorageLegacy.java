@@ -56,8 +56,7 @@ public class BufferStorageLegacy extends AbstractBufferStorage {
 			long				bufferDataSize,
 			GLBufferType		bufferType,
 			GLBufferStorageFlag	storageFlag,
-			GLBufferMapAccess	mapAccess,
-			IGLMappedBuffer		prototype
+			GLBufferMapAccess	mapAccess
 	) {
 		var buffer = bufferContext.createRawBuffer(bufferType);
 
@@ -69,24 +68,10 @@ public class BufferStorageLegacy extends AbstractBufferStorage {
 				storageFlag
 		);
 
-		if (prototype == null) {
-			return new GLMappedBufferLegacy(
-					storageFlag,
-					mapAccess,
-					buffer,
-					0
-			);
-		}
-
-		if (prototype instanceof GLMappedBufferLegacy legacy) {
-			return new GLMappedBufferLegacy(
-					storageFlag,
-					mapAccess,
-					buffer,
-					legacy.getCount()
-			);
-		}
-
-		throw new IllegalArgumentException("Incorrect prototype mapped buffer type.");
+		return new GLMappedBufferLegacy(
+				storageFlag,
+				mapAccess,
+				buffer
+		);
 	}
 }

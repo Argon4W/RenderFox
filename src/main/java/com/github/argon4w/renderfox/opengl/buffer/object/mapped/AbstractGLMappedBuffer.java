@@ -20,7 +20,6 @@
 package com.github.argon4w.renderfox.opengl.buffer.object.mapped;
 
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
-import com.github.argon4w.renderfox.data.view.IMappedDataView;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
 import com.github.argon4w.renderfox.opengl.buffer.object.GLBuffer;
@@ -29,10 +28,10 @@ import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 
 public abstract class AbstractGLMappedBuffer extends GLBuffer implements IGLMappedBufferInternal {
 
-	protected final GLBufferStorageFlag		storageFlag;
+	protected final	GLBufferStorageFlag		storageFlag;
 	protected final	GLBufferMapAccess		mapAccess;
-	protected final GLMappedDataView.Root	mapView;
-	private			int						mapGeneration;
+	protected final	GLMappedDataView.Root	mapView;
+	private			int						generation;
 
 	public AbstractGLMappedBuffer(
 			GLBufferStorageFlag	storageFlag,
@@ -41,13 +40,11 @@ public abstract class AbstractGLMappedBuffer extends GLBuffer implements IGLMapp
 	) {
 		super(buffer);
 
-		this.mapGeneration	= 0;
 		this.storageFlag	= storageFlag			.copy();
 		this.mapAccess		= mapAccess				.copy();
 		this.mapView		= new GLMappedDataView	.Root(this);
+		this.generation		= 0;
 	}
-
-	public abstract void disable();
 
 	protected IGLBufferDataView<?> mapBuffer() {
 		return super.mapRangeData(
@@ -57,7 +54,7 @@ public abstract class AbstractGLMappedBuffer extends GLBuffer implements IGLMapp
 	}
 
 	@Override
-	public IMappedDataView<?> reserve(long size) {
+	public GLMappedDataView reserve(long size) {
 		open();
 
 		if (size < 0) {
@@ -80,7 +77,7 @@ public abstract class AbstractGLMappedBuffer extends GLBuffer implements IGLMapp
 	}
 
 	@Override
-	public IGLBufferDataView<?> mapRangeData(IDataRange mapDataRange, GLBufferMapAccess mapAccess) {
+	public GLMappedDataView mapRangeData(IDataRange mapDataRange, GLBufferMapAccess mapAccess) {
 		open();
 
 		if (this.isDeleted()) {
@@ -132,23 +129,13 @@ public abstract class AbstractGLMappedBuffer extends GLBuffer implements IGLMapp
 
 	@Override
 	public void clear() {
-		this.mapGeneration	++;
+		this.generation		++;
 		this.mapView.clear	();
 		this.mapView.sync	();
 	}
 
 	@Override
-	public long getRemaining() {
-		return mapView.remaining();
-	}
-
-	@Override
-	public long getPosition() {
-		return mapView.position();
-	}
-
-	@Override
 	public int getGeneration() {
-		return mapGeneration;
+		return generation;
 	}
 }

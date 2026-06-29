@@ -72,7 +72,7 @@ public class GLMappedBufferCreateInfo {
 		private GLBufferMapAccess	mapAccess;
 
 		private Builder() {
-			this.bufferSize		= 64;
+			this.bufferSize		= -1;
 			this.bufferType		= GLBufferType			.VERTEX_BUFFER;
 			this.storageFlag	= GLBufferStorageFlag	.of();
 			this.mapAccess		= GLBufferMapAccess		.of();

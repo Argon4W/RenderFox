@@ -63,7 +63,7 @@ public class GLBufferCreateInfo {
 		private GLBufferStorageFlag	storageFlag;
 
 		private Builder() {
-			this.bufferSize		= 64;
+			this.bufferSize		= -1;
 			this.bufferType		= GLBufferType			.VERTEX_BUFFER;
 			this.storageFlag	= GLBufferStorageFlag	.of();
 		}

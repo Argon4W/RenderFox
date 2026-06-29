@@ -50,8 +50,7 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 			long				bufferDataSize,
 			GLBufferType		bufferType,
 			GLBufferStorageFlag	storageFlag,
-			GLBufferMapAccess	mapAccess,
-			IGLMappedBuffer		prototype
+			GLBufferMapAccess	mapAccess
 	);
 
 	protected IGLMappedBuffer setupPersistent(
@@ -60,8 +59,7 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 			long				bufferDataSize,
 			GLBufferType		bufferType,
 			GLBufferStorageFlag	storageFlag,
-			GLBufferMapAccess	mapAccess,
-			IGLMappedBuffer		prototype
+			GLBufferMapAccess	mapAccess
 	) {
 		return setupMapped(
 				bufferDataAddress,
@@ -69,8 +67,7 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 				bufferDataSize,
 				bufferType,
 				storageFlag,
-				mapAccess,
-				prototype
+				mapAccess
 		);
 	}
 
@@ -82,6 +79,77 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 
 		return createBuffer(
 				info.getBufferSize	(),
+				info.getBufferType	(),
+				info.getStorageFlag	()
+		);
+	}
+
+	@Override
+	public IGLBuffer createBuffer(GLBufferCreateInfo info, long size) {
+		return createBuffer(
+				size,
+				info.getBufferType	(),
+				info.getStorageFlag	()
+		);
+	}
+
+
+	@Override
+	public IGLBuffer createBuffer(GLBufferCreateInfo info, IDataView<?> bufferData) {
+		if (bufferData == null) {
+			throw new IllegalArgumentException("bufferData cannot be null.");
+		}
+
+		return createBuffer(
+				info,
+				bufferData,
+				bufferData.position	(),
+				bufferData.remaining()
+		);
+	}
+
+	@Override
+	public IGLBuffer createBuffer(
+			GLBufferCreateInfo	info,
+			IDataView<?>		bufferData,
+			long				bufferDataOffset,
+			long				bufferDataSize
+	) {
+		if (bufferData == null) {
+			throw new IllegalArgumentException("BufferData cannot be null.");
+		}
+
+		if (!bufferData.isOffHeap()) {
+			throw new IllegalArgumentException("BufferData is not an off-heap data view.");
+		}
+
+		if (bufferDataOffset + bufferDataSize > bufferData.limit()) {
+			throw new IllegalArgumentException("BufferDataOffset + bufferDataSize cannot be greater than the value of buffer limit.");
+		}
+
+		return createBuffer(
+				info,
+				bufferData.address(),
+				bufferDataOffset,
+				bufferDataSize
+		);
+	}
+
+	@Override
+	public IGLBuffer createBuffer(
+			GLBufferCreateInfo	info,
+			long				bufferDataAddress,
+			long				bufferDataOffset,
+			long				bufferDataSize
+	) {
+		if (info == null) {
+			throw new IllegalArgumentException("Info cannot be null.");
+		}
+
+		return createBuffer(
+				bufferDataAddress,
+				bufferDataOffset,
+				bufferDataSize,
 				info.getBufferType	(),
 				info.getStorageFlag	()
 		);
@@ -173,6 +241,89 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 		);
 
 		return new GLBuffer(buffer);
+	}
+
+	@Override
+	public IGLMutableBuffer createMutableBuffer(GLBufferCreateInfo info) {
+		if (info == null) {
+			throw new IllegalArgumentException("Info cannot be null.");
+		}
+
+		return createMutableBuffer(
+				info.getBufferSize	(),
+				info.getBufferType	(),
+				info.getStorageFlag	()
+		);
+	}
+
+	@Override
+	public IGLMutableBuffer createMutableBuffer(GLBufferCreateInfo info, long size) {
+		return createMutableBuffer(
+				size,
+				info.getBufferType	(),
+				info.getStorageFlag	()
+		);
+	}
+
+	@Override
+	public IGLMutableBuffer createMutableBuffer(GLBufferCreateInfo info, IDataView<?> bufferData) {
+		if (bufferData == null) {
+			throw new IllegalArgumentException("bufferData cannot be null.");
+		}
+
+		return createMutableBuffer(
+				info,
+				bufferData,
+				bufferData.position	(),
+				bufferData.remaining()
+		);
+	}
+
+	@Override
+	public IGLMutableBuffer createMutableBuffer(
+			GLBufferCreateInfo	info,
+			IDataView<?>		bufferData,
+			long				bufferDataOffset,
+			long				bufferDataSize
+	) {
+		if (bufferData == null) {
+			throw new IllegalArgumentException("BufferData cannot be null.");
+		}
+
+		if (!bufferData.isOffHeap()) {
+			throw new IllegalArgumentException("BufferData is not an off-heap data view.");
+		}
+
+		if (bufferDataOffset + bufferDataSize > bufferData.limit()) {
+			throw new IllegalArgumentException("BufferDataOffset + bufferDataSize cannot be greater than the value of buffer limit.");
+		}
+
+		return createMutableBuffer(
+				info,
+				bufferData.address(),
+				bufferDataOffset,
+				bufferDataSize
+		);
+	}
+
+	@Override
+	public IGLMutableBuffer createMutableBuffer(
+			GLBufferCreateInfo	info,
+			long				bufferDataAddress,
+			long				bufferDataOffset,
+			long				bufferDataSize
+	) {
+		if (info == null) {
+			throw new IllegalArgumentException("Info cannot be null.");
+		}
+
+		return createMutableBuffer(
+				bufferDataAddress,
+				bufferDataOffset,
+				bufferDataSize,
+				info.getBufferType	(),
+				info.getStorageFlag	()
+		);
 	}
 
 	@Override
@@ -271,6 +422,82 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 	}
 
 	@Override
+	public IGLMappedBuffer createMappedBuffer(GLMappedBufferCreateInfo info, long size) {
+		if (info == null) {
+			throw new IllegalArgumentException("Info cannot be null.");
+		}
+
+		return createMappedBuffer(
+				size,
+				info.getBufferType	(),
+				info.getStorageFlag	(),
+				info.getMapAccess	()
+		);
+	}
+
+	@Override
+	public IGLMappedBuffer createMappedBuffer(GLMappedBufferCreateInfo info, IDataView<?> bufferData) {
+		if (bufferData == null) {
+			throw new IllegalArgumentException("bufferData cannot be null.");
+		}
+
+		return createMappedBuffer(
+				info,
+				bufferData,
+				bufferData.position	(),
+				bufferData.remaining()
+		);
+	}
+
+	@Override
+	public IGLMappedBuffer createMappedBuffer(
+			GLMappedBufferCreateInfo	info,
+			IDataView<?>				bufferData,
+			long						bufferDataOffset,
+			long						bufferDataSize
+	) {
+		if (bufferData == null) {
+			throw new IllegalArgumentException("BufferData cannot be null.");
+		}
+
+		if (!bufferData.isOffHeap()) {
+			throw new IllegalArgumentException("BufferData is not an off-heap data view.");
+		}
+
+		if (bufferDataOffset + bufferDataSize > bufferData.limit()) {
+			throw new IllegalArgumentException("BufferDataOffset + bufferDataSize cannot be greater than the value of buffer limit.");
+		}
+
+		return createMappedBuffer(
+				info,
+				bufferData.address(),
+				bufferDataOffset,
+				bufferDataSize
+		);
+	}
+
+	@Override
+	public IGLMappedBuffer createMappedBuffer(
+			GLMappedBufferCreateInfo	info,
+			long						bufferDataAddress,
+			long						bufferDataOffset,
+			long						bufferDataSize
+	) {
+		if (info == null) {
+			throw new IllegalArgumentException("Info cannot be null.");
+		}
+
+		return createMappedBuffer(
+				bufferDataAddress,
+				bufferDataOffset,
+				bufferDataSize,
+				info.getBufferType	(),
+				info.getStorageFlag	(),
+				info.getMapAccess	()
+		);
+	}
+
+	@Override
 	public IGLMappedBuffer createMappedBuffer(
 			long				bufferSize,
 			GLBufferType		bufferType,
@@ -348,27 +575,6 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 			GLBufferStorageFlag	storageFlag,
 			GLBufferMapAccess	mapAccess
 	) {
-		return createMappedBuffer(
-				bufferDataAddress,
-				bufferDataOffset,
-				bufferDataSize,
-				bufferType,
-				storageFlag,
-				mapAccess,
-				null
-		);
-	}
-
-	@Override
-	public IGLMappedBuffer createMappedBuffer(
-			long				bufferDataAddress,
-			long				bufferDataOffset,
-			long				bufferDataSize,
-			GLBufferType		bufferType,
-			GLBufferStorageFlag	storageFlag,
-			GLBufferMapAccess	mapAccess,
-			IGLMappedBuffer		prototype
-	) {
 		if (storageFlag == null) {
 			throw new IllegalArgumentException("StorageFlag cannot be null.");
 		}
@@ -388,8 +594,7 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 					bufferDataSize,
 					bufferType,
 					storageFlag,
-					mapAccess,
-					prototype
+					mapAccess
 			);
 		}
 
@@ -399,8 +604,7 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 				bufferDataSize,
 				bufferType,
 				storageFlag,
-				mapAccess,
-				prototype
+				mapAccess
 		);
 	}
 
@@ -412,6 +616,82 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 
 		return createMutableMappedBuffer(
 				info.getBufferSize	(),
+				info.getBufferType	(),
+				info.getStorageFlag	(),
+				info.getMapAccess	()
+		);
+	}
+
+	@Override
+	public IGLMutableMappedBuffer createMutableMappedBuffer(GLMappedBufferCreateInfo info, long size) {
+		if (info == null) {
+			throw new IllegalArgumentException("Info cannot be null.");
+		}
+
+		return createMutableMappedBuffer(
+				size,
+				info.getBufferType	(),
+				info.getStorageFlag	(),
+				info.getMapAccess	()
+		);
+	}
+
+	@Override
+	public IGLMutableMappedBuffer createMutableMappedBuffer(GLMappedBufferCreateInfo info, IDataView<?> bufferData) {
+		if (bufferData == null) {
+			throw new IllegalArgumentException("bufferData cannot be null.");
+		}
+
+		return createMutableMappedBuffer(
+				info,
+				bufferData,
+				bufferData.position	(),
+				bufferData.remaining()
+		);
+	}
+
+	@Override
+	public IGLMutableMappedBuffer createMutableMappedBuffer(
+			GLMappedBufferCreateInfo	info,
+			IDataView<?>				bufferData,
+			long						bufferDataOffset,
+			long						bufferDataSize
+	) {
+		if (bufferData == null) {
+			throw new IllegalArgumentException("BufferData cannot be null.");
+		}
+
+		if (!bufferData.isOffHeap()) {
+			throw new IllegalArgumentException("BufferData is not an off-heap data view.");
+		}
+
+		if (bufferDataOffset + bufferDataSize > bufferData.limit()) {
+			throw new IllegalArgumentException("BufferDataOffset + bufferDataSize cannot be greater than the value of buffer limit.");
+		}
+
+		return createMutableMappedBuffer(
+				info,
+				bufferData.address(),
+				bufferDataOffset,
+				bufferDataSize
+		);
+	}
+
+	@Override
+	public IGLMutableMappedBuffer createMutableMappedBuffer(
+			GLMappedBufferCreateInfo	info,
+			long						bufferDataAddress,
+			long						bufferDataOffset,
+			long						bufferDataSize
+	) {
+		if (info == null) {
+			throw new IllegalArgumentException("Info cannot be null.");
+		}
+
+		return createMutableMappedBuffer(
+				bufferDataAddress,
+				bufferDataOffset,
+				bufferDataSize,
 				info.getBufferType	(),
 				info.getStorageFlag	(),
 				info.getMapAccess	()

@@ -109,9 +109,9 @@ public class RenderFox {
 
 		// Create the staging buffer.
 		var stagingBuffer = device
-				.getBufferContext	()
-				.getBufferCreator	()
-				.createMappedBuffer	(stagingInfo);
+				.getBufferContext			()
+				.getBufferCreator			()
+				.createMutableMappedBuffer	(stagingInfo);
 
 		// Create the pixel buffer.
 		var pixelBuffer = device

@@ -27,8 +27,9 @@ import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
 
 public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implements IGLBufferDataView<GLMappedDataView> {
 
-	protected final IGLMappedBufferInternal	buffer;
+	protected final	IGLMappedBufferInternal	buffer;
 	protected final	long					offset;
+	protected final	long					depth;
 
 	protected		long					generation;
 
@@ -36,13 +37,15 @@ public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implement
 			IGLMappedBufferInternal	buffer,
 			long					generation,
 			long					offset,
-			long					length
+			long					length,
+			long					depth
 	) {
 		super(length);
 
 		this.generation	= generation;
 		this.buffer		= buffer;
 		this.offset		= offset;
+		this.depth		= depth;
 	}
 
 	public GLMappedDataView(IGLMappedBufferInternal buffer) {
@@ -50,13 +53,16 @@ public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implement
 
 		this.generation	= buffer.getGeneration();
 		this.buffer		= buffer;
-		this.offset		= 0;
+		this.offset		= 0L;
+		this.depth		= 0L;
 	}
 
 	@Override
 	public void close() {
-		this	.flush();
-		buffer	.close();
+		if (this.depth <= 1) {
+			this		.flush();
+			this.buffer	.close();
+		}
 	}
 
 	@Override
@@ -113,17 +119,19 @@ public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implement
 				this.buffer,
 				this.generation,
 				this.offset +	range.getOffset(),
-								range.getLength()
+								range.getLength(),
+				this.depth + 1
 		);
 	}
 
 	@Override
 	public GLMappedDataView slice() {
 		return new GLMappedDataView(
-				buffer,
-				generation,
-				offset +	position	(),
-							remaining	()
+				this.buffer,
+				this.generation,
+				this.offset +	position	(),
+								remaining	(),
+				this.depth + 1
 		);
 	}
 

@@ -29,6 +29,7 @@ public class GLBufferDataView extends OffsetDataView<GLBufferDataView> implement
 	private final IGLBuffer		buffer;
 	private final IDataView<?>	dataView;
 	private final long			offset;
+	private final long			depth;
 
 	public GLBufferDataView(
 			IGLBuffer			buffer,
@@ -40,19 +41,22 @@ public class GLBufferDataView extends OffsetDataView<GLBufferDataView> implement
 		this.buffer		= buffer;
 		this.dataView	= dataView;
 		this.offset		= 0L;
+		this.depth		= 0L;
 	}
 
 	public GLBufferDataView(
 			IGLBuffer		buffer,
 			IDataView<?>	dataView,
 			long			offset,
-			long			length
+			long			length,
+			long			depth
 	) {
 		super(length);
 
 		this.buffer		= buffer;
 		this.dataView	= dataView;
 		this.offset		= offset;
+		this.depth		= depth;
 	}
 
 	@Override
@@ -103,7 +107,8 @@ public class GLBufferDataView extends OffsetDataView<GLBufferDataView> implement
 				this.buffer,
 				this.dataView,
 				this.offset +	position	(),
-								remaining	()
+								remaining	(),
+				this.depth + 1
 		);
 	}
 
@@ -129,8 +134,16 @@ public class GLBufferDataView extends OffsetDataView<GLBufferDataView> implement
 				this.buffer,
 				this.dataView,
 				this.offset +	range.getOffset(),
-								range.getLength()
+								range.getLength(),
+				this.depth + 1
 		);
+	}
+
+	@Override
+	public void close() {
+		if (depth == 0) {
+			buffer.getRawBuffer().unmap();
+		}
 	}
 
 	@Override
@@ -141,10 +154,5 @@ public class GLBufferDataView extends OffsetDataView<GLBufferDataView> implement
 	@Override
 	protected long getOffset() {
 		return offset;
-	}
-
-	@Override
-	public void close() {
-		buffer.getRawBuffer().unmap();
 	}
 }

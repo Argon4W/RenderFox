@@ -24,7 +24,4 @@ import com.github.argon4w.renderfox.opengl.buffer.object.IGLBuffer;
 
 public interface IGLMappedBuffer extends IMappedBuffer, IGLBuffer {
 
-	long	getRemaining	();
-	long	getPosition		();
-	int		getGeneration	();
 }

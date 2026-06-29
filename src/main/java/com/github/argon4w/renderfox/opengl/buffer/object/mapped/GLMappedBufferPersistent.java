@@ -55,12 +55,7 @@ public class GLMappedBufferPersistent extends AbstractGLMappedBuffer {
 	}
 
 	@Override
-	public void disable() {
-
-	}
-
-	@Override
-	public IDataView<?> getView() {
+	public IGLBufferDataView<?> getView() {
 		return dataView;
 	}
 
@@ -71,8 +66,10 @@ public class GLMappedBufferPersistent extends AbstractGLMappedBuffer {
 
 	@Override
 	public void delete() {
-		dataView.flush();
-		dataView.close();
+		if (isMapped()) {
+			dataView.flush();
+			dataView.close();
+		}
 
 		super.delete();
 	}
