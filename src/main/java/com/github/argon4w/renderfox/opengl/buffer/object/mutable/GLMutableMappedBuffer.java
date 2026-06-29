@@ -214,6 +214,16 @@ public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMutabl
 	}
 
 	@Override
+	public void delete() {
+		if (this.bufferOpened) {
+			this.bufferOpened = false;
+			this.buffer.close();
+		}
+
+		super.delete();
+	}
+
+	@Override
 	public IDataRange flush(IDataRange range) {
 		return buffer.flush(range);
 	}
