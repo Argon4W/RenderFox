@@ -21,6 +21,7 @@ package com.github.argon4w.renderfox.opengl.buffer.object.mutable;
 
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.size.IMutableSizeObject;
+import com.github.argon4w.renderfox.data.size.IMutableSizeObjectInternal;
 import com.github.argon4w.renderfox.data.size.IResizeMethod;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
@@ -31,7 +32,7 @@ import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
 import org.lwjgl.system.MemoryUtil;
 
-public class GLMutableBuffer extends AbstractGLBuffer implements IGLMutableBuffer {
+public class GLMutableBuffer extends AbstractGLBuffer implements IGLMutableBuffer, IMutableSizeObjectInternal {
 
 	protected final	GLBufferContext		bufferContext;
 	protected final IResizeMethod		resizeMethod;

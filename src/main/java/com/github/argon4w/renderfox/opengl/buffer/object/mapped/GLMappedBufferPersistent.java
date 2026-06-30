@@ -20,7 +20,6 @@
 package com.github.argon4w.renderfox.opengl.buffer.object.mapped;
 
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
-import com.github.argon4w.renderfox.data.view.IDataView;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
 import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
@@ -66,10 +65,8 @@ public class GLMappedBufferPersistent extends AbstractGLMappedBuffer {
 
 	@Override
 	public void delete() {
-		if (isMapped()) {
-			dataView.flush();
-			dataView.close();
-		}
+		dataView.flush();
+		dataView.close();
 
 		super.delete();
 	}

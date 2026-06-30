@@ -19,12 +19,38 @@
 
 package com.github.argon4w.renderfox.data.size;
 
-public interface IMutableSizeObject {
+public interface IMutableSizeObjectInternal extends IMutableSizeObject {
 
+	void setSize		(long size);
+	void onResize		(long size, long bytes);
+	void doResize		(long size, long bytes);
+	void beforeResize	();
+	void afterResize	();
 
-	IResizeMethod	getResizeMethod	();
-	long			getSize			();
-	void			expand			(long bytes);
-	void			resize			(long atLeast);
-	void			resizeTo		(long newBufferSize);
+	@Override
+	default void expand(long bytes) {
+		if (bytes <= 0) {
+			return;
+		}
+
+		var size = getSize();
+
+		beforeResize();
+
+		onResize	(size, bytes);
+		doResize	(size, bytes);
+		setSize		(size + bytes);
+
+		afterResize	();
+	}
+
+	@Override
+	default void resize(long atLeast) {
+		resizeTo(getResizeMethod().resize(atLeast));
+	}
+
+	@Override
+	default void resizeTo(long newBufferSize) {
+		expand(newBufferSize - getSize());
+	}
 }
