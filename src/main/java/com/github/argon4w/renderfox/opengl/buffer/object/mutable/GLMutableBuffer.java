@@ -23,9 +23,11 @@ import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.size.IMutableSizeObjectInternal;
 import com.github.argon4w.renderfox.data.size.IResizeMethod;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
+import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
 import com.github.argon4w.renderfox.opengl.buffer.object.AbstractGLBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.GLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
@@ -74,8 +76,8 @@ public class GLMutableBuffer extends AbstractGLBuffer implements IGLMutableBuffe
 			throw new IllegalArgumentException("ViewLength cannot be negative.");
 		}
 
-		if (viewRange.getOffset() + viewRange.getLength() > bufferSize) {
-			throw new IllegalArgumentException("ViewOffset + viewLength cannot be greater than the value of buffer size.");
+		if (viewRange.getRequired() > bufferSize) {
+			resize(viewRange);
 		}
 
 		return new GLBuffer(
@@ -85,6 +87,27 @@ public class GLMutableBuffer extends AbstractGLBuffer implements IGLMutableBuffe
 						viewRange.getLength()
 				)
 		);
+	}
+
+	@Override
+	public IGLBufferDataView<?> mapRangeData(IDataRange mapDataRange, GLBufferMapAccess mapAccess) {
+		if (mapDataRange == null) {
+			throw new IllegalArgumentException("MapDataRange cannot be null.");
+		}
+
+		if (mapDataRange.getOffset() < 0) {
+			throw new IllegalArgumentException("MapOffset cannot be negative.");
+		}
+
+		if (mapDataRange.getLength() < 0) {
+			throw new IllegalArgumentException("MapLength cannot be negative.");
+		}
+
+		if (mapDataRange.getRequired() > bufferSize) {
+			resize(mapDataRange);
+		}
+
+		return super.mapRangeData(mapDataRange, mapAccess);
 	}
 
 	@Override

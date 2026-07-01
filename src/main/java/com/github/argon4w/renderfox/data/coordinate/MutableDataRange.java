@@ -17,16 +17,38 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.data.size;
+package com.github.argon4w.renderfox.data.coordinate;
 
-import com.github.argon4w.renderfox.data.coordinate.IDataRange;
+public class MutableDataRange implements IDataRange {
 
-public interface IMutableSizeObject {
+	protected long offset;
+	protected long length;
 
-	IResizeMethod	getResizeMethod	();
-	long			getSize			();
-	void			expand			(long		bytes);
-	void			resize			(long		atLeast);
-	void			resizeTo		(long		newBufferSize);
-	void			resize			(IDataRange	dataRange);
+	public MutableDataRange(long offset, long length) {
+		this.offset = offset;
+		this.length = length;
+	}
+
+	public MutableDataRange(long length) {
+		this.offset = 0L;
+		this.length = length;
+	}
+
+	@Override
+	public long getOffset() {
+		return this.offset;
+	}
+
+	@Override
+	public long getLength() {
+		return this.length;
+	}
+
+	public void setOffset(long offset) {
+		this.offset = offset;
+	}
+
+	public void setLength(long length) {
+		this.length = length;
+	}
 }

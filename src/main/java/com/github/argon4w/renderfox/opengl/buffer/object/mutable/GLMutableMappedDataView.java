@@ -26,39 +26,21 @@ import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
 
 public class GLMutableMappedDataView extends OffsetDataView<GLMutableMappedDataView> implements IGLBufferDataView<GLMutableMappedDataView> {
 
-	private final GLMutableMappedBuffer	buffer;
-	private final long					offset;
-	private final long					depth;
-
-	public GLMutableMappedDataView(GLMutableMappedBuffer buffer) {
-		super(buffer.getBufferSize());
-
-		this.buffer	= buffer;
-		this.offset	= 0;
-		this.depth	= 0;
-	}
+	protected final GLMutableMappedBuffer	buffer;
+	protected final long					offset;
+	protected final long					depth;
 
 	public GLMutableMappedDataView(
 			GLMutableMappedBuffer	buffer,
+			long					depth,
 			long					offset,
-			long					length,
-			long					depth
+			long					length
 	) {
 		super(length);
 
 		this.buffer	= buffer;
 		this.offset	= offset;
 		this.depth	= depth;
-	}
-
-	@Override
-	public GLMutableMappedDataView slice() {
-		return new GLMutableMappedDataView(
-				this.buffer,
-				this.offset +	this.position	(),
-								this.remaining	(),
-				this.depth + 1
-		);
 	}
 
 	@Override
@@ -81,16 +63,27 @@ public class GLMutableMappedDataView extends OffsetDataView<GLMutableMappedDataV
 
 		return new GLMutableMappedDataView(
 				this.buffer,
-				this.offset +	range.getOffset(),
-								range.getLength(),
-				this.depth + 1
+				this.depth	+ 1,
+				this.offset	+	range.getOffset(),
+								range.getLength()
+		);
+	}
+
+	@Override
+	public GLMutableMappedDataView slice() {
+		return new GLMutableMappedDataView(
+				this.buffer,
+				this.depth	+ 1,
+				this.offset	+	this.position	(),
+								this.remaining	()
 		);
 	}
 
 	@Override
 	public void close() {
 		if (this.depth <= 1) {
-			this.buffer.close();
+			this		.flush();
+			this.buffer	.close();
 		}
 	}
 
@@ -102,5 +95,42 @@ public class GLMutableMappedDataView extends OffsetDataView<GLMutableMappedDataV
 	@Override
 	public long getOffset() {
 		return offset;
+	}
+
+	public static class Root extends GLMutableMappedDataView {
+
+		public Root(GLMutableMappedBuffer buffer) {
+			super(buffer, 0L, 0L, 0L);
+		}
+
+		@Override
+		public GLMutableMappedDataView position(long position) {
+			throw new UnsupportedOperationException("Unsupported Operation.");
+		}
+
+		@Override
+		public GLMutableMappedDataView limit(long limit) {
+			throw new UnsupportedOperationException("Unsupported Operation.");
+		}
+
+		@Override
+		public Root mark() {
+			throw new UnsupportedOperationException("Unsupported Operation.");
+		}
+
+		@Override
+		public void close() {
+			throw new UnsupportedOperationException("Unsupported Operation.");
+		}
+
+		@Override
+		public long capacity() {
+			return buffer.bufferSize;
+		}
+
+		@Override
+		public long limit() {
+			return buffer.bufferSize;
+		}
 	}
 }

@@ -19,6 +19,8 @@
 
 package com.github.argon4w.renderfox.data.size;
 
+import com.github.argon4w.renderfox.data.coordinate.IDataRange;
+
 public interface IMutableSizeObjectInternal extends IMutableSizeObject {
 
 	void setSize		(long size);
@@ -42,6 +44,11 @@ public interface IMutableSizeObjectInternal extends IMutableSizeObject {
 		setSize		(size + bytes);
 
 		afterResize	();
+	}
+
+	@Override
+	default void resize(IDataRange dataRange) {
+		resize(dataRange.getRequired());
 	}
 
 	@Override

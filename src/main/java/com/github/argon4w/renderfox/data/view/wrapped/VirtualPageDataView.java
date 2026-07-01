@@ -451,9 +451,9 @@ public class VirtualPageDataView extends AbstractDataView<VirtualPageDataView> {
 
 	@Override
 	public VirtualPageDataView slice() {
-		var sliceOffset		= (position + offset)	% pageSize;
-		var pageIndexStart	= (position + offset)	/ pageSize;
-		var pageIndexEnd	= limit					/ pageSize;
+		var sliceOffset		= (position() + offset)	% pageSize;
+		var pageIndexStart	= (position() + offset)	/ pageSize;
+		var pageIndexEnd	= limit()				/ pageSize;
 
 		return new VirtualPageDataView(
 				dataView,
@@ -482,7 +482,7 @@ public class VirtualPageDataView extends AbstractDataView<VirtualPageDataView> {
 
 		var end = range.getOffset() + range.getLength();
 
-		if (end > limit) {
+		if (end > limit()) {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of limit.");
 		}
 

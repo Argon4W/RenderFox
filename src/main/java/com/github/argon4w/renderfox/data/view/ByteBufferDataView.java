@@ -52,7 +52,7 @@ public class ByteBufferDataView extends AbstractDataView<ByteBufferDataView> {
 
 	@Override
 	public IDataRange flush() {
-		return new DataRange(offset, limit);
+		return new DataRange(offset, limit());
 	}
 
 	@Override
@@ -269,8 +269,8 @@ public class ByteBufferDataView extends AbstractDataView<ByteBufferDataView> {
 	public ByteBufferDataView slice() {
 		return new ByteBufferDataView(
 				byteBuffer,
-				remaining(),
-				position + offset
+				remaining	(),
+				position	() + offset
 		);
 	}
 
@@ -288,7 +288,7 @@ public class ByteBufferDataView extends AbstractDataView<ByteBufferDataView> {
 			throw new IllegalArgumentException("Length cannot be negative.");
 		}
 
-		if (range.getOffset() + range.getLength() < limit) {
+		if (range.getOffset() + range.getLength() < limit()) {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of limit.");
 		}
 

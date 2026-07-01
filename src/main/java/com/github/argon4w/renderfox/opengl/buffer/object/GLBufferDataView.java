@@ -62,13 +62,13 @@ public class GLBufferDataView extends OffsetDataView<GLBufferDataView> implement
 	@Override
 	public IDataRange flush() {
 		buffer.getRawBuffer().flushMappedRange(
-				this.offset,
-				this.limit
+				this.getOffset	(),
+				this.limit		()
 		);
 
 		return new DataRange(
-				this.offset,
-				this.limit
+				this.getOffset	(),
+				this.limit		()
 		);
 	}
 

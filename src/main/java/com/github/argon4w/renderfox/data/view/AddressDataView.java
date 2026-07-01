@@ -51,7 +51,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 
 	@Override
 	public IDataRange flush() {
-		return new DataRange(offset, limit);
+		return new DataRange(offset, limit());
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 
 	@Override
 	public AddressDataView putByte(long position, byte value) {
-		if (limit - position < 1) {
+		if (limit() - position < 1) {
 			throw new BufferOverflowException();
 		}
 
@@ -75,7 +75,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 
 	@Override
 	public AddressDataView putShort(long position, short value) {
-		if (limit - position < 2) {
+		if (limit() - position < 2) {
 			throw new BufferOverflowException();
 		}
 
@@ -86,7 +86,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 
 	@Override
 	public AddressDataView putInt(long position, int value) {
-		if (limit - position < 4) {
+		if (limit() - position < 4) {
 			throw new BufferOverflowException();
 		}
 
@@ -97,7 +97,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 
 	@Override
 	public AddressDataView putLong(long position, long value) {
-		if (limit - position < 8) {
+		if (limit() - position < 8) {
 			throw new BufferOverflowException();
 		}
 
@@ -108,7 +108,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 
 	@Override
 	public AddressDataView putFloat(long position, float value) {
-		if (limit - position < 4) {
+		if (limit() - position < 4) {
 			throw new BufferOverflowException();
 		}
 
@@ -119,7 +119,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 
 	@Override
 	public AddressDataView putDouble(long position, double value) {
-		if (limit - position < 8) {
+		if (limit() - position < 8) {
 			throw new BufferOverflowException();
 		}
 
@@ -147,7 +147,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of array length.");
 		}
 
-		if (limit - position < length) {
+		if (limit() - position < length) {
 			throw new BufferOverflowException();
 		}
 
@@ -181,7 +181,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of array length.");
 		}
 
-		if (limit - position < length * Short.BYTES) {
+		if (limit() - position < length * Short.BYTES) {
 			throw new BufferOverflowException();
 		}
 
@@ -215,7 +215,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of array length.");
 		}
 
-		if (limit - position < length * Integer.BYTES) {
+		if (limit() - position < length * Integer.BYTES) {
 			throw new BufferOverflowException();
 		}
 
@@ -249,7 +249,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of array length.");
 		}
 
-		if (limit - position < length * Long.BYTES) {
+		if (limit() - position < length * Long.BYTES) {
 			throw new BufferOverflowException();
 		}
 
@@ -283,7 +283,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of array length.");
 		}
 
-		if (limit - position < length * Float.BYTES) {
+		if (limit() - position < length * Float.BYTES) {
 			throw new BufferOverflowException();
 		}
 
@@ -317,7 +317,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of array length.");
 		}
 
-		if (limit - position < length * Double.BYTES) {
+		if (limit() - position < length * Double.BYTES) {
 			throw new BufferOverflowException();
 		}
 
@@ -355,7 +355,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of buffer limit.");
 		}
 
-		if (limit - position < length) {
+		if (limit() - position < length) {
 			throw new BufferOverflowException();
 		}
 
@@ -383,7 +383,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 			throw new IllegalArgumentException("Length cannot be negative.");
 		}
 
-		if (limit - position < length) {
+		if (limit() - position < length) {
 			throw new BufferOverflowException();
 		}
 
@@ -398,7 +398,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 
 	@Override
 	public byte getByte(long position) {
-		if (limit - position < 1) {
+		if (limit() - position < 1) {
 			throw new BufferOverflowException();
 		}
 
@@ -407,7 +407,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 
 	@Override
 	public short getShort(long position) {
-		if (limit - position < 2) {
+		if (limit() - position < 2) {
 			throw new BufferOverflowException();
 		}
 
@@ -416,7 +416,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 
 	@Override
 	public int getInt(long position) {
-		if (limit - position < 4) {
+		if (limit() - position < 4) {
 			throw new BufferOverflowException();
 		}
 
@@ -425,7 +425,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 
 	@Override
 	public long getLong(long position) {
-		if (limit - position < 8) {
+		if (limit() - position < 8) {
 			throw new BufferOverflowException();
 		}
 
@@ -434,7 +434,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 
 	@Override
 	public float getFloat(long position) {
-		if (limit - position < 4) {
+		if (limit() - position < 4) {
 			throw new BufferOverflowException();
 		}
 
@@ -443,7 +443,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 
 	@Override
 	public double getDouble(long position) {
-		if (limit - position < 8) {
+		if (limit() - position < 8) {
 			throw new BufferOverflowException();
 		}
 
@@ -469,7 +469,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of array length.");
 		}
 
-		if (limit - position < length) {
+		if (limit() - position < length) {
 			throw new IllegalArgumentException("Cannot get data from data view that exceeds the range of limit.");
 		}
 
@@ -488,8 +488,8 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 	public AddressDataView slice() {
 		return new AddressDataView(
 				address,
-				offset + position,
-				limit
+				position() + offset,
+				limit	()
 		);
 	}
 
@@ -507,7 +507,7 @@ public class AddressDataView extends AbstractDataView<AddressDataView> {
 			throw new IllegalArgumentException("Length cannot be negative.");
 		}
 
-		if (range.getRequired() > limit) {
+		if (range.getRequired() > limit()) {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of limit.");
 		}
 

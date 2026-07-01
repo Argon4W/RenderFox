@@ -50,7 +50,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 
 	@Override
 	public IDataRange flush() {
-		return new DataRange(offset, limit);
+		return new DataRange(offset, limit());
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 
 	@Override
 	public HeapDataView putByte(long position, byte value) {
-		if (limit - (position + offset) < 1) {
+		if (limit() - (position + offset) < 1) {
 			throw new BufferOverflowException();
 		}
 
@@ -71,7 +71,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 
 	@Override
 	public HeapDataView putShort(long position, short value) {
-		if (limit - (position + offset) < 2) {
+		if (limit() - (position + offset) < 2) {
 			throw new BufferOverflowException();
 		}
 
@@ -82,7 +82,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 
 	@Override
 	public HeapDataView putInt(long position, int value) {
-		if (limit - (position + offset) < 4) {
+		if (limit() - (position + offset) < 4) {
 			throw new BufferOverflowException();
 		}
 
@@ -93,7 +93,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 
 	@Override
 	public HeapDataView putLong(long position, long value) {
-		if (limit - (position + offset) < 8) {
+		if (limit() - (position + offset) < 8) {
 			throw new BufferOverflowException();
 		}
 
@@ -104,7 +104,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 
 	@Override
 	public HeapDataView putFloat(long position, float value) {
-		if (limit - (position + offset) < 4) {
+		if (limit() - (position + offset) < 4) {
 			throw new BufferOverflowException();
 		}
 
@@ -115,7 +115,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 
 	@Override
 	public HeapDataView putDouble(long position, double value) {
-		if (limit - (position + offset) < 8) {
+		if (limit() - (position + offset) < 8) {
 			throw new BufferOverflowException();
 		}
 
@@ -143,7 +143,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of array length.");
 		}
 
-		if (limit - (position + this.offset) < length) {
+		if (limit() - (position + this.offset) < length) {
 			throw new BufferOverflowException();
 		}
 
@@ -177,7 +177,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of array length.");
 		}
 
-		if (limit - (position + this.offset) < length * Short.BYTES) {
+		if (limit() - (position + this.offset) < length * Short.BYTES) {
 			throw new BufferOverflowException();
 		}
 
@@ -211,7 +211,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of array length.");
 		}
 
-		if (limit - (position + this.offset) < length * Integer.BYTES) {
+		if (limit() - (position + this.offset) < length * Integer.BYTES) {
 			throw new BufferOverflowException();
 		}
 
@@ -245,7 +245,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of array length.");
 		}
 
-		if (limit - (position + this.offset) < length * Long.BYTES) {
+		if (limit() - (position + this.offset) < length * Long.BYTES) {
 			throw new BufferOverflowException();
 		}
 
@@ -279,7 +279,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of array length.");
 		}
 
-		if (limit - (position + this.offset) < length * Float.BYTES) {
+		if (limit() - (position + this.offset) < length * Float.BYTES) {
 			throw new BufferOverflowException();
 		}
 
@@ -313,7 +313,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of array length.");
 		}
 
-		if (limit - (position + this.offset) < length * Double.BYTES) {
+		if (limit() - (position + this.offset) < length * Double.BYTES) {
 			throw new BufferOverflowException();
 		}
 
@@ -347,7 +347,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of buffer limit.");
 		}
 
-		if (limit - (position + this.offset) < length) {
+		if (limit() - (position + this.offset) < length) {
 			throw new BufferOverflowException();
 		}
 
@@ -376,7 +376,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 			throw new IllegalArgumentException("Length cannot be negative.");
 		}
 
-		if (limit - (position + this.offset) < length) {
+		if (limit() - (position + this.offset) < length) {
 			throw new BufferOverflowException();
 		}
 
@@ -393,7 +393,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 
 	@Override
 	public byte getByte(long position) {
-		if (limit - position < 1) {
+		if (limit() - position < 1) {
 			throw new BufferOverflowException();
 		}
 
@@ -402,7 +402,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 
 	@Override
 	public short getShort(long position) {
-		if (limit - position < 2) {
+		if (limit() - position < 2) {
 			throw new BufferOverflowException();
 		}
 
@@ -411,7 +411,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 
 	@Override
 	public int getInt(long position) {
-		if (limit - position < 4) {
+		if (limit() - position < 4) {
 			throw new BufferOverflowException();
 		}
 
@@ -420,7 +420,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 
 	@Override
 	public long getLong(long position) {
-		if (limit - position < 8) {
+		if (limit() - position < 8) {
 			throw new BufferOverflowException();
 		}
 
@@ -429,7 +429,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 
 	@Override
 	public float getFloat(long position) {
-		if (limit - position < 4) {
+		if (limit() - position < 4) {
 			throw new BufferOverflowException();
 		}
 
@@ -438,7 +438,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 
 	@Override
 	public double getDouble(long position) {
-		if (limit - position < 8) {
+		if (limit() - position < 8) {
 			throw new BufferOverflowException();
 		}
 
@@ -464,7 +464,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of array length.");
 		}
 
-		if (limit - (position + this.offset) < length) {
+		if (limit() - (position + this.offset) < length) {
 			throw new IllegalArgumentException("Cannot get data from data view that exceeds the range of limit.");
 		}
 
@@ -483,8 +483,8 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 	public HeapDataView slice() {
 		return new HeapDataView(
 				memory,
-				remaining(),
-				offset + position
+				remaining	(),
+				position	() + offset
 		);
 	}
 
@@ -502,7 +502,7 @@ public class HeapDataView extends AbstractDataView<HeapDataView> {
 			throw new IllegalArgumentException("Length cannot be negative.");
 		}
 
-		if (range.getOffset() + range.getLength() > limit) {
+		if (range.getOffset() + range.getLength() > limit()) {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of limit.");
 		}
 

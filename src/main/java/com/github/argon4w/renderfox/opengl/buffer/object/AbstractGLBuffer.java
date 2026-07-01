@@ -32,7 +32,6 @@ import com.github.argon4w.renderfox.opengl.buffer.function.parameter.GLBufferUsa
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferBase;
-import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 import com.github.argon4w.renderfox.opengl.format.GLDataType;
 import com.github.argon4w.renderfox.opengl.format.GLFormat;
 import com.github.argon4w.renderfox.opengl.format.GLInternalFormat;

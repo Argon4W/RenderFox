@@ -25,5 +25,5 @@ import com.github.argon4w.renderfox.data.view.IMappedDataView;
 public interface IMappedBuffer {
 
 	IMappedDataView<?> data();
-	IMappedDataView<?> data(IDataRange dataRange);
+	IMappedDataView<?> data(IDataRange	dataRange);
 }

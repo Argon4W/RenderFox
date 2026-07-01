@@ -27,10 +27,10 @@ import java.nio.InvalidMarkException;
 @SuppressWarnings("unchecked")
 public abstract class AbstractDataView<T extends AbstractDataView<T>> implements IDataView<T> {
 
-	protected final	long capacity;
-	protected		long position;
-	protected		long limit;
-	protected		long mark;
+	private final	long capacity;
+	private			long position;
+	private			long limit;
+	private			long mark;
 
 	public AbstractDataView(long capacity) {
 		this.capacity	= capacity;
@@ -63,13 +63,6 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 	}
 
 	@Override
-	public long remaining() {
-		var remaining = limit - position;
-
-		return remaining < 0 ? 0 : remaining;
-	}
-
-	@Override
 	public long position() {
 		return position;
 	}
@@ -80,12 +73,19 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 	}
 
 	@Override
+	public long remaining() {
+		var remaining = limit() - position();
+
+		return remaining < 0 ? 0 : remaining;
+	}
+
+	@Override
 	public T position(long position) {
 		if (position < 0) {
 			throw new IllegalArgumentException("Position cannot be negative.");
 		}
 
-		if (position > limit) {
+		if (position > limit()) {
 			throw new IllegalArgumentException("Position cannot be greater than the value of limit.");
 		}
 
@@ -99,11 +99,12 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 			throw new IllegalArgumentException("Limit cannot be negative.");
 		}
 
-		if (limit > capacity) {
+		if (limit > capacity()) {
 			throw new IllegalArgumentException("Limit cannot be greater than the value of capacity.");
 		}
 
 		this.limit = limit;
+
 		return (T) this;
 	}
 
@@ -152,7 +153,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T putByte(byte value) {
-		putByte(position, value);
+		putByte(position(), value);
 
 		position += 1;
 
@@ -161,7 +162,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T putShort(short value) {
-		putShort(position, value);
+		putShort(position(), value);
 
 		position += 2;
 
@@ -170,7 +171,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T putInt(int value) {
-		putInt(position, value);
+		putInt(position(), value);
 
 		position += 4;
 
@@ -179,7 +180,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T putInt24(int value) {
-		putInt(position, value & 0xFFFFFF);
+		putInt(position(), value & 0xFFFFFF);
 
 		position += 3;
 
@@ -188,7 +189,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T putLong(long value) {
-		putLong(position, value);
+		putLong(position(), value);
 
 		position += 8;
 
@@ -197,7 +198,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T putFloat(float value) {
-		putFloat(position, value);
+		putFloat(position(), value);
 
 		position += 4;
 
@@ -206,7 +207,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T putDouble(double value) {
-		putDouble(position, value);
+		putDouble(position(), value);
 
 		position += 8;
 
@@ -215,7 +216,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T putBytes(byte[] value) {
-		putBytes(position, value);
+		putBytes(position(), value);
 
 		position += value.length;
 
@@ -224,7 +225,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T putShorts(short[] value) {
-		putShorts(position, value);
+		putShorts(position(), value);
 
 		position += (long) value.length * Short.BYTES;
 
@@ -233,7 +234,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T putInts(int[] value) {
-		putInts(position, value);
+		putInts(position(), value);
 
 		position += (long) value.length * Integer.BYTES;
 
@@ -242,7 +243,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T putLongs(long[] value) {
-		putLongs(position, value);
+		putLongs(position(), value);
 
 		position += (long) value.length * Long.BYTES;
 
@@ -251,7 +252,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T putFloats(float[] value) {
-		putFloats(position, value);
+		putFloats(position(), value);
 
 		position += (long) value.length * Float.BYTES;
 
@@ -260,7 +261,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T putDoubles(double[] value) {
-		putDoubles(position, value);
+		putDoubles(position(), value);
 
 		position += (long) value.length * Double.BYTES;
 
@@ -269,7 +270,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T putBuffer(IDataView<?> value) {
-		putBuffer(position, value);
+		putBuffer(position(), value);
 
 		position += value.remaining();
 
@@ -278,7 +279,12 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T putBuffer(long valueAddress, long length) {
-		putBuffer(position, valueAddress, 0, length);
+		putBuffer(
+				position(),
+				valueAddress,
+				0,
+				length
+		);
 
 		position += length;
 
@@ -292,7 +298,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 			long	length
 	) {
 		putBytes(
-				position,
+				position(),
 				value,
 				offset,
 				length
@@ -310,7 +316,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 			long	length
 	) {
 		putShorts(
-				position,
+				position(),
 				value,
 				offset,
 				length
@@ -328,7 +334,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 			long	length
 	) {
 		putInts(
-				position,
+				position(),
 				value,
 				offset,
 				length
@@ -346,7 +352,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 			long	length
 	) {
 		putLongs(
-				position,
+				position(),
 				value,
 				offset,
 				length
@@ -364,7 +370,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 			long	length
 	) {
 		putFloats(
-				position,
+				position(),
 				value,
 				offset,
 				length
@@ -382,7 +388,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 			long		length
 	) {
 		putDoubles(
-				position,
+				position(),
 				value,
 				offset,
 				length
@@ -400,7 +406,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 			long			length
 	) {
 		putBuffer(
-				position,
+				position(),
 				value,
 				offset,
 				length
@@ -418,7 +424,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 			long length
 	) {
 		putBuffer(
-				position,
+				position(),
 				valueAddress,
 				offset,
 				length
@@ -515,7 +521,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public byte getByte() {
-		var value = getByte(position);
+		var value = getByte(position());
 
 		position += 1;
 
@@ -524,7 +530,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public short getShort() {
-		var value = getShort(position);
+		var value = getShort(position());
 
 		position += 2;
 
@@ -533,7 +539,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public int getInt() {
-		var value = getInt(position);
+		var value = getInt(position());
 
 		position += 4;
 
@@ -542,7 +548,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public long getLong() {
-		var value = getLong(position);
+		var value = getLong(position());
 
 		position += 8;
 
@@ -551,7 +557,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public float getFloat() {
-		var value = getFloat(position);
+		var value = getFloat(position());
 
 		position += 4;
 
@@ -560,7 +566,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public double getDouble() {
-		var value = getDouble(position);
+		var value = getDouble(position());
 
 		position += 8;
 
@@ -570,7 +576,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 	@Override
 	public T getBytes(byte[] value) {
 		getBytes(
-				position,
+				position(),
 				value,
 				0,
 				value.length
@@ -596,7 +602,7 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 	@Override
 	public T getBytes(byte[] value, long offset, long length) {
 		getBytes(
-				position,
+				position(),
 				value,
 				offset,
 				length
@@ -609,8 +615,12 @@ public abstract class AbstractDataView<T extends AbstractDataView<T>> implements
 
 	@Override
 	public T slice(long length) {
+		if (length <= 0) {
+			throw new IllegalArgumentException("Length cannot be less than or equal to zero.");
+		}
+
 		var range = new DataRange(
-				position,
+				position(),
 				length
 		);
 

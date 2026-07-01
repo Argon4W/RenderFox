@@ -64,7 +64,7 @@ public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMutabl
 
 		this.bufferStorage	= bufferStorage;
 		this.resizeMethod	= resizeMethod;
-		this.mapView		= new GLMutableMappedDataView(this);
+		this.mapView		= new GLMutableMappedDataView.Root(this);
 
 		this.mapImplView	= null;
 		this.mapCount		= 0;
@@ -72,16 +72,12 @@ public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMutabl
 	}
 
 	@Override
-	public GLMappedDataView data() {
-		return new GLMappedDataView(
-				this,
-				getOffset(),
-				getLength()
-		);
+	public GLMutableMappedDataView data() {
+		return open();
 	}
 
 	@Override
-	public GLMappedDataView data(IDataRange dataRange) {
+	public GLMutableMappedDataView data(IDataRange dataRange) {
 		if (dataRange == null) {
 			throw new IllegalArgumentException("Data range cannot be null.");
 		}
@@ -95,18 +91,14 @@ public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMutabl
 		}
 
 		if (dataRange.getRequired() > bufferSize) {
-			resize(dataRange.getRequired());
+			resize(dataRange);
 		}
 
-		return new GLMappedDataView(
-				this,
-				dataRange.getOffset(),
-				dataRange.getLength()
-		);
+		return open().slice(dataRange);
 	}
 
 	@Override
-	public GLMappedDataView mapRangeData(IDataRange mapDataRange, GLBufferMapAccess mapAccess) {
+	public GLMutableMappedDataView mapRangeData(IDataRange mapDataRange, GLBufferMapAccess mapAccess) {
 		if (mapDataRange == null) {
 			throw new IllegalArgumentException("MapDataRange cannot be null.");
 		}
@@ -124,14 +116,10 @@ public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMutabl
 		}
 
 		if (mapDataRange.getRequired() > bufferSize) {
-			resize(mapDataRange.getRequired());
+			resize(mapDataRange);
 		}
 
-		return new GLMappedDataView(
-				this,
-				mapDataRange.getOffset(),
-				mapDataRange.getLength()
-		);
+		return open().slice(mapDataRange);
 	}
 
 	@Override
@@ -153,7 +141,7 @@ public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMutabl
 		}
 
 		if (viewRange.getRequired() > bufferSize) {
-			resize(viewRange.getRequired());
+			resize(viewRange);
 		}
 
 		return new GLMappedBufferView(
@@ -201,7 +189,7 @@ public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMutabl
 	}
 
 	@Override
-	public IDataView<?> open() {
+	public GLMutableMappedDataView open() {
 		this.mapCount ++;
 
 		if (this.mapImplView == null) {
