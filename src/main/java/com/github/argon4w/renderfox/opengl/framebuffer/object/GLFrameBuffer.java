@@ -34,7 +34,6 @@ import com.github.argon4w.renderfox.opengl.framebuffer.object.raw.IGLRawFramebuf
 import com.github.argon4w.renderfox.opengl.texture.constant.GLTextureComponentType;
 import com.github.argon4w.renderfox.opengl.texture.constant.filter.GLFilterMode;
 import com.github.argon4w.renderfox.opengl.texture.object.feature.IGLRawTextureBase;
-import it.unimi.dsi.fastutil.ints.Int2IntSortedMap;
 
 public class GLFrameBuffer implements IGLFramebufferBase, IGLFramebufferBinding, IGLFramebufferStore {
 
@@ -42,33 +41,6 @@ public class GLFrameBuffer implements IGLFramebufferBase, IGLFramebufferBinding,
 
 	public GLFrameBuffer(IGLRawFramebuffer framebuffer) {
 		this.framebuffer = framebuffer;
-	}
-
-	public void setDrawColorAttachments(Int2IntSortedMap attachments) {
-		if (attachments == null) {
-			throw new IllegalArgumentException("Attachments cannot be null.");
-		}
-
-		var size = attachments.lastIntKey() + 1;
-
-		try (var drawBuffers = StackDataView.ofIntsZeros(size)) {
-			for (var entry : attachments.int2IntEntrySet()) {
-				var drawBufferIndex = entry											.getIntKey	();
-				var attachmentIndex = entry											.getIntValue();
-				var attachmentValue = GLFramebufferAttachment.color(attachmentIndex).getConstant();
-
-				drawBuffers.putIntAligned(drawBufferIndex, attachmentValue);
-			}
-
-			framebuffer.setDrawAttachments(
-					attachments.size	(),
-					drawBuffers.address	()
-			);
-		}
-	}
-
-	public void setReadColorAttachment(int attachment) {
-		framebuffer.setReadAttachment(GLFramebufferAttachment.color(attachment));
 	}
 
 	public void updateColorAttachment(

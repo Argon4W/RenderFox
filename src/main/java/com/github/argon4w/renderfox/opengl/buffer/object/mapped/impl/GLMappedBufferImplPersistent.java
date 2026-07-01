@@ -23,7 +23,6 @@ import com.github.argon4w.renderfox.data.view.IDataView;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.object.GLBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
-import com.github.argon4w.renderfox.opengl.buffer.object.mapped.IGLMappedBufferInternal;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 
 public class GLMappedBufferImplPersistent extends GLBuffer implements IGLMappedBufferImpl {
