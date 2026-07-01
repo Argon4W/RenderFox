@@ -21,8 +21,4 @@ package com.github.argon4w.renderfox.data.view;
 
 public interface IMappedDataView<T extends IDataView<T>> extends IDataView<T>, AutoCloseable {
 
-	@Override
-	default void close() {
-		flush();
-	}
 }

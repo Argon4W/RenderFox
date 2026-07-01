@@ -52,10 +52,6 @@ public class GLMutableRawBufferView extends AbstractGLRawBufferView {
 			throw new IllegalArgumentException("Length cannot be negative.");
 		}
 
-		if (buffer.isDeleted()) {
-			throw new IllegalStateException("The buffer has been deleted.");
-		}
-
 		if (offset + length > this.getLength()) {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the view length.");
 		}

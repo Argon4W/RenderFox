@@ -145,7 +145,7 @@ public class RenderFox {
 		var stagingRange = (IDataRange) null;
 
 		// Allocate a slice of memory in our staging buffer.
-		try(var view = stagingBuffer.reserve(1024)) {
+		try(var view = stagingBuffer.data()) {
 			// Decorate it with our transfer info to make writing pixels easier through ImageDataView.
 			var pixels= view.as(transfer);
 
@@ -188,9 +188,6 @@ public class RenderFox {
 				stagingRange,
 				stagingRange.withOffset(0L)
 		);
-
-		// Free all allocated space from staging buffer because we have done using it.
-		stagingBuffer.clear();
 
 		// Clear the texture to fully opaque black.
 		texture.clearFullImage(0, new ColorFloat());

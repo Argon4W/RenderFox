@@ -22,82 +22,116 @@ package com.github.argon4w.renderfox.opengl.buffer.object.mutable;
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.size.IMutableSizeObjectInternal;
 import com.github.argon4w.renderfox.data.size.IResizeMethod;
+import com.github.argon4w.renderfox.data.view.IDataView;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
 import com.github.argon4w.renderfox.opengl.buffer.object.AbstractGLBuffer;
-import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
 import com.github.argon4w.renderfox.opengl.buffer.object.mapped.*;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.impl.IGLMappedBufferImpl;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
-import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
+import com.github.argon4w.renderfox.opengl.device.buffer.storage.AbstractBufferStorage;
 import org.lwjgl.system.MemoryUtil;
 
-public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMutableMappedBuffer, IGLMappedBufferInternal, IMutableSizeObjectInternal {
+public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMutableMappedBuffer, IMutableSizeObjectInternal, IGLMappedBufferInternal {
 
-	private final	GLBufferContext				bufferContext;
-	private final	IResizeMethod				resizeMethod;
-	private final	GLMappedBufferCreateInfo	createInfo;
-	private final	GLMappedDataView.Root		mapView;
-	private			AbstractGLMappedBuffer		buffer;
-	private			boolean						bufferOpened;
-	private			int							bufferOpenCount;
-	private			int							generation;
-	private 		long						bufferSize;
+	protected final	AbstractBufferStorage	bufferStorage;
+	protected final	IResizeMethod			resizeMethod;
+	protected final	GLMutableMappedDataView	mapView;
+	protected		IGLMappedBufferImpl		mapImpl;
+	protected		IDataView<?>			mapImplView;
+	protected		int						mapCount;
+	protected 		long					bufferSize;
 
 	public GLMutableMappedBuffer(
-			GLBufferContext		bufferContext,
-			long				bufferDataAddress,
-			long				bufferOffset,
-			long				bufferLength,
-			GLBufferType		bufferType,
-			GLBufferStorageFlag	storageFlag,
-			GLBufferMapAccess	mapAccess
+			AbstractBufferStorage	bufferStorage,
+			IResizeMethod			resizeMethod,
+			long					bufferDataAddress,
+			long					bufferOffset,
+			long					bufferLength,
+			GLBufferType			bufferType,
+			GLBufferStorageFlag		storageFlag,
+			GLBufferMapAccess		mapAccess
 	) {
-		this.createInfo = new GLMappedBufferCreateInfo(
-				-1,
-				bufferType,
-				storageFlag	.copy(),
-				mapAccess	.copy()
-		);
-
-		this.buffer = (AbstractGLMappedBuffer) bufferContext.getBufferCreator().createMappedBuffer(
-				this.createInfo,
+		this.mapImpl = bufferStorage.createMappedBufferImpl(
 				bufferDataAddress,
 				bufferOffset,
-				bufferLength
+				bufferLength,
+				bufferType,
+				storageFlag,
+				mapAccess
 		);
 
-		this.bufferContext		= bufferContext;
-		this.resizeMethod		= bufferContext.getResizeMethod();
-		this.mapView			= new GLMappedDataView.Root(this);
+		this.bufferStorage	= bufferStorage;
+		this.resizeMethod	= resizeMethod;
+		this.mapView		= new GLMutableMappedDataView(this);
 
-		this.bufferOpened		= false;
-		this.bufferOpenCount	= 0;
-		this.generation			= 0;
-		this.bufferSize			= bufferLength;
+		this.mapImplView	= null;
+		this.mapCount		= 0;
+		this.bufferSize		= bufferLength;
 	}
 
 	@Override
-	public GLMappedDataView reserve(long size) {
-		open();
+	public GLMappedDataView data() {
+		return new GLMappedDataView(
+				this,
+				getOffset(),
+				getLength()
+		);
+	}
 
-		if (size < 0) {
-			throw new IllegalArgumentException("Size cannot be negative.");
+	@Override
+	public GLMappedDataView data(IDataRange dataRange) {
+		if (dataRange == null) {
+			throw new IllegalArgumentException("Data range cannot be null.");
 		}
 
-		if (isDeleted()) {
-			throw new IllegalStateException("The buffer has been deleted.");
+		if (dataRange.getOffset() < 0) {
+			throw new IllegalArgumentException("DataOffset cannot be negative.");
 		}
 
-		if (!isMapped()) {
-			throw new IllegalStateException("The buffer is not in a mapped state.");
+		if (dataRange.getLength() < 0) {
+			throw new IllegalArgumentException("DataLength cannot be negative.");
 		}
 
-		if (mapView.remaining() < size) {
-			resize(mapView.position() + size);
+		if (dataRange.getRequired() > bufferSize) {
+			resize(dataRange.getRequired());
 		}
 
-		return mapView.slice(size);
+		return new GLMappedDataView(
+				this,
+				dataRange.getOffset(),
+				dataRange.getLength()
+		);
+	}
+
+	@Override
+	public GLMappedDataView mapRangeData(IDataRange mapDataRange, GLBufferMapAccess mapAccess) {
+		if (mapDataRange == null) {
+			throw new IllegalArgumentException("MapDataRange cannot be null.");
+		}
+
+		if (mapDataRange.getOffset() < 0) {
+			throw new IllegalArgumentException("MapOffset cannot be negative.");
+		}
+
+		if (mapDataRange.getLength() < 0) {
+			throw new IllegalArgumentException("MapLength cannot be negative.");
+		}
+
+		if (!getAccessFlag().allow(mapAccess)) {
+			throw new IllegalStateException("The mapAccess contains bits that are not in the pre-defined mapAccess in this buffer.");
+		}
+
+		if (mapDataRange.getRequired() > bufferSize) {
+			resize(mapDataRange.getRequired());
+		}
+
+		return new GLMappedDataView(
+				this,
+				mapDataRange.getOffset(),
+				mapDataRange.getLength()
+		);
 	}
 
 	@Override
@@ -124,8 +158,7 @@ public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMutabl
 
 		return new GLMappedBufferView(
 				this,
-				this.mapView.slice			(viewRange),
-				new GLMutableRawBufferView	(
+				new GLMutableRawBufferView(
 						this,
 						viewRange.getOffset(),
 						viewRange.getLength()
@@ -134,114 +167,69 @@ public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMutabl
 	}
 
 	@Override
-	public GLMappedDataView mapRangeData(IDataRange mapDataRange, GLBufferMapAccess mapAccess) {
-		open();
-
-		if (this.isDeleted()) {
-			throw new IllegalStateException("The buffer has been deleted.");
-		}
-
-		if (!this.isMapped()) {
-			throw new IllegalStateException("The buffer is not in a mapped state.");
-		}
-
-		if (!this.createInfo.getMapAccess().allow(mapAccess)) {
-			throw new IllegalStateException("The mapAccess contains bits that are not in the pre-defined mapAccess in this buffer.");
-		}
-
-		if (this.bufferSize < mapDataRange.getRequired()) {
-			resize(mapDataRange.getRequired());
-		}
-
-		return this.mapView.slice(mapDataRange);
-	}
-
-	@Override
 	public void doResize(long size, long bytes) {
 		if (bytes < 0) {
 			return;
 		}
 
-		if (this.bufferOpened) {
-			this.buffer.close();
+		if (this.mapCount > 0) {
+			this.mapImpl.close();
+			this.mapImplView = null;
 		}
 
-		var newBuffer = (AbstractGLMappedBuffer) this.bufferContext.getBufferCreator().createMappedBuffer(
-				this.createInfo,
+		var newImpl = bufferStorage.createMappedBufferImpl(
 				MemoryUtil.NULL,
 				MemoryUtil.NULL,
-				size + bytes
+				size + bytes,
+				this.mapImpl.getBufferType	(),
+				this.mapImpl.getStorageFlag	(),
+				this.mapImpl.getAccessFlag	()
 		);
 
-		this.buffer.copyRangeDataTo(
-				newBuffer,
-				this.buffer,
-				this.buffer
+		this.mapImpl.copyRangeDataTo(
+				newImpl,
+				this.mapImpl,
+				this.mapImpl
 		);
 
-		this.buffer.delete();
-		this.buffer = newBuffer;
+		this.mapImpl.delete();
+		this.mapImpl = newImpl;
 
-		if (this.bufferOpened) {
-			this.buffer.open();
+		if (this.mapCount > 0) {
+			this.mapImplView = this.mapImpl.open();
 		}
 	}
 
 	@Override
-	public void clear() {
-		this.generation		++;
-		this.mapView.clear	();
-		this.mapView.sync	();
-	}
+	public IDataView<?> open() {
+		this.mapCount ++;
 
-	@Override
-	public void open() {
-		this.bufferOpenCount ++;
-
-		if (!this.bufferOpened) {
-			this.bufferOpened = true;
-			this.buffer.open();
+		if (this.mapImplView == null) {
+			this.mapImplView = this.mapImpl.open();
 		}
+
+		// IMPORTANT: Return the wrapper to prevent incorrect address after resizing.
+		return this.mapView;
 	}
 
 	@Override
 	public void close() {
-		this.bufferOpenCount --;
+		this.mapCount --;
 
-		if (this.bufferOpenCount == 0) {
-			this.bufferOpened = false;
-			this.buffer.close();
+		if (this.mapCount == 0) {
+			this.mapImpl.close();
+			this.mapImplView = null;
 		}
 	}
 
 	@Override
 	public void delete() {
-		if (this.bufferOpened) {
-			this.bufferOpened = false;
-			this.buffer.close();
+		if (this.mapCount > 0) {
+			this.mapImpl.close();
+			this.mapImplView = null;
 		}
 
 		super.delete();
-	}
-
-	@Override
-	public IDataRange flush(IDataRange range) {
-		return buffer.flush(range);
-	}
-
-	@Override
-	public IGLRawBufferView getRawBuffer() {
-		return buffer.getRawBuffer();
-	}
-
-	@Override
-	public IGLBufferDataView<?> getView() {
-		return buffer.getView();
-	}
-
-	@Override
-	public IResizeMethod getResizeMethod() {
-		return resizeMethod;
 	}
 
 	@Override
@@ -255,8 +243,13 @@ public class GLMutableMappedBuffer extends AbstractGLBuffer implements IGLMutabl
 	}
 
 	@Override
-	public int getGeneration() {
-		return generation;
+	public IResizeMethod getResizeMethod() {
+		return resizeMethod;
+	}
+
+	@Override
+	public IGLRawBufferView getRawBuffer() {
+		return mapImpl.getRawBuffer();
 	}
 
 	@Override

@@ -19,7 +19,6 @@
 
 package com.github.argon4w.renderfox.opengl.buffer.object.mapped;
 
-import com.github.argon4w.renderfox.data.coordinate.DataRange;
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.view.IDataView;
 import com.github.argon4w.renderfox.data.view.wrapped.OffsetDataView;
@@ -27,34 +26,37 @@ import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
 
 public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implements IGLBufferDataView<GLMappedDataView> {
 
-	protected final	IGLMappedBufferInternal	buffer;
-	protected final	long					offset;
-	protected final	long					depth;
-
-	protected		long					generation;
+	protected final IGLMappedBufferInternal	buffer;
+	protected final IDataView<?>			dataView;
+	protected final long					offset;
+	protected final long					depth;
 
 	public GLMappedDataView(
 			IGLMappedBufferInternal	buffer,
-			long					generation,
+			long					offset,
+			long					length
+	) {
+		super(length);
+
+		this.dataView	= buffer.open();
+		this.buffer		= buffer;
+		this.offset		= offset;
+		this.depth		= 0L;
+	}
+
+	public GLMappedDataView(
+			IGLMappedBufferInternal	buffer,
+			IDataView<?>			dataView,
 			long					offset,
 			long					length,
 			long					depth
 	) {
 		super(length);
 
-		this.generation	= generation;
 		this.buffer		= buffer;
+		this.dataView	= dataView;
 		this.offset		= offset;
 		this.depth		= depth;
-	}
-
-	public GLMappedDataView(IGLMappedBufferInternal buffer) {
-		super(buffer.getBufferSize());
-
-		this.generation	= buffer.getGeneration();
-		this.buffer		= buffer;
-		this.offset		= 0L;
-		this.depth		= 0L;
 	}
 
 	@Override
@@ -63,38 +65,6 @@ public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implement
 			this		.flush();
 			this.buffer	.close();
 		}
-	}
-
-	@Override
-	public IDataRange flush() {
-		return this.buffer.flush(new DataRange(
-				this.offset,
-				this.limit
-		));
-	}
-
-	@Override
-	public IDataRange flush(IDataRange range) {
-		if (range == null) {
-			throw new IllegalArgumentException("Range cannot be null.");
-		}
-
-		if (range.getOffset() < 0) {
-			throw new IllegalArgumentException("Offset cannot be negative.");
-		}
-
-		if (range.getLength() < 0) {
-			throw new IllegalArgumentException("Length cannot be negative.");
-		}
-
-		if (range.getOffset() + range.getLength() > limit()) {
-			throw new IllegalArgumentException("Offset + length cannot be greater than the value of limit.");
-		}
-
-		return buffer.flush(new DataRange(
-				this.offset +	range.getOffset(),
-								range.getLength()
-		));
 	}
 
 	@Override
@@ -111,13 +81,13 @@ public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implement
 			throw new IllegalArgumentException("Length cannot be negative.");
 		}
 
-		if (range.getOffset() + range.getLength() > limit()) {
+		if (range.getRequired() > limit()) {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of view limit.");
 		}
 
 		return new GLMappedDataView(
 				this.buffer,
-				this.generation,
+				this.dataView,
 				this.offset +	range.getOffset(),
 								range.getLength(),
 				this.depth + 1
@@ -128,63 +98,20 @@ public class GLMappedDataView extends OffsetDataView<GLMappedDataView> implement
 	public GLMappedDataView slice() {
 		return new GLMappedDataView(
 				this.buffer,
-				this.generation,
-				this.offset +	position	(),
-								remaining	(),
+				this.dataView,
+				this.offset +	this.position	(),
+								this.remaining	(),
 				this.depth + 1
 		);
 	}
 
 	@Override
 	public IDataView<?> getDataView() {
-		if (buffer.isDeleted()) {
-			throw new IllegalStateException("The buffer has been deleted.");
-		}
-
-		if (!buffer.isMapped()) {
-			throw new IllegalStateException("The buffer is not in a mapped state.");
-		}
-
-		if (buffer.getGeneration() != generation) {
-			throw new IllegalStateException("This view of the buffer is outdated.");
-		}
-
-		return buffer.getView();
+		return dataView;
 	}
 
 	@Override
 	protected long getOffset() {
 		return offset;
-	}
-
-	public static class Root extends GLMappedDataView {
-
-		public Root(IGLMappedBufferInternal buffer) {
-			super(buffer);
-		}
-
-		@Override
-		public Root limit(long limit) {
-			throw new UnsupportedOperationException("Unsupported Operation.");
-		}
-
-		@Override
-		public Root mark() {
-			throw new UnsupportedOperationException("Unsupported Operation.");
-		}
-
-		@Override
-		public void close() {
-			throw new UnsupportedOperationException("Unsupported Operation.");
-		}
-
-		@Override
-		public long limit() {
-			return capacity;
-		}
-
-		public void sync() {
-			this.generation = buffer.getGeneration();
-		}
 	}
 }

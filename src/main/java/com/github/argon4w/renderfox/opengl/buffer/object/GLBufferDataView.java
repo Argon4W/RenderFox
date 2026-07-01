@@ -86,7 +86,7 @@ public class GLBufferDataView extends OffsetDataView<GLBufferDataView> implement
 			throw new IllegalArgumentException("Length cannot be negative.");
 		}
 
-		if (range.getOffset() + range.getLength() > limit()) {
+		if (range.getRequired() > limit()) {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of limit.");
 		}
 
@@ -126,7 +126,7 @@ public class GLBufferDataView extends OffsetDataView<GLBufferDataView> implement
 			throw new IllegalArgumentException("Length cannot be negative.");
 		}
 
-		if (range.getOffset() + range.getLength() > limit()) {
+		if (range.getRequired() > limit()) {
 			throw new IllegalArgumentException("Offset + length cannot be greater than the value of mapped length.");
 		}
 

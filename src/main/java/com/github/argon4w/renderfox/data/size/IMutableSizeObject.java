@@ -21,7 +21,6 @@ package com.github.argon4w.renderfox.data.size;
 
 public interface IMutableSizeObject {
 
-
 	IResizeMethod	getResizeMethod	();
 	long			getSize			();
 	void			expand			(long bytes);

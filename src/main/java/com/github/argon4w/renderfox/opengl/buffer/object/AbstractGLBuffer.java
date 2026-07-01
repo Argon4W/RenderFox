@@ -482,11 +482,6 @@ public abstract class AbstractGLBuffer implements IGLBuffer {
 	}
 
 	@Override
-	public IGLRawBufferView getRawBuffer() {
-		return getRawBuffer();
-	}
-
-	@Override
 	public int getBufferHandle() {
 		return getRawBuffer().getBufferHandle();
 	}

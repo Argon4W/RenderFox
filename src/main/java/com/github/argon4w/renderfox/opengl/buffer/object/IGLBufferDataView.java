@@ -22,7 +22,7 @@ package com.github.argon4w.renderfox.opengl.buffer.object;
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.view.IMappedDataView;
 
-public interface IGLBufferDataView<T extends IGLBufferDataView<T>> extends IMappedDataView<T>, AutoCloseable {
+public interface IGLBufferDataView<T extends IGLBufferDataView<T>> extends IMappedDataView<T> {
 
 	void					close();
 	IGLBufferDataView<?>	slice();

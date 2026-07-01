@@ -20,8 +20,12 @@
 package com.github.argon4w.renderfox.opengl.buffer.object.mapped;
 
 import com.github.argon4w.renderfox.buffer.IMappedBuffer;
+import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.opengl.buffer.object.IGLBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
 
-public interface IGLMappedBuffer extends IMappedBuffer, IGLBuffer {
+public interface IGLMappedBuffer extends IGLBuffer, IMappedBuffer {
 
+	IGLBufferDataView<?> data();
+	IGLBufferDataView<?> data(IDataRange dataRange);
 }

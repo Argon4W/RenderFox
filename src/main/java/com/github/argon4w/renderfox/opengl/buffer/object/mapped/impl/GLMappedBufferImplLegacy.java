@@ -17,33 +17,25 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.opengl.buffer.object.mapped;
+package com.github.argon4w.renderfox.opengl.buffer.object.mapped.impl;
 
-import com.github.argon4w.renderfox.data.coordinate.IDataRange;
+import com.github.argon4w.renderfox.data.view.IDataView;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferAccessBit;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
-import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
+import com.github.argon4w.renderfox.opengl.buffer.object.GLBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 
-public class GLMappedBufferLegacy extends AbstractGLMappedBuffer {
+public class GLMappedBufferImplLegacy extends GLBuffer implements IGLMappedBufferImpl {
 
-	private IGLBufferDataView<?>	dataView;
-	private int						dataViewRefCount;
+	protected final	GLBufferMapAccess		mapAccess;
+	protected		IGLBufferDataView<?>	dataView;
 
-	public GLMappedBufferLegacy(
-			GLBufferStorageFlag	storageFlag,
-			GLBufferMapAccess	mapAccess,
-			IGLRawBufferView	buffer
-	) {
-		super(
-				storageFlag,
-				mapAccess,
-				buffer
-		);
+	public GLMappedBufferImplLegacy(IGLRawBufferView buffer, GLBufferMapAccess mapAccess) {
+		super(buffer);
 
-		this.dataView			= null;
-		this.dataViewRefCount	= 0;
+		this.mapAccess	= mapAccess;
+		this.dataView	= null;
 
 		this.mapAccess.remove(GLBufferAccessBit.MAP_INVALIDATE_RANGE);
 		this.mapAccess.remove(GLBufferAccessBit.MAP_PERSISTENT);
@@ -51,19 +43,20 @@ public class GLMappedBufferLegacy extends AbstractGLMappedBuffer {
 	}
 
 	@Override
-	public void open() {
-		this.dataViewRefCount ++;
-
+	public IDataView<?> open() {
 		if (this.dataView == null) {
-			this.dataView = mapBuffer();
+			this.dataView = mapRangeData(
+					this,
+					this.mapAccess
+			);
 		}
+
+		return this.dataView;
 	}
 
 	@Override
 	public void close() {
-		this.dataViewRefCount --;
-
-		if (this.dataViewRefCount <= 0) {
+		if (this.dataView != null) {
 			this.dataView.close();
 			this.dataView = null;
 		}
@@ -71,21 +64,11 @@ public class GLMappedBufferLegacy extends AbstractGLMappedBuffer {
 
 	@Override
 	public void delete() {
-		if (this.dataViewRefCount > 0) {
-			this.dataViewRefCount = 0;
+		if (this.dataView != null) {
 			this.dataView.close();
+			this.dataView = null;
 		}
 
 		super.delete();
-	}
-
-	@Override
-	public IDataRange flush(IDataRange range) {
-		return range;
-	}
-
-	@Override
-	public IGLBufferDataView<?> getView() {
-		return dataView;
 	}
 }

@@ -17,35 +17,28 @@
  * along with RenderFox.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.argon4w.renderfox.opengl.buffer.object.mapped;
+package com.github.argon4w.renderfox.opengl.buffer.object.mapped.impl;
 
-import com.github.argon4w.renderfox.data.coordinate.IDataRange;
+import com.github.argon4w.renderfox.data.view.IDataView;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
-import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
+import com.github.argon4w.renderfox.opengl.buffer.object.GLBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.IGLBufferDataView;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.IGLMappedBufferInternal;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBufferView;
 
-public class GLMappedBufferPersistent extends AbstractGLMappedBuffer {
+public class GLMappedBufferImplPersistent extends GLBuffer implements IGLMappedBufferImpl {
 
-	private final IGLBufferDataView<?> dataView;
+	protected final GLBufferMapAccess		mapAccess;
+	protected final IGLBufferDataView<?>	dataView;
 
-	public GLMappedBufferPersistent(
-			GLBufferStorageFlag	storageFlag,
-			GLBufferMapAccess	mapAccess,
-			IGLRawBufferView	buffer
-	) {
-		super(
-				storageFlag,
-				mapAccess,
-				buffer
+	public GLMappedBufferImplPersistent(IGLRawBufferView buffer, GLBufferMapAccess mapAccess) {
+		super(buffer);
+
+		this.mapAccess	= mapAccess;
+		this.dataView	= mapRangeData(
+				this,
+				this.mapAccess
 		);
-
-		this.dataView = mapBuffer();
-	}
-
-	@Override
-	public void open() {
-
 	}
 
 	@Override
@@ -54,19 +47,14 @@ public class GLMappedBufferPersistent extends AbstractGLMappedBuffer {
 	}
 
 	@Override
-	public IGLBufferDataView<?> getView() {
-		return dataView;
-	}
-
-	@Override
-	public IDataRange flush(IDataRange range) {
-		return dataView.flush(range);
+	public IDataView<?> open() {
+		return this.dataView;
 	}
 
 	@Override
 	public void delete() {
-		dataView.flush();
-		dataView.close();
+		this.dataView.flush();
+		this.dataView.close();
 
 		super.delete();
 	}

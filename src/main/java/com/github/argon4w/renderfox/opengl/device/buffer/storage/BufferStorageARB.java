@@ -22,9 +22,10 @@ package com.github.argon4w.renderfox.opengl.device.buffer.storage;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
-import com.github.argon4w.renderfox.opengl.buffer.object.mapped.GLMappedBufferLegacy;
-import com.github.argon4w.renderfox.opengl.buffer.object.mapped.GLMappedBufferPersistent;
-import com.github.argon4w.renderfox.opengl.buffer.object.mapped.IGLMappedBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.IGLMappedBufferInternal;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.impl.GLMappedBufferImplLegacy;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.impl.GLMappedBufferImplPersistent;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.impl.IGLMappedBufferImpl;
 import com.github.argon4w.renderfox.opengl.buffer.object.raw.IGLRawBuffer;
 import com.github.argon4w.renderfox.opengl.device.buffer.GLBufferContext;
 
@@ -50,7 +51,7 @@ public class BufferStorageARB extends AbstractBufferStorage {
 	}
 
 	@Override
-	protected IGLMappedBuffer setupMapped(
+	protected IGLMappedBufferImpl setupMapped(
 			long				bufferDataAddress,
 			long				bufferDataOffset,
 			long				bufferDataSize,
@@ -68,15 +69,11 @@ public class BufferStorageARB extends AbstractBufferStorage {
 				storageFlag
 		);
 
-		return new GLMappedBufferLegacy(
-				storageFlag,
-				mapAccess,
-				buffer
-		);
+		return new GLMappedBufferImplLegacy(buffer, mapAccess);
 	}
 
 	@Override
-	protected IGLMappedBuffer setupPersistent(
+	protected IGLMappedBufferImpl setupPersistent(
 			long				bufferDataAddress,
 			long				bufferDataOffset,
 			long				bufferDataSize,
@@ -94,10 +91,6 @@ public class BufferStorageARB extends AbstractBufferStorage {
 				storageFlag
 		);
 
-		return new GLMappedBufferPersistent(
-				storageFlag,
-				mapAccess,
-				buffer
-		);
+		return new GLMappedBufferImplPersistent(buffer, mapAccess);
 	}
 }

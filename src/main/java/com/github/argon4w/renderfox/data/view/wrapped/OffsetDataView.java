@@ -19,6 +19,8 @@
 
 package com.github.argon4w.renderfox.data.view.wrapped;
 
+import com.github.argon4w.renderfox.data.coordinate.DataRange;
+import com.github.argon4w.renderfox.data.coordinate.IDataRange;
 import com.github.argon4w.renderfox.data.view.AbstractDataView;
 import com.github.argon4w.renderfox.data.view.IDataView;
 
@@ -31,6 +33,30 @@ public abstract class OffsetDataView<T extends OffsetDataView<T>> extends Abstra
 
 	protected abstract IDataView<?>	getDataView	();
 	protected abstract long			getOffset	();
+
+	@Override
+	public IDataRange flush() {
+		if (getDataView() == null) {
+			throw new IllegalStateException("DataView cannot be null.");
+		}
+
+		return getDataView().flush(new DataRange(
+				this.getOffset	(),
+				this.limit		()
+		));
+	}
+
+	@Override
+	public IDataRange flush(IDataRange range) {
+		if (getDataView() == null) {
+			throw new IllegalStateException("DataView cannot be null.");
+		}
+
+		return getDataView().flush(new DataRange(
+				getOffset() +	range.getOffset(),
+								range.getLength()
+		));
+	}
 
 	@Override
 	public long address() {

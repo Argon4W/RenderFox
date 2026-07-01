@@ -24,6 +24,9 @@ import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferMapAccess;
 import com.github.argon4w.renderfox.opengl.buffer.function.parameter.flag.GLBufferStorageFlag;
 import com.github.argon4w.renderfox.opengl.buffer.object.GLBufferCreateInfo;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.GLMappedBuffer;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.IGLMappedBufferInternal;
+import com.github.argon4w.renderfox.opengl.buffer.object.mapped.impl.IGLMappedBufferImpl;
 import com.github.argon4w.renderfox.opengl.buffer.object.mutable.GLMutableBuffer;
 import com.github.argon4w.renderfox.opengl.buffer.object.mapped.GLMappedBufferCreateInfo;
 import com.github.argon4w.renderfox.opengl.buffer.object.mapped.IGLMappedBuffer;
@@ -44,7 +47,7 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 		this.bufferContext = bufferContext;
 	}
 
-	protected abstract IGLMappedBuffer setupMapped(
+	protected abstract IGLMappedBufferImpl setupMapped(
 			long				bufferDataAddress,
 			long				bufferDataOffset,
 			long				bufferDataSize,
@@ -53,7 +56,7 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 			GLBufferMapAccess	mapAccess
 	);
 
-	protected IGLMappedBuffer setupPersistent(
+	protected IGLMappedBufferImpl setupPersistent(
 			long				bufferDataAddress,
 			long				bufferDataOffset,
 			long				bufferDataSize,
@@ -61,6 +64,39 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 			GLBufferStorageFlag	storageFlag,
 			GLBufferMapAccess	mapAccess
 	) {
+		return setupMapped(
+				bufferDataAddress,
+				bufferDataOffset,
+				bufferDataSize,
+				bufferType,
+				storageFlag,
+				mapAccess
+		);
+	}
+
+	public IGLMappedBufferImpl createMappedBufferImpl(
+			long				bufferDataAddress,
+			long				bufferDataOffset,
+			long				bufferDataSize,
+			GLBufferType		bufferType,
+			GLBufferStorageFlag	storageFlag,
+			GLBufferMapAccess	mapAccess
+	) {
+		if (mapAccess == null) {
+			throw new IllegalArgumentException("MapAccess cannot be null.");
+		}
+
+		if (mapAccess.isPersistent()) {
+			return setupPersistent(
+					bufferDataAddress,
+					bufferDataOffset,
+					bufferDataSize,
+					bufferType,
+					storageFlag,
+					mapAccess
+			);
+		}
+
 		return setupMapped(
 				bufferDataAddress,
 				bufferDataOffset,
@@ -587,25 +623,14 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 			throw new IllegalArgumentException("MapAccess cannot be empty.");
 		}
 
-		if (mapAccess.isPersistent()) {
-			return setupPersistent(
-					bufferDataAddress,
-					bufferDataOffset,
-					bufferDataSize,
-					bufferType,
-					storageFlag,
-					mapAccess
-			);
-		}
-
-		return setupMapped(
+		return new GLMappedBuffer(createMappedBufferImpl(
 				bufferDataAddress,
 				bufferDataOffset,
 				bufferDataSize,
 				bufferType,
 				storageFlag,
 				mapAccess
-		);
+		));
 	}
 
 	@Override
@@ -777,7 +802,8 @@ public abstract class AbstractBufferStorage implements IBufferStorage {
 			GLBufferMapAccess	mapAccess
 	) {
 		return new GLMutableMappedBuffer(
-				bufferContext,
+				this,
+				this.bufferContext.getResizeMethod(),
 				bufferDataAddress,
 				bufferDataOffset,
 				bufferDataSize,

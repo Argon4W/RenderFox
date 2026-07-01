@@ -20,7 +20,6 @@
 package com.github.argon4w.renderfox.opengl.buffer.object.mutable;
 
 import com.github.argon4w.renderfox.data.coordinate.IDataRange;
-import com.github.argon4w.renderfox.data.size.IMutableSizeObject;
 import com.github.argon4w.renderfox.data.size.IMutableSizeObjectInternal;
 import com.github.argon4w.renderfox.data.size.IResizeMethod;
 import com.github.argon4w.renderfox.opengl.buffer.GLBufferType;
@@ -34,12 +33,10 @@ import org.lwjgl.system.MemoryUtil;
 
 public class GLMutableBuffer extends AbstractGLBuffer implements IGLMutableBuffer, IMutableSizeObjectInternal {
 
-	protected final	GLBufferContext		bufferContext;
-	protected final IResizeMethod		resizeMethod;
-	protected final	GLBufferType		bufferType;
-	protected final	GLBufferStorageFlag	storageFlag;
-	protected		IGLRawBuffer		buffer;
-	protected 		long				bufferSize;
+	protected final	GLBufferContext	bufferContext;
+	protected final	IResizeMethod	resizeMethod;
+	protected		IGLRawBuffer	buffer;
+	protected 		long			bufferSize;
 
 	public GLMutableBuffer(
 			GLBufferContext		bufferContext,
@@ -49,12 +46,10 @@ public class GLMutableBuffer extends AbstractGLBuffer implements IGLMutableBuffe
 			GLBufferType		bufferType,
 			GLBufferStorageFlag	storageFlag
 	) {
-		this.bufferType		= bufferType;
 		this.bufferContext	= bufferContext;
 		this.resizeMethod	= bufferContext.getResizeMethod();
-		this.storageFlag	= storageFlag;
-		this.bufferSize		= bufferLength;
 		this.buffer			= bufferContext.createRawBuffer(bufferType);
+		this.bufferSize		= bufferLength;
 
 		bufferContext.getBufferCreator().setupStorage(
 				this.buffer,
@@ -67,10 +62,6 @@ public class GLMutableBuffer extends AbstractGLBuffer implements IGLMutableBuffe
 
 	@Override
 	public GLBuffer view(IDataRange viewRange) {
-		if (buffer.isDeleted()) {
-			throw new IllegalStateException("The buffer has been deleted.");
-		}
-
 		if (viewRange == null) {
 			throw new IllegalArgumentException("ViewRange cannot be null.");
 		}
@@ -102,14 +93,14 @@ public class GLMutableBuffer extends AbstractGLBuffer implements IGLMutableBuffe
 			return;
 		}
 
-		var newBuffer = this.bufferContext.createRawBuffer(bufferType);
+		var newBuffer = this.bufferContext.createRawBuffer(this.buffer.getBufferType());
 
 		this.bufferContext.getBufferCreator().setupStorage(
 				newBuffer,
 				MemoryUtil.NULL,
 				MemoryUtil.NULL,
 				size + bytes,
-				this.storageFlag
+				this.buffer.getStorageFlag()
 		);
 
 		newBuffer.copyRangeDataFrom(
